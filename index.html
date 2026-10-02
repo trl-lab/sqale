@@ -761,8 +761,8 @@ mark.ep-lit { background: var(--accent-soft); color: var(--fg); box-shadow: 0 0 
       <dd><ul class="links">
         <!-- TODO: arXiv URL -->
         <li><a class="lnk" href="#">Paper</a></li>
-        <li><a class="lnk" href="https://huggingface.co/datasets/trl-lab/sqale2_queries" target="_blank" rel="noopener" title="Questions and SQL on Hugging Face">Queries<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M3 2h5v5M8 2 2 8"/></svg></a></li>
-        <li><a class="lnk" href="https://huggingface.co/datasets/trl-lab/sqale2_schemas" target="_blank" rel="noopener" title="Schemas and databases on Hugging Face">Schemas<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M3 2h5v5M8 2 2 8"/></svg></a></li>
+        <li><a class="lnk" href="https://huggingface.co/datasets/trl-lab/SQaLe-2-text-to-SQL-Queries" target="_blank" rel="noopener" title="Questions and SQL on Hugging Face">Queries<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M3 2h5v5M8 2 2 8"/></svg></a></li>
+        <li><a class="lnk" href="https://huggingface.co/datasets/trl-lab/SQaLe-2-text-to-SQL-Schemas" target="_blank" rel="noopener" title="Schemas and databases on Hugging Face">Schemas<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M3 2h5v5M8 2 2 8"/></svg></a></li>
         <li><a class="lnk" href="https://github.com/trl-lab/SQaLe_2" target="_blank" rel="noopener" title="Code on GitHub">Code<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M3 2h5v5M8 2 2 8"/></svg></a></li>
         <li><a class="lnk" href="https://huggingface.co/trl-lab/qwen3.5-2b-grpo-sqale" target="_blank" rel="noopener" title="Model on Hugging Face">Model<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M3 2h5v5M8 2 2 8"/></svg></a></li>
         <li><a class="lnk" href="#cite">Cite</a></li>
@@ -813,7 +813,7 @@ mark.ep-lit { background: var(--accent-soft); color: var(--fg); box-shadow: 0 0 
 
       <p>Each record pairs a natural-language question with a schema and a gold SQL query that has been run against the populated database. Every question exists in 8 phrasings, the original and seven rewrites in different styles, and all eight share one SQL query. The split into train and test is by schema, 95% / 5%.</p>
 
-      <p>The dataset is published on Hugging Face in two parts that join on <code>schema_id</code>. <a class="m" href="https://huggingface.co/datasets/trl-lab/sqale2_queries" target="_blank" rel="noopener">trl-lab/sqale2_queries</a> holds the questions in all eight phrasings, the gold SQL and its result. <a class="m" href="https://huggingface.co/datasets/trl-lab/sqale2_schemas" target="_blank" rel="noopener">trl-lab/sqale2_schemas</a> holds the DDL and the generated rows of each database.</p>
+      <p>The dataset is published on Hugging Face in two parts that join on <code>schema_id</code>. <a class="m" href="https://huggingface.co/datasets/trl-lab/SQaLe-2-text-to-SQL-Queries" target="_blank" rel="noopener">trl-lab/SQaLe-2-text-to-SQL-Queries</a> holds the questions in all eight phrasings, the gold SQL and its result. <a class="m" href="https://huggingface.co/datasets/trl-lab/SQaLe-2-text-to-SQL-Schemas" target="_blank" rel="noopener">trl-lab/SQaLe-2-text-to-SQL-Schemas</a> holds the DDL and the generated rows of each database.</p>
 
 
       <figure class="fig wide" id="fig-record" aria-labelledby="cap-1">
