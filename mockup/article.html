@@ -895,7 +895,7 @@ mark.ep-lit { background: var(--accent-soft); color: var(--fg); box-shadow: 0 0 
             <div class="chart tr" id="tr-outcome" tabindex="0" role="img" aria-label="Line chart over 1,800 training steps. The share of rollouts that return the gold result rises from 12% to about 45%; invalid rollouts fall from 43% to under 1%; rollouts that execute with a wrong result settle around 55%; parse-only rollouts stay under 11%. Steps after 1,658 were not reported."><div class="tip" id="tr-outcome-tip" hidden role="status"></div></div>
           </div>
         </div>
-        <figcaption id="cap-4"><b>Figure 4.</b> Reward tiers of the rollouts during GRPO training on SQaLe (run 26640986): the query returns the gold result, executes with a different result, only parses, or is invalid. Coloured lines are centred moving averages over 9 reported steps (54 training steps); grey lines show the unsmoothed values. The run trained for 1,800 steps; the reporting tool missed its updates after step 1,658, so the curves end there. Hover over a chart, or focus it and use the arrow keys, for the values at a step. Data: <a href="assets/training/26640986-Outcome-mix.csv" target="_blank" rel="noopener">outcome mix</a> and <a href="assets/training/26640986-Episode-shape.csv" target="_blank" rel="noopener">episode shape</a> (CSV).</figcaption>
+        <figcaption id="cap-4"><b>Figure 4.</b> Reward tiers of the rollouts during GRPO training on SQaLe (run 26640986): the query returns the gold result, executes with a different result, only parses, or is invalid. Coloured lines are centred moving averages over 9 reported steps (54 training steps); grey lines show the unsmoothed values. The moving averages leave out step 1,658, which the export logs twice with diverging values; the grey lines still show it. The run trained for 1,800 steps; the reporting tool missed its updates after step 1,658, so the curves end there. Hover over a chart, or focus it and use the arrow keys, for the values at a step. Data: <a href="assets/training/26640986-Outcome-mix.csv" target="_blank" rel="noopener">outcome mix</a> and <a href="assets/training/26640986-Episode-shape.csv" target="_blank" rel="noopener">episode shape</a> (CSV).</figcaption>
       </figure>
       <p>On the SQaLe test set (Figure&nbsp;5), <span class="m">M<sub>SQaLe</sub></span> reaches 54.7%, which is 30.7 points above the untrained model and 3.6 points behind Qwen3.6-27B. Training on BIRD adds 19.7 points and training on SynSQL 13.3. On BIRD, <span class="m">M<sub>SQaLe</sub></span> reaches 52.3% against 54.7% for <span class="m">M<sub>BIRD</sub></span>, which was trained on BIRD itself. On EHRSQL the two are tied at 23.7%.</p>
 
@@ -1841,6 +1841,7 @@ mark.ep-lit { background: var(--accent-soft); color: var(--fg); box-shadow: 0 0 
   var TRAIN = {
     'tr-outcome': {
       smooth: 9,  /* centred moving average over 9 reported steps (54 training steps) */
+      smoothExclude: [1658],  /* logged twice with diverging values; shown raw only */
       yMax: 0.8, yTicks: [0, 0.2, 0.4, 0.6, 0.8],
       yFmt: function (v) { return Math.round(v * 100) + '%'; },
       tipFmt: function (v) { return fmt(v * 100, 1) + '%'; },
@@ -1895,14 +1896,19 @@ mark.ep-lit { background: var(--accent-soft); color: var(--fg); box-shadow: 0 0 
     var pw = W - m.l - m.r, ph = H - m.t - m.b;
     function X(st) { return m.l + st / T.totalSteps * pw; }
     function Y(v) { return m.t + ph - Math.min(v, cfg.yMax) / cfg.yMax * ph; }
-    function smooth(vals) {  /* centred moving average; the window shrinks at both ends */
+    var excl = cfg.smoothExclude || [];
+    function smooth(vals) {  /* centred moving average; the window shrinks at both ends.
+                                Excluded steps are left out of every window and get null. */
       if (!cfg.smooth) return vals;
       var h = Math.floor(cfg.smooth / 2);
-      return vals.map(function (_, i) {
-        var a = Math.max(0, i - h), b = Math.min(vals.length - 1, i + h), sum = 0;
-        for (var j = a; j <= b; j++) sum += vals[j];
-        return sum / (b - a + 1);
+      var keep = T.steps.map(function (st, i) { return excl.indexOf(st) < 0 ? i : -1; }).filter(function (i) { return i >= 0; });
+      var out = vals.map(function () { return null; });
+      keep.forEach(function (i, k) {
+        var a = Math.max(0, k - h), b = Math.min(keep.length - 1, k + h), sum = 0;
+        for (var j = a; j <= b; j++) sum += vals[keep[j]];
+        out[i] = sum / (b - a + 1);
       });
+      return out;
     }
     var RAW = {}, VAL = {};
     cfg.series.forEach(function (s) { RAW[s.key] = T[s.key]; VAL[s.key] = smooth(T[s.key]); });
@@ -1929,15 +1935,21 @@ mark.ep-lit { background: var(--accent-soft); color: var(--fg); box-shadow: 0 0 
     var at = svg('text', { x: m.l + pw, y: H - 4, 'text-anchor': 'end', class: 'c-axis-title' }, root);
     at.textContent = 'Training step';
 
-    function pathOf(vals) {
-      return T.steps.map(function (st, i) { return (i ? 'L' : 'M') + X(st).toFixed(1) + ',' + Y(vals[i]).toFixed(1); }).join('');
+    function pathOf(vals) {  /* skips null points */
+      var d = '', pen = false;
+      T.steps.forEach(function (st, i) {
+        if (vals[i] == null) { pen = false; return; }
+        d += (pen ? 'L' : 'M') + X(st).toFixed(1) + ',' + Y(vals[i]).toFixed(1); pen = true;
+      });
+      return d;
     }
+    function lastOf(vals) { for (var i = vals.length - 1; i >= 0; i--) if (vals[i] != null) return vals[i]; return 0; }
     if (cfg.smooth) cfg.series.forEach(function (s) { svg('path', { d: pathOf(RAW[s.key]), class: 'tr-line tr-raw' }, root); });
     cfg.series.forEach(function (s) { svg('path', { d: pathOf(VAL[s.key]), class: 'tr-line ' + s.cls }, root); });
 
     var last = T.steps.length - 1;
     if (!narrow) {  /* direct labels beside the not-reported band, nudged apart */
-      var labs = cfg.series.map(function (s) { return { s: s, y: Y(VAL[s.key][last]) }; })
+      var labs = cfg.series.map(function (s) { return { s: s, y: Y(lastOf(VAL[s.key])) }; })
         .sort(function (a, b) { return a.y - b.y; });
       for (var i = 1; i < labs.length; i++) if (labs[i].y - labs[i - 1].y < 15) labs[i].y = labs[i - 1].y + 15;
       var over = labs.length ? labs[labs.length - 1].y - (m.t + ph) : 0;
@@ -1958,13 +1970,16 @@ mark.ep-lit { background: var(--accent-soft); color: var(--fg); box-shadow: 0 0 
       var st = T.steps[idx], x = X(st);
       guide.setAttribute('x1', x); guide.setAttribute('x2', x); guide.setAttribute('visibility', 'visible');
       cfg.series.forEach(function (s, k) {
-        dots[k].setAttribute('cx', x); dots[k].setAttribute('cy', Y(VAL[s.key][idx])); dots[k].setAttribute('visibility', 'visible');
+        var v = VAL[s.key][idx] != null ? VAL[s.key][idx] : RAW[s.key][idx];
+        dots[k].setAttribute('cx', x); dots[k].setAttribute('cy', Y(v)); dots[k].setAttribute('visibility', 'visible');
       });
       tip.textContent = '';
       el('span', { class: 't-name' }, tip, 'Step ' + fmt(st));
+      if (excl.indexOf(st) >= 0) el('span', { class: 't-desc' }, tip, 'left out of the moving average');
       cfg.series.forEach(function (s) {
-        el('span', { class: 't-more' }, tip, s.label + ': ' + cfg.tipFmt(VAL[s.key][idx]) +
-          (cfg.smooth ? ' (raw ' + cfg.tipFmt(RAW[s.key][idx]) + ')' : ''));
+        var sv = VAL[s.key][idx], rv = RAW[s.key][idx];
+        el('span', { class: 't-more' }, tip, s.label + ': ' + (sv == null ? cfg.tipFmt(rv) + ' raw' :
+          cfg.tipFmt(sv) + (cfg.smooth ? ' (raw ' + cfg.tipFmt(rv) + ')' : '')));
       });
       tip.hidden = false;
       var tw = tip.offsetWidth, th = tip.offsetHeight;
