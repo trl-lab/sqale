@@ -1,0 +1,35 @@
+# SQaLe
+
+> SQaLe is a large semi-synthetic text-to-SQL dataset grounded in real-world database schemas: 1,408,056 natural-language questions paired with 176,761 distinct SQL queries over 9,259 populated SQLite databases built from SchemaPile, with a median of 113 tables and 538 columns per schema. It comes from the paper "SQaLe: a large realistic dataset to empower small specialised text-to-SQL models" by Cornelius Wolff, Daniel Gomm and Madelon Hulsebos (University of Amsterdam and Centrum Wiskunde & Informatica, 2026), which also trains Qwen3.5-2B text-to-SQL agents on it with GRPO.
+
+- Every question comes in eight phrasings that share one gold SQL query, at a simple, moderate or hard difficulty.
+- Every gold query was executed on its populated database and accepted by an LLM judge.
+- The data is split by schema into train (8,836 databases, 169,277 question records) and test (423 databases, 8,100 question records).
+- The questions and the databases are two Hugging Face datasets that join on `schema_id`. Both are MIT licensed.
+
+## Project page
+
+- [SQaLe project page in Markdown](https://trl-lab.github.io/sqale/index.md): the full text of https://trl-lab.github.io/sqale/, with every figure given as a table
+- [Using SQaLe](https://trl-lab.github.io/sqale/reference.md): dataset fields, loading the data, running the models, known issues
+- [Everything in one file](https://trl-lab.github.io/sqale/llms-full.txt): the project page and the reference together
+
+## Datasets
+
+- [trl-lab/SQaLe-2-text-to-SQL-Queries](https://huggingface.co/datasets/trl-lab/SQaLe-2-text-to-SQL-Queries): 177,377 question records with eight phrasings, gold SQL, difficulty and the gold query's result ([dataset card in Markdown](https://huggingface.co/datasets/trl-lab/SQaLe-2-text-to-SQL-Queries/raw/main/README.md))
+- [trl-lab/SQaLe-2-text-to-SQL-Schemas](https://huggingface.co/datasets/trl-lab/SQaLe-2-text-to-SQL-Schemas): 9,259 databases, each with its DDL and generated table rows ([dataset card in Markdown](https://huggingface.co/datasets/trl-lab/SQaLe-2-text-to-SQL-Schemas/raw/main/README.md))
+
+## Models
+
+- [trl-lab/qwen3.5-2b-grpo-sqale](https://huggingface.co/trl-lab/qwen3.5-2b-grpo-sqale): M_SQaLe, Qwen3.5-2B trained with GRPO on SQaLe ([model card in Markdown](https://huggingface.co/trl-lab/qwen3.5-2b-grpo-sqale/raw/main/README.md))
+- [trl-lab/qwen3.5-2b-grpo-bird](https://huggingface.co/trl-lab/qwen3.5-2b-grpo-bird): M_BIRD, the same recipe trained on BIRD train ([model card in Markdown](https://huggingface.co/trl-lab/qwen3.5-2b-grpo-bird/raw/main/README.md))
+- [trl-lab/qwen3.5-2b-grpo-synsql](https://huggingface.co/trl-lab/qwen3.5-2b-grpo-synsql): M_SynSQL, the same recipe trained on SynSQL-2.5M ([model card in Markdown](https://huggingface.co/trl-lab/qwen3.5-2b-grpo-synsql/raw/main/README.md))
+
+## Code
+
+- [SQaLe Python library](https://pypi.org/project/SQaLe/): loads the questions and writes the databases as SQLite files ([source on GitHub](https://github.com/trl-lab/SQaLe-Library))
+
+## Optional
+
+- [Earlier workshop paper](https://arxiv.org/abs/2602.22223): SQaLe: A Large Text-to-SQL Corpus Grounded in Real Schemas (AI for Tabular Data workshop at EurIPS 2025)
+- [SchemaPile](https://huggingface.co/datasets/trl-lab/schemapile): the collection of real-world database schemas SQaLe is built from
+- [SchemaPile with domain descriptions](https://huggingface.co/datasets/trl-lab/schemapile_annotated): the per-repository domain descriptions used to generate table values

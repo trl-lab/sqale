@@ -60,20 +60,22 @@ window.SQALE = {
     { name: "SQaLe",              sql: 176761,  nl: 1408056, func: 13.6, where: 82.1, join: 55.4, nested: 23.4, agg: 43.0 }
   ],
 
-  // tab:corpus-matrix: execution accuracy (%), Qwen3.5-2B + GRPO on one corpus each
+  // tab:corpus-matrix (iclr2027_conference.tex): execution accuracy (%), 300 questions per benchmark,
+  // schema withheld, SQaLe test over the full schema; Qwen3.5-2B + GRPO on one corpus each
   matrix: [
-    { model: "M_SQaLe",     kind: "ours",     sqale: 54.7, bird: 52.3, ehrsql: 23.7 },
-    { model: "M_BIRD",      kind: "trained",  sqale: 43.7, bird: 54.7, ehrsql: 23.7 },
-    { model: "M_SynSQL",    kind: "trained",  sqale: 37.3, bird: 44.3, ehrsql: 13.3 },
-    { model: "Qwen3.5-2B",  kind: "base",     sqale: 24.0, bird: 19.3, ehrsql: 8.2 },
-    { model: "Qwen3.6-27B", kind: "base",     sqale: 58.3, bird: 69.3, ehrsql: null }
+    { model: "M_SQaLe",     kind: "ours",     sqale: 66.3, bird: 52.3, ehrsql: 23.7 },
+    { model: "M_BIRD",      kind: "trained",  sqale: 54.0, bird: 54.7, ehrsql: 23.7 },
+    { model: "M_SynSQL",    kind: "trained",  sqale: 50.7, bird: 44.3, ehrsql: 13.3 },
+    { model: "Qwen3.5-2B",  kind: "base",     sqale: 38.7, bird: 19.3, ehrsql: 8.2 },
+    { model: "Qwen3.6-27B", kind: "base",     sqale: 76.0, bird: 69.3, ehrsql: 55.0 }
   ],
 
-  // tab:scale-domain (a): accuracy % and (share of gold tables inspected %)
+  // tab:scale-domain (a) (iclr2027_conference.tex): accuracy % and (share of episodes that opened every gold table %),
+  // 300 SQaLe test questions, schema withheld
   scale: [
-    { level: "Gold tables only",        sqale: [50.0, 93.5], bird: [39.8, 94.4], synsql: [30.6, 98.1] },
-    { level: "+32 distractor tables",   sqale: [46.3, 82.4], bird: [34.3, 82.4], synsql: [30.6, 85.2] },
-    { level: "Full schema",             sqale: [38.9, 71.3], bird: [32.4, 56.5], synsql: [25.0, 60.2] }
+    { level: "Gold tables only",        sqale: [72.7, 95.3], bird: [64.7, 98.7], synsql: [59.3, 98.3] },
+    { level: "+32 distractor tables",   sqale: [68.0, 96.7], bird: [61.0, 90.7], synsql: [52.3, 92.7] },
+    { level: "Full schema",             sqale: [66.3, 89.7], bird: [54.0, 85.0], synsql: [50.7, 83.3] }
   ],
 
   // tab:scale-domain (b): not significant at this n (CIs on the gap cross zero)
@@ -82,10 +84,11 @@ window.SQALE = {
     { split: "Outside BIRD's domains", sqale: 46.4, bird: 36.5 }
   ],
 
-  // share of string literals the answer depends on that the model saw before submitting
+  // app:value-grounding (iclr2027_conference.tex): share of the string literals the gold answer depends on
+  // that the model saw in a tool result before submitting
   literalsSeen: [
-    { model: "M_SQaLe", pct: 75 }, { model: "M_SynSQL", pct: 45 },
-    { model: "M_BIRD", pct: 36 },  { model: "Qwen3.5-2B", pct: 25 }
+    { model: "M_SQaLe", pct: 88 }, { model: "M_SynSQL", pct: 55 },
+    { model: "M_BIRD", pct: 40 },  { model: "Qwen3.5-2B", pct: 35 }
   ],
 
   // fig:size-accuracy-curve. params in B (total for MoE), acc = output-match rate, tflops per question

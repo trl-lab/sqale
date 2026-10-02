@@ -3,8 +3,544 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>SQaLe · text-to-SQL dataset</title>
-<meta name="description" content="SQaLe is a semi-synthetic text-to-SQL dataset of 1,408,056 questions paired with SQL over 9,259 real-world schemas. A Qwen3.5-2B model trained on it with GRPO rises from 24.0% to 54.7% execution accuracy.">
+<title>SQaLe: a large realistic dataset for small text-to-SQL models</title>
+<meta name="description" content="SQaLe is a semi-synthetic text-to-SQL dataset of 1,408,056 questions paired with SQL over 9,259 real-world schemas. A Qwen3.5-2B model trained on it with GRPO rises from 38.7% to 66.3% execution accuracy on the SQaLe test set.">
+<link rel="canonical" href="https://trl-lab.github.io/sqale/">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+<meta name="author" content="Cornelius Wolff, Daniel Gomm, Madelon Hulsebos">
+<meta name="theme-color" content="#107250">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<!-- Plain-text versions for LLMs and other readers that do not run JavaScript -->
+<link rel="alternate" type="text/markdown" href="https://trl-lab.github.io/sqale/index.md" title="SQaLe project page (Markdown)">
+<link rel="alternate" type="text/plain" href="https://trl-lab.github.io/sqale/llms.txt" title="llms.txt">
+<!-- Social previews -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="SQaLe">
+<meta property="og:title" content="SQaLe: a large realistic dataset for small text-to-SQL models">
+<meta property="og:description" content="1,408,056 natural-language questions paired with SQL over 9,259 populated real-world schemas, and 2B text-to-SQL agents trained on it with GRPO.">
+<meta property="og:url" content="https://trl-lab.github.io/sqale/">
+<meta property="og:image" content="https://trl-lab.github.io/sqale/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SQaLe: a large realistic dataset to empower small specialised text-to-SQL models. 1,408,056 questions with SQL, 9,259 real-world schemas, 113 median tables per schema.">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="SQaLe: a large realistic dataset for small text-to-SQL models">
+<meta name="twitter:description" content="1,408,056 natural-language questions paired with SQL over 9,259 populated real-world schemas, and 2B text-to-SQL agents trained on it with GRPO.">
+<meta name="twitter:image" content="https://trl-lab.github.io/sqale/assets/og-image.png">
+<meta name="twitter:image:alt" content="SQaLe: a large realistic dataset to empower small specialised text-to-SQL models. 1,408,056 questions with SQL, 9,259 real-world schemas, 113 median tables per schema.">
+<!-- Citation metadata (Google Scholar, Zotero) -->
+<meta name="citation_title" content="SQaLe: A Large Realistic Dataset to Empower Small Specialised Text-to-SQL Models">
+<meta name="citation_author" content="Wolff, Cornelius">
+<meta name="citation_author" content="Gomm, Daniel">
+<meta name="citation_author" content="Hulsebos, Madelon">
+<meta name="citation_publication_date" content="2026">
+<!-- Structured data: the paper, the two datasets (Google Dataset Search) and the library -->
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "WebPage",
+   "@id": "https://trl-lab.github.io/sqale/#webpage",
+   "url": "https://trl-lab.github.io/sqale/",
+   "name": "SQaLe: a large realistic dataset for small text-to-SQL models",
+   "inLanguage": "en",
+   "description": "1,408,056 natural-language questions paired with SQL over 9,259 populated real-world schemas, and 2B text-to-SQL agents trained on it with GRPO.",
+   "primaryImageOfPage": "https://trl-lab.github.io/sqale/assets/og-image.png",
+   "mainEntity": {
+    "@id": "https://trl-lab.github.io/sqale/#paper"
+   },
+   "about": [
+    {
+     "@id": "https://trl-lab.github.io/sqale/#queries"
+    },
+    {
+     "@id": "https://trl-lab.github.io/sqale/#schemas"
+    }
+   ]
+  },
+  {
+   "@type": "ScholarlyArticle",
+   "@id": "https://trl-lab.github.io/sqale/#paper",
+   "headline": "SQaLe: A Large Realistic Dataset to Empower Small Specialised Text-to-SQL Models",
+   "name": "SQaLe: A Large Realistic Dataset to Empower Small Specialised Text-to-SQL Models",
+   "author": [
+    {
+     "@type": "Person",
+     "name": "Cornelius Wolff",
+     "affiliation": [
+      {
+       "@type": "Organization",
+       "name": "University of Amsterdam",
+       "url": "https://www.uva.nl"
+      },
+      {
+       "@type": "Organization",
+       "name": "Centrum Wiskunde & Informatica",
+       "url": "https://www.cwi.nl"
+      }
+     ]
+    },
+    {
+     "@type": "Person",
+     "name": "Daniel Gomm",
+     "affiliation": [
+      {
+       "@type": "Organization",
+       "name": "University of Amsterdam",
+       "url": "https://www.uva.nl"
+      },
+      {
+       "@type": "Organization",
+       "name": "Centrum Wiskunde & Informatica",
+       "url": "https://www.cwi.nl"
+      }
+     ]
+    },
+    {
+     "@type": "Person",
+     "name": "Madelon Hulsebos",
+     "affiliation": [
+      {
+       "@type": "Organization",
+       "name": "Centrum Wiskunde & Informatica",
+       "url": "https://www.cwi.nl"
+      }
+     ]
+    }
+   ],
+   "datePublished": "2026",
+   "inLanguage": "en",
+   "url": "https://trl-lab.github.io/sqale/",
+   "keywords": [
+    "text-to-SQL",
+    "NL2SQL",
+    "SQL",
+    "SQLite",
+    "database schemas",
+    "schema linking",
+    "semi-synthetic data",
+    "small language models",
+    "reinforcement learning",
+    "GRPO",
+    "SchemaPile"
+   ],
+   "abstract": "SQaLe is a semi-synthetic text-to-SQL dataset built on 9,259 real-world schemas from SchemaPile. A generation pipeline extends each schema, fills it with synthetic rows, generates questions and answers them with an agent, and validates every stage by execution. The result is 1,408,056 natural-language questions paired with SQL over schemas far larger than in any existing dataset. Qwen3.5-2B trained on SQaLe with GRPO alone learns to explore the database: it finds the relevant tables in large schemas and reads the values its answer needs.",
+   "about": [
+    {
+     "@id": "https://trl-lab.github.io/sqale/#queries"
+    },
+    {
+     "@id": "https://trl-lab.github.io/sqale/#schemas"
+    }
+   ],
+   "isBasedOn": {
+    "@type": "ScholarlyArticle",
+    "name": "SQaLe: A Large Text-to-SQL Corpus Grounded in Real Schemas",
+    "url": "https://arxiv.org/abs/2602.22223"
+   }
+  },
+  {
+   "creator": [
+    {
+     "@type": "Person",
+     "name": "Cornelius Wolff",
+     "affiliation": [
+      {
+       "@type": "Organization",
+       "name": "University of Amsterdam",
+       "url": "https://www.uva.nl"
+      },
+      {
+       "@type": "Organization",
+       "name": "Centrum Wiskunde & Informatica",
+       "url": "https://www.cwi.nl"
+      }
+     ]
+    },
+    {
+     "@type": "Person",
+     "name": "Daniel Gomm",
+     "affiliation": [
+      {
+       "@type": "Organization",
+       "name": "University of Amsterdam",
+       "url": "https://www.uva.nl"
+      },
+      {
+       "@type": "Organization",
+       "name": "Centrum Wiskunde & Informatica",
+       "url": "https://www.cwi.nl"
+      }
+     ]
+    },
+    {
+     "@type": "Person",
+     "name": "Madelon Hulsebos",
+     "affiliation": [
+      {
+       "@type": "Organization",
+       "name": "Centrum Wiskunde & Informatica",
+       "url": "https://www.cwi.nl"
+      }
+     ]
+    }
+   ],
+   "publisher": {
+    "@type": "Organization",
+    "name": "TRL Lab",
+    "url": "https://trl-lab.github.io/"
+   },
+   "license": "https://opensource.org/licenses/MIT",
+   "isAccessibleForFree": true,
+   "inLanguage": "en",
+   "keywords": [
+    "text-to-SQL",
+    "NL2SQL",
+    "SQL",
+    "SQLite",
+    "database schemas",
+    "schema linking",
+    "semi-synthetic data",
+    "small language models",
+    "reinforcement learning",
+    "GRPO",
+    "SchemaPile"
+   ],
+   "isBasedOn": {
+    "@type": "Dataset",
+    "name": "SchemaPile",
+    "url": "https://huggingface.co/datasets/trl-lab/schemapile"
+   },
+   "citation": {
+    "@id": "https://trl-lab.github.io/sqale/#paper"
+   },
+   "@type": "Dataset",
+   "@id": "https://trl-lab.github.io/sqale/#queries",
+   "name": "SQaLe text-to-SQL questions and SQL",
+   "alternateName": "trl-lab/SQaLe-2-text-to-SQL-Queries",
+   "url": "https://huggingface.co/datasets/trl-lab/SQaLe-2-text-to-SQL-Queries",
+   "sameAs": "https://huggingface.co/datasets/trl-lab/SQaLe-2-text-to-SQL-Queries",
+   "description": "The questions of SQaLe, a large semi-synthetic text-to-SQL dataset grounded in real-world database schemas: 177,377 question records with 176,761 distinct SQLite queries over 9,259 populated databases. Each record holds the question in eight phrasings (1,408,056 in total), the gold SQL, a simple, moderate or hard difficulty label, the tables of the subschema it was generated from and the first rows of the gold query's result. The split into train (169,277) and test (8,100) is by schema. The databases themselves are in trl-lab/SQaLe-2-text-to-SQL-Schemas, joined on schema_id.",
+   "variableMeasured": [
+    {
+     "@type": "PropertyValue",
+     "name": "question_id",
+     "description": "unique question identifier"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "schema_id",
+     "description": "the database the question is asked over"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "sql",
+     "description": "the gold SQLite query"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "difficulty",
+     "description": "simple, moderate or hard"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "questions",
+     "description": "the question in eight phrasings: verbose, evidence_supported, structured, requirements_list, short_ambiguous, short_high_level, casual, spelling_grammar_mistakes"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "relevant_tables",
+     "description": "tables of the subschema the question was generated from"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "number_of_relevant_tables",
+     "description": "number of relevant tables"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "execution_result",
+     "description": "up to the first 50 result rows of the gold query"
+    }
+   ],
+   "distribution": [
+    {
+     "@type": "DataDownload",
+     "name": "test-00000-of-00001.parquet",
+     "encodingFormat": "application/vnd.apache.parquet",
+     "contentUrl": "https://huggingface.co/datasets/trl-lab/SQaLe-2-text-to-SQL-Queries/resolve/main/data/test-00000-of-00001.parquet",
+     "contentSize": "13.0 MB"
+    },
+    {
+     "@type": "DataDownload",
+     "name": "train-00000-of-00001.parquet",
+     "encodingFormat": "application/vnd.apache.parquet",
+     "contentUrl": "https://huggingface.co/datasets/trl-lab/SQaLe-2-text-to-SQL-Queries/resolve/main/data/train-00000-of-00001.parquet",
+     "contentSize": "277.7 MB"
+    }
+   ]
+  },
+  {
+   "creator": [
+    {
+     "@type": "Person",
+     "name": "Cornelius Wolff",
+     "affiliation": [
+      {
+       "@type": "Organization",
+       "name": "University of Amsterdam",
+       "url": "https://www.uva.nl"
+      },
+      {
+       "@type": "Organization",
+       "name": "Centrum Wiskunde & Informatica",
+       "url": "https://www.cwi.nl"
+      }
+     ]
+    },
+    {
+     "@type": "Person",
+     "name": "Daniel Gomm",
+     "affiliation": [
+      {
+       "@type": "Organization",
+       "name": "University of Amsterdam",
+       "url": "https://www.uva.nl"
+      },
+      {
+       "@type": "Organization",
+       "name": "Centrum Wiskunde & Informatica",
+       "url": "https://www.cwi.nl"
+      }
+     ]
+    },
+    {
+     "@type": "Person",
+     "name": "Madelon Hulsebos",
+     "affiliation": [
+      {
+       "@type": "Organization",
+       "name": "Centrum Wiskunde & Informatica",
+       "url": "https://www.cwi.nl"
+      }
+     ]
+    }
+   ],
+   "publisher": {
+    "@type": "Organization",
+    "name": "TRL Lab",
+    "url": "https://trl-lab.github.io/"
+   },
+   "license": "https://opensource.org/licenses/MIT",
+   "isAccessibleForFree": true,
+   "inLanguage": "en",
+   "keywords": [
+    "text-to-SQL",
+    "NL2SQL",
+    "SQL",
+    "SQLite",
+    "database schemas",
+    "schema linking",
+    "semi-synthetic data",
+    "small language models",
+    "reinforcement learning",
+    "GRPO",
+    "SchemaPile"
+   ],
+   "isBasedOn": {
+    "@type": "Dataset",
+    "name": "SchemaPile",
+    "url": "https://huggingface.co/datasets/trl-lab/schemapile"
+   },
+   "citation": {
+    "@id": "https://trl-lab.github.io/sqale/#paper"
+   },
+   "@type": "Dataset",
+   "@id": "https://trl-lab.github.io/sqale/#schemas",
+   "name": "SQaLe text-to-SQL schemas and databases",
+   "alternateName": "trl-lab/SQaLe-2-text-to-SQL-Schemas",
+   "url": "https://huggingface.co/datasets/trl-lab/SQaLe-2-text-to-SQL-Schemas",
+   "sameAs": "https://huggingface.co/datasets/trl-lab/SQaLe-2-text-to-SQL-Schemas",
+   "description": "The 9,259 populated SQLite databases of SQaLe, a large semi-synthetic text-to-SQL dataset. Each row holds a database's DDL, extended from a real-world schema in SchemaPile, and the generated rows of its tables as JSON. Together the databases hold 1,103,669 tables with a median of 113 tables and 538 columns per schema, 1,196,078 foreign-key relations and 108,708,694 rows. The split into train (8,836) and test (423) is by schema. The questions are in trl-lab/SQaLe-2-text-to-SQL-Queries, joined on schema_id.",
+   "variableMeasured": [
+    {
+     "@type": "PropertyValue",
+     "name": "schema_id",
+     "description": "join key into the questions dataset"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "full_schema",
+     "description": "the DDL: every CREATE TABLE statement of the database"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "schema_content",
+     "description": "JSON object mapping each populated table to a list of row objects"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "number_of_tables",
+     "description": "number of CREATE TABLE statements"
+    }
+   ],
+   "distribution": [
+    {
+     "@type": "DataDownload",
+     "name": "test-00000-of-00001.parquet",
+     "encodingFormat": "application/vnd.apache.parquet",
+     "contentUrl": "https://huggingface.co/datasets/trl-lab/SQaLe-2-text-to-SQL-Schemas/resolve/main/data/test-00000-of-00001.parquet",
+     "contentSize": "178.3 MB"
+    },
+    {
+     "@type": "DataDownload",
+     "name": "train-00000-of-00016.parquet",
+     "encodingFormat": "application/vnd.apache.parquet",
+     "contentUrl": "https://huggingface.co/datasets/trl-lab/SQaLe-2-text-to-SQL-Schemas/resolve/main/data/train-00000-of-00016.parquet",
+     "contentSize": "251.1 MB"
+    },
+    {
+     "@type": "DataDownload",
+     "name": "train-00001-of-00016.parquet",
+     "encodingFormat": "application/vnd.apache.parquet",
+     "contentUrl": "https://huggingface.co/datasets/trl-lab/SQaLe-2-text-to-SQL-Schemas/resolve/main/data/train-00001-of-00016.parquet",
+     "contentSize": "259.6 MB"
+    },
+    {
+     "@type": "DataDownload",
+     "name": "train-00002-of-00016.parquet",
+     "encodingFormat": "application/vnd.apache.parquet",
+     "contentUrl": "https://huggingface.co/datasets/trl-lab/SQaLe-2-text-to-SQL-Schemas/resolve/main/data/train-00002-of-00016.parquet",
+     "contentSize": "254.5 MB"
+    },
+    {
+     "@type": "DataDownload",
+     "name": "train-00003-of-00016.parquet",
+     "encodingFormat": "application/vnd.apache.parquet",
+     "contentUrl": "https://huggingface.co/datasets/trl-lab/SQaLe-2-text-to-SQL-Schemas/resolve/main/data/train-00003-of-00016.parquet",
+     "contentSize": "254.4 MB"
+    },
+    {
+     "@type": "DataDownload",
+     "name": "train-00004-of-00016.parquet",
+     "encodingFormat": "application/vnd.apache.parquet",
+     "contentUrl": "https://huggingface.co/datasets/trl-lab/SQaLe-2-text-to-SQL-Schemas/resolve/main/data/train-00004-of-00016.parquet",
+     "contentSize": "245.9 MB"
+    },
+    {
+     "@type": "DataDownload",
+     "name": "train-00005-of-00016.parquet",
+     "encodingFormat": "application/vnd.apache.parquet",
+     "contentUrl": "https://huggingface.co/datasets/trl-lab/SQaLe-2-text-to-SQL-Schemas/resolve/main/data/train-00005-of-00016.parquet",
+     "contentSize": "257.3 MB"
+    },
+    {
+     "@type": "DataDownload",
+     "name": "train-00006-of-00016.parquet",
+     "encodingFormat": "application/vnd.apache.parquet",
+     "contentUrl": "https://huggingface.co/datasets/trl-lab/SQaLe-2-text-to-SQL-Schemas/resolve/main/data/train-00006-of-00016.parquet",
+     "contentSize": "257.3 MB"
+    },
+    {
+     "@type": "DataDownload",
+     "name": "train-00007-of-00016.parquet",
+     "encodingFormat": "application/vnd.apache.parquet",
+     "contentUrl": "https://huggingface.co/datasets/trl-lab/SQaLe-2-text-to-SQL-Schemas/resolve/main/data/train-00007-of-00016.parquet",
+     "contentSize": "253.6 MB"
+    },
+    {
+     "@type": "DataDownload",
+     "name": "train-00008-of-00016.parquet",
+     "encodingFormat": "application/vnd.apache.parquet",
+     "contentUrl": "https://huggingface.co/datasets/trl-lab/SQaLe-2-text-to-SQL-Schemas/resolve/main/data/train-00008-of-00016.parquet",
+     "contentSize": "223.2 MB"
+    },
+    {
+     "@type": "DataDownload",
+     "name": "train-00009-of-00016.parquet",
+     "encodingFormat": "application/vnd.apache.parquet",
+     "contentUrl": "https://huggingface.co/datasets/trl-lab/SQaLe-2-text-to-SQL-Schemas/resolve/main/data/train-00009-of-00016.parquet",
+     "contentSize": "220.3 MB"
+    },
+    {
+     "@type": "DataDownload",
+     "name": "train-00010-of-00016.parquet",
+     "encodingFormat": "application/vnd.apache.parquet",
+     "contentUrl": "https://huggingface.co/datasets/trl-lab/SQaLe-2-text-to-SQL-Schemas/resolve/main/data/train-00010-of-00016.parquet",
+     "contentSize": "224.4 MB"
+    },
+    {
+     "@type": "DataDownload",
+     "name": "train-00011-of-00016.parquet",
+     "encodingFormat": "application/vnd.apache.parquet",
+     "contentUrl": "https://huggingface.co/datasets/trl-lab/SQaLe-2-text-to-SQL-Schemas/resolve/main/data/train-00011-of-00016.parquet",
+     "contentSize": "213.1 MB"
+    },
+    {
+     "@type": "DataDownload",
+     "name": "train-00012-of-00016.parquet",
+     "encodingFormat": "application/vnd.apache.parquet",
+     "contentUrl": "https://huggingface.co/datasets/trl-lab/SQaLe-2-text-to-SQL-Schemas/resolve/main/data/train-00012-of-00016.parquet",
+     "contentSize": "225.0 MB"
+    },
+    {
+     "@type": "DataDownload",
+     "name": "train-00013-of-00016.parquet",
+     "encodingFormat": "application/vnd.apache.parquet",
+     "contentUrl": "https://huggingface.co/datasets/trl-lab/SQaLe-2-text-to-SQL-Schemas/resolve/main/data/train-00013-of-00016.parquet",
+     "contentSize": "240.2 MB"
+    },
+    {
+     "@type": "DataDownload",
+     "name": "train-00014-of-00016.parquet",
+     "encodingFormat": "application/vnd.apache.parquet",
+     "contentUrl": "https://huggingface.co/datasets/trl-lab/SQaLe-2-text-to-SQL-Schemas/resolve/main/data/train-00014-of-00016.parquet",
+     "contentSize": "236.2 MB"
+    },
+    {
+     "@type": "DataDownload",
+     "name": "train-00015-of-00016.parquet",
+     "encodingFormat": "application/vnd.apache.parquet",
+     "contentUrl": "https://huggingface.co/datasets/trl-lab/SQaLe-2-text-to-SQL-Schemas/resolve/main/data/train-00015-of-00016.parquet",
+     "contentSize": "230.7 MB"
+    }
+   ]
+  },
+  {
+   "@type": "SoftwareSourceCode",
+   "@id": "https://trl-lab.github.io/sqale/#library",
+   "name": "SQaLe Python library",
+   "description": "Loads the SQaLe questions and writes the SQaLe databases as populated SQLite files.",
+   "codeRepository": "https://github.com/trl-lab/SQaLe-Library",
+   "url": "https://pypi.org/project/SQaLe/",
+   "programmingLanguage": "Python",
+   "license": "https://opensource.org/licenses/MIT",
+   "author": [
+    {
+     "@type": "Person",
+     "name": "Cornelius Wolff",
+     "affiliation": [
+      {
+       "@type": "Organization",
+       "name": "University of Amsterdam",
+       "url": "https://www.uva.nl"
+      },
+      {
+       "@type": "Organization",
+       "name": "Centrum Wiskunde & Informatica",
+       "url": "https://www.cwi.nl"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..700;1,6..72,300..700&family=Hanken+Grotesk:wght@400..700&family=JetBrains+Mono:wght@400..600&display=swap">
@@ -789,9 +1325,11 @@ mark.ep-lit { background: var(--accent-soft); color: var(--fg); box-shadow: 0 0 
 
   <main class="article" id="article">
 
+    <noscript><p>This page draws its figures and tables with JavaScript. The full text, with every figure as a table, is also available as <a href="index.md">Markdown</a> and in <a href="llms-full.txt">llms-full.txt</a>.</p></noscript>
+
     <section class="sec" id="abstract" aria-labelledby="h-abstract">
       <h2 class="label kicker" id="h-abstract">Abstract</h2>
-      <p class="lede">Frontier language models in agentic pipelines lead text-to-SQL benchmarks, at a high inference cost. Small specialised models would avoid that cost, but training them needs data that reflects the scale, semantics and structure of real databases. SQaLe is a semi-synthetic text-to-SQL dataset built on 9,259 real-world schemas from SchemaPile. Our generation pipeline extends each schema, fills it with synthetic rows, generates questions and answers them with an agent, and validates every stage by execution. The result is 1,408,056 natural-language questions paired with SQL, over schemas far larger than in any existing dataset. We train Qwen3.5-2B on SQaLe with GRPO alone, and its execution accuracy on the SQaLe test set rises from 24.0% to 54.7%. The model learns to explore the database: it finds the relevant tables in large schemas and reads the values its answer needs, which training on existing datasets elicits far less.</p>
+      <p class="lede">Frontier language models in agentic pipelines lead text-to-SQL benchmarks, at a high inference cost. Small specialised models would avoid that cost, but training them needs data that reflects the scale, semantics and structure of real databases. SQaLe is a semi-synthetic text-to-SQL dataset built on 9,259 real-world schemas from SchemaPile. Our generation pipeline extends each schema, fills it with synthetic rows, generates questions and answers them with an agent, and validates every stage by execution. The result is 1,408,056 natural-language questions paired with SQL, over schemas far larger than in any existing dataset. We train Qwen3.5-2B on SQaLe with GRPO alone, and its execution accuracy on the SQaLe test set rises from 38.7% to 66.3%. The model learns to explore the database: it finds the relevant tables in large schemas and reads the values its answer needs, which training on existing datasets elicits far less.</p>
     </section>
 
     <section class="sec" id="why" aria-labelledby="h-why">
@@ -885,7 +1423,7 @@ mark.ep-lit { background: var(--accent-soft); color: var(--fg); box-shadow: 0 0 
       </figure>
 
       <h3>Training on SQaLe</h3>
-      <p>To isolate the effect of the data, we train Qwen3.5-2B with GRPO directly from the base checkpoint three times, once each on SQaLe, SynSQL-2.5M and BIRD train. We call the results <span class="m">M<sub>SQaLe</sub></span> (Qwen3.5-2B trained with GRPO on SQaLe), <span class="m">M<sub>SynSQL</sub></span> and <span class="m">M<sub>BIRD</sub></span>. Base model, environment, tools, reward, steps, batch size and evaluation are identical. There are no distilled traces, no teacher and no test-time scaffolding.<sup class="sn-ref"><a href="#sn-2" id="snr-2" aria-label="Note 2">2</a></sup></p>
+      <p>To isolate the effect of the data, we train Qwen3.5-2B with GRPO directly from the base checkpoint three times, once each on SQaLe, SynSQL-2.5M and BIRD train. We call the results <span class="m">M<sub>SQaLe</sub></span> (Qwen3.5-2B trained with GRPO on SQaLe), <span class="m">M<sub>SynSQL</sub></span> and <span class="m">M<sub>BIRD</sub></span>. Apart from the training data and the strength of a length curriculum, the base model, environment, tools, reward, steps, batch size and evaluation are identical. There are no distilled traces, no teacher and no test-time scaffolding.<sup class="sn-ref"><a href="#sn-2" id="snr-2" aria-label="Note 2">2</a></sup></p>
 
       <p>Figure&nbsp;4 shows how the outcome of the rollouts changes during training. Over the first 30 steps, 43% of rollouts end without a query that parses and 12% return the gold result. Over the last 200 reported steps, under 1% are invalid and 45% return the gold result.</p>
 
@@ -900,7 +1438,7 @@ mark.ep-lit { background: var(--accent-soft); color: var(--fg); box-shadow: 0 0 
         </div>
         <figcaption id="cap-4"><b>Figure 4.</b> Reward tiers of the rollouts during GRPO training on SQaLe (run 26640986): the query returns the gold result, executes with a different result, only parses, or is invalid. Coloured lines are centred moving averages over 9 reported steps (54 training steps); grey lines show the unsmoothed values. The moving averages leave out step 1,658, which the export logs twice with diverging values; the grey lines still show it. The run trained for 1,800 steps; the reporting tool missed its updates after step 1,658, so the curves end there. Hover over a chart, or focus it and use the arrow keys, for the values at a step. Data: <a href="assets/training/26640986-Outcome-mix.csv" target="_blank" rel="noopener">outcome mix</a> and <a href="assets/training/26640986-Episode-shape.csv" target="_blank" rel="noopener">episode shape</a> (CSV).</figcaption>
       </figure>
-      <p>On the SQaLe test set (Figure&nbsp;5), <span class="m">M<sub>SQaLe</sub></span> reaches 54.7%, which is 30.7 points above the untrained model and 3.6 points behind Qwen3.6-27B. Training on BIRD adds 19.7 points and training on SynSQL 13.3. On BIRD, <span class="m">M<sub>SQaLe</sub></span> reaches 52.3% against 54.7% for <span class="m">M<sub>BIRD</sub></span>, which was trained on BIRD itself. On EHRSQL the two are tied at 23.7%.</p>
+      <p>On the SQaLe test set (Figure&nbsp;5), <span class="m">M<sub>SQaLe</sub></span> reaches 66.3%, which is 27.6 points above the untrained model and 9.7 points behind Qwen3.6-27B. Training on BIRD adds 15.3 points and training on SynSQL 12.0. On BIRD, <span class="m">M<sub>SQaLe</sub></span> reaches 52.3% against 54.7% for <span class="m">M<sub>BIRD</sub></span>, which was trained on BIRD itself. On EHRSQL the two are tied at 23.7%.</p>
 
       <figure class="fig wide" id="fig-results" aria-labelledby="cap-5">
         <div class="fig-body">
@@ -977,9 +1515,9 @@ mark.ep-lit { background: var(--accent-soft); color: var(--fg); box-shadow: 0 0 
         <figcaption id="cap-7"><b>Figure 7.</b> Three real episodes of <span class="m">M<sub>SQaLe</sub></span> on full SQaLe schemas, with the schema withheld. Pick an episode and step through its rounds. Each round shows the model’s reasoning and every tool call it issued in that round, with the output it got back. After six rounds the environment stops the exploration and the model writes its final SQL as text. Each square is one table of the schema. Reasoning is abridged to verbatim excerpts, identical calls within a round are shown once with a count, and long outputs are clipped.</figcaption>
       </figure>
 
-      <p>All three episodes start the same way. The first round lists the tables, and the next one or two rounds inspect the few tables that match the question, with four to nine distinct calls in a round. The model then drafts a query and checks its output. The first two episodes end with <code>submit_sql</code>. The third keeps checking until the six rounds run out, and then the environment asks for the SQL as text. Most episodes end this way: 84 of the 108 full-schema episodes in this evaluation reach the round limit.</p>
+      <p>All three episodes start the same way. The first round lists the tables, and the next one or two rounds inspect the few tables that match the question, with four to nine distinct calls in a round. The model then drafts a query and checks its output. The first two episodes end with <code>submit_sql</code>. The third keeps checking until the six rounds run out, and then the environment asks for the SQL as text. Most episodes end this way: in the 108-question evaluation these episodes come from, 84 of the 108 full-schema episodes reach the round limit.</p>
 
-      <p><span class="m">M<sub>SQaLe</sub></span> also learned to batch its tool calls. The prompt asks for a single JSON object per reply, and we neither encouraged nor limited multiple calls; the environment simply runs every call it finds. During training, rounds per episode stay between 5.6 and 6.8 (Figure&nbsp;8). Tool calls per episode stay near six for the first 800 steps, spike twice, and then climb steadily from step 954 to an average of 19.3 over steps 1,300 to 1,658. On full schemas, the untrained Qwen3.5-2B never issues more than one call per round. <span class="m">M<sub>SQaLe</sub></span> issues several in 85% of its rounds, 5.5 calls per round of which 4.4 are distinct. The environment caps rounds, not calls, so batching lets the model inspect more of the database within the same budget. The other two GRPO runs picked up the habit less cleanly.</p>
+      <p><span class="m">M<sub>SQaLe</sub></span> also learned to batch its tool calls. The prompt asks for a single JSON object per reply, and we neither encouraged nor limited multiple calls; the environment simply runs every call it finds. During training, rounds per episode stay between 5.6 and 6.8 (Figure&nbsp;8). Tool calls per episode stay near six for the first 800 steps, spike twice, and then climb steadily from step 954 to an average of 19.3 over steps 1,300 to 1,658. In the same evaluation, the untrained Qwen3.5-2B never issues more than one call per round on full schemas. <span class="m">M<sub>SQaLe</sub></span> issues several in 85% of its rounds, 5.5 calls per round of which 4.4 are distinct. The environment caps rounds, not calls, so batching lets the model inspect more of the database within the same budget. The other two GRPO runs picked up the habit less cleanly.</p>
 
       <figure class="fig wide" id="fig-train-shape" aria-labelledby="cap-8">
         <div class="fig-body">
@@ -999,10 +1537,10 @@ mark.ep-lit { background: var(--accent-soft); color: var(--fg); box-shadow: 0 0 
       <p>The three trained models differ only in their training data, so differences in how they behave come from the data. We look at three of them.</p>
 
       <h3>Schema size</h3>
-      <p>Accuracy falls for every model as the schema grows, and <span class="m">M<sub>SQaLe</sub></span> leads at every size, from 50.0% with only the gold tables to 38.9% on the full schema. On the full schema it inspects 71.3% of the gold tables, against 56.5% for <span class="m">M<sub>BIRD</sub></span> and 60.2% for <span class="m">M<sub>SynSQL</sub></span>. BIRD and SynSQL training schemas have a median of 5 and 10 tables, so models trained on them never have to search.</p>
+      <p>Accuracy falls for every model as the schema grows, and <span class="m">M<sub>SQaLe</sub></span> leads at every size, from 72.7% with only the gold tables to 66.3% on the full schema. With only the gold tables present, all three models open every gold table in at least 95% of episodes. On the full schema, <span class="m">M<sub>SQaLe</sub></span> opens every gold table in 89.7% of episodes, against 85.0% for <span class="m">M<sub>BIRD</sub></span> and 83.3% for <span class="m">M<sub>SynSQL</sub></span>. BIRD and SynSQL training schemas have a median of 5 and 10 tables, so models trained on them never have to search.</p>
 
       <h3>Populated tables</h3>
-      <p>Before submitting, <span class="m">M<sub>SQaLe</sub></span> has seen 75% of the string literals its answer depends on. <span class="m">M<sub>SynSQL</sub></span> has seen 45%, <span class="m">M<sub>BIRD</sub></span> 36% and the untrained model 25%. SynSQL’s tables hold a median of 2 rows, and SQaLe’s hold 69.</p>
+      <p>Before submitting, <span class="m">M<sub>SQaLe</sub></span> has seen 88% of the string literals its answer depends on. <span class="m">M<sub>SynSQL</sub></span> has seen 55%, <span class="m">M<sub>BIRD</sub></span> 40% and the untrained model 35%. SynSQL’s tables hold a median of 2 rows, and SQaLe’s hold 69.</p>
 
       <figure class="fig wide" id="fig-learns" aria-labelledby="cap-9">
         <div class="fig-body f5">
@@ -1011,7 +1549,7 @@ mark.ep-lit { background: var(--accent-soft); color: var(--fg); box-shadow: 0 0 
               <p class="panel-title">Schema size</p>
               <div class="seg" role="group" aria-label="Measure shown" id="scale-toggle">
                 <button type="button" aria-pressed="true" data-metric="0">Accuracy</button>
-                <button type="button" aria-pressed="false" data-metric="1">Gold tables inspected</button>
+                <button type="button" aria-pressed="false" data-metric="1">Gold tables found</button>
               </div>
             </div>
             <p class="panel-sub" id="scale-sub" aria-live="polite">Execution accuracy (%) at three schema sizes</p>
@@ -1023,7 +1561,7 @@ mark.ep-lit { background: var(--accent-soft); color: var(--fg); box-shadow: 0 0 
             <div class="mpanel" id="literals"></div>
           </div>
         </div>
-        <figcaption id="cap-9"><b>Figure 9.</b> Top, the three trained models at three schema sizes: the gold tables only, the gold tables plus 32 distractor tables, and the full schema. The toggle switches between accuracy and the share of gold tables the model inspected. Bottom, how many of the literals its answer needs each model has seen before it submits.</figcaption>
+        <figcaption id="cap-9"><b>Figure 9.</b> Top, the three trained models at three schema sizes: the gold tables only, the gold tables plus 32 distractor tables, and the full schema. The toggle switches between accuracy and the share of episodes in which the model opened every gold table. Bottom, how many of the literals its answer needs each model has seen before it submits.</figcaption>
       </figure>
 
       <h3>Domains</h3>
@@ -1048,7 +1586,7 @@ mark.ep-lit { background: var(--accent-soft); color: var(--fg); box-shadow: 0 0 
       <ol class="notes-list">
         <li id="sn-1"><span>On 158 BIRD dev questions (225 judge calls), 94.5% of the queries the judge accepts are aligned with the question. The judge agrees with human labels 86.2% of the time (κ&nbsp;=&nbsp;0.68).<a class="back" href="#snr-1" aria-label="Back to note 1 in the text">↩</a></span></li>
         <li id="sn-2"><span>The schema is withheld. The model explores the database through tools, the five used in answering plus <code>foreign_keys</code> and <code>join_path</code>. The reward is tiered (correct result, then executes, then parses, then nothing), and partial credit never ranks a wrong query above a correct one.<a class="back" href="#snr-2" aria-label="Back to note 2 in the text">↩</a></span></li>
-        <li id="sn-3"><span>The episodes come from the full-schema condition of the evaluation behind Figure&nbsp;9. Their questions use the evidence-supported phrasing, so each comes with a short evidence note.<a class="back" href="#snr-3" aria-label="Back to note 3 in the text">↩</a></span></li>
+        <li id="sn-3"><span>The episodes come from the full-schema condition of an earlier schema-size evaluation on 108 questions, not the 300-question evaluation behind Figures&nbsp;5 and&nbsp;9. Their questions use the evidence-supported phrasing, so each comes with a short evidence note.<a class="back" href="#snr-3" aria-label="Back to note 3 in the text">↩</a></span></li>
         <li id="sn-4"><span>The domain split covers 108 schemas. That sample is too small to call the difference between the two gaps significant.<a class="back" href="#snr-4" aria-label="Back to note 4 in the text">↩</a></span></li>
       </ol>
     </section>
@@ -1069,6 +1607,8 @@ mark.ep-lit { background: var(--accent-soft); color: var(--fg); box-shadow: 0 0 
     <div>
       <span class="label">Earlier version</span>
       <p><a href="https://arxiv.org/abs/2602.22223" target="_blank" rel="noopener">SQaLe: A Large Text-to-SQL Corpus Grounded in Real Schemas</a></p>
+      <span class="label">Text versions</span>
+      <p><a href="index.md">Markdown</a> · <a href="llms.txt">llms.txt</a> · <a href="llms-full.txt">llms-full.txt</a></p>
       <p>Website content MIT licensed</p>
     </div>
   </div>
@@ -1574,7 +2114,7 @@ mark.ep-lit { background: var(--accent-soft); color: var(--fg); box-shadow: 0 0 
 
   /* ---------- Figure 9: what SQaLe teaches ---------- */
   var scaleBars = [];
-  var SCALE_SUB = ['Execution accuracy (%) at three schema sizes', 'Share of the gold tables the model inspected (%) at three schema sizes'];
+  var SCALE_SUB = ['Execution accuracy (%) at three schema sizes', 'Share of episodes in which the model opened every gold table (%) at three schema sizes'];
   function barRow(parent, name, value, decimals) {
     var row = el('div', { class: 'bar-row' + (name === 'M_SQaLe' ? ' is-ours' : '') }, parent);
     var lab = el('span', { class: 'bar-lab' }, row);
