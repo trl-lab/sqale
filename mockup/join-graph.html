@@ -1,0 +1,1544 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SQaLe dataset</title>
+<meta name="description" content="SQaLe is a semi-synthetic text-to-SQL dataset of 1,408,056 questions paired with SQL on 9,259 real-world schemas. A 2B model trained on it with GRPO learns to explore large databases.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Schibsted+Grotesk:ital,wght@0,400..900;1,400..700&display=swap">
+<style>
+/*
+  Design plan · "Join Graph"
+  Layout: the hero is the thesis drawn, a real 87-table foreign-key graph with an agent trace beside it;
+  the rest is an airy two-rail grid (mono labels left, grotesque content right) with hairline rules.
+  Colour (5 + 1): --bg white · --fg graphite · --node / --edge cool grey · --accent deep teal
+  (explored path, M_SQaLe, links) · --amber only for the step that is playing right now.
+  Dark: blue-green-grey ground (not black), light grey nodes, teal lifted to stay legible.
+  Type: Schibsted Grotesk for display and body (400 to 800, tight tracking on the title);
+  Geist Mono for code, the trace, labels and ticks.
+*/
+:root {
+  --bg: #ffffff;
+  --bg-2: #f3f5f6;
+  --fg: #1d2327;
+  --fg-2: #4f595f;
+  --fg-3: #6b7479;
+  --rule: #e3e7e9;
+  --rule-strong: #c7cfd3;
+  --node: #a5aeb4;
+  --node-soft: #d9dee1;
+  --edge: #d0d6da;
+  --accent: #0b7a75;
+  --accent-ink: #ffffff;
+  --accent-soft: #d9eeec;
+  --amber: #d98e04;
+  --tip-bg: #1d2327;
+  --tip-fg: #ffffff;
+  --sans: "Schibsted Grotesk", "Helvetica Neue", Helvetica, Arial, system-ui, sans-serif;
+  --mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1517;
+    --bg-2: #142023;
+    --fg: #dce3e4;
+    --fg-2: #a7b3b5;
+    --fg-3: #8d9a9c;
+    --rule: #203034;
+    --rule-strong: #34474c;
+    --node: #9aa7aa;
+    --node-soft: #33454a;
+    --edge: #36494d;
+    --accent: #3cc6bc;
+    --accent-ink: #062422;
+    --accent-soft: #123a37;
+    --amber: #f2a93b;
+    --tip-bg: #dce3e4;
+    --tip-fg: #0d1517;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d1517;
+  --bg-2: #142023;
+  --fg: #dce3e4;
+  --fg-2: #a7b3b5;
+  --fg-3: #8d9a9c;
+  --rule: #203034;
+  --rule-strong: #34474c;
+  --node: #9aa7aa;
+  --node-soft: #33454a;
+  --edge: #36494d;
+  --accent: #3cc6bc;
+  --accent-ink: #062422;
+  --accent-soft: #123a37;
+  --amber: #f2a93b;
+  --tip-bg: #dce3e4;
+  --tip-fg: #0d1517;
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--sans);
+  font-size: 17px;
+  line-height: 1.6;
+  padding-inline: max(16px, min(4.5vw, 64px));
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+.page { max-width: 1280px; margin-inline: auto; }
+a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+a:hover { text-decoration-thickness: 2px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+sub { font-size: .68em; line-height: 0; vertical-align: -.28em; letter-spacing: 0; }
+sup { font-size: .62em; line-height: 0; vertical-align: .62em; }
+code, pre, kbd { font-family: var(--mono); }
+p { margin: 0; }
+h1, h2, h3 { margin: 0; text-wrap: balance; }
+
+.label {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+}
+.num { font-variant-numeric: tabular-nums; }
+
+/* ---------- top bar ---------- */
+.top {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  gap: 8px 24px;
+  padding-block: 22px 0;
+}
+.top nav { display: flex; flex-wrap: wrap; gap: 4px 20px; }
+.top nav a {
+  font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--fg-2); text-decoration: none; padding-block: 4px;
+}
+.top nav a:hover { color: var(--accent); }
+
+/* ---------- hero ---------- */
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: "id" "fig" "log";
+  gap: 40px;
+  padding-block: 40px 72px;
+}
+@media (min-width: 1080px) {
+  .hero {
+    grid-template-columns: minmax(0, 11fr) minmax(0, 16fr);
+    grid-template-rows: auto 1fr;
+    grid-template-areas: "id fig" "log fig";
+    column-gap: 56px;
+    row-gap: 44px;
+    padding-block: 56px 88px;
+  }
+}
+.id { grid-area: id; display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+.title {
+  font-size: clamp(76px, 11vw, 144px);
+  font-weight: 800;
+  line-height: .86;
+  letter-spacing: -.058em;
+  margin-left: -.04em;
+}
+.subtitle {
+  font-size: clamp(21px, 2.1vw, 27px);
+  font-weight: 500;
+  line-height: 1.22;
+  letter-spacing: -.012em;
+  max-width: 24ch;
+  text-wrap: balance;
+}
+.authors { font-size: 17px; font-weight: 500; display: flex; flex-wrap: wrap; gap: 2px 18px; }
+.affs { font-size: 14px; color: var(--fg-2); display: flex; flex-wrap: wrap; gap: 2px 16px; }
+.links { display: flex; flex-wrap: wrap; gap: 8px; padding-top: 6px; }
+.btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 8px 15px 8px 12px;
+  border: 1px solid var(--rule-strong);
+  border-radius: 999px;
+  font: 500 15px/1.2 var(--sans);
+  color: var(--fg);
+  background: var(--bg);
+  text-decoration: none;
+  transition: border-color .15s, color .15s;
+}
+.btn .pip { width: 9px; height: 9px; border-radius: 50%; background: var(--node); transition: background .15s; flex: none; }
+.btn:hover { border-color: var(--accent); color: var(--accent); }
+.btn:hover .pip { background: var(--accent); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.primary .pip { background: var(--accent-ink); }
+.btn.primary:hover { color: var(--accent-ink); }
+
+.episode { grid-area: fig; margin: 0; min-width: 0; display: flex; flex-direction: column; gap: 14px; }
+.ep-title {
+  font-size: clamp(30px, 3.6vw, 48px);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -.035em;
+  text-wrap: balance;
+}
+.ep-title em { font-style: normal; color: var(--accent); }
+.question {
+  margin: 4px 0 0;
+  font-size: 18px; line-height: 1.5;
+  color: var(--fg);
+  max-width: 62ch;
+  display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 12px;
+}
+.question .label { grid-column: 1 / -1; }
+.question q { quotes: "\201C" "\201D"; }
+.graph-wrap { position: relative; width: 100%; margin-top: 6px; }
+.graph-wrap svg { display: block; width: 100%; height: auto; overflow: visible; }
+.legend {
+  display: flex; flex-wrap: wrap; gap: 6px 22px;
+  font-family: var(--mono); font-size: 12px; color: var(--fg-2);
+}
+.legend > span { display: inline-flex; align-items: center; gap: 8px; }
+.sw { width: 10px; height: 10px; border-radius: 50%; flex: none; background: var(--node); }
+.sw.teal { background: var(--accent); }
+.sw.amber { background: var(--amber); }
+.sw.line { width: 18px; height: 0; border-radius: 0; border-top: 1px solid var(--fg-3); background: none; }
+.sw.ring { background: var(--accent-soft); box-shadow: inset 0 0 0 1.5px var(--accent); }
+
+/* graph marks */
+.g-edge { stroke: var(--edge); stroke-width: 1; fill: none; }
+.g-over { stroke: transparent; stroke-width: 3; fill: none; stroke-linecap: round; transition: stroke .3s, stroke-width .3s; }
+.g-over.is-active { stroke: var(--amber); stroke-width: 3; }
+.g-over.is-seen { stroke: var(--accent); stroke-width: 1.75; }
+.g-over.is-lit { stroke: var(--accent); stroke-width: 3.5; }
+.g-node { cursor: default; outline: none; }
+.g-node .dot { fill: var(--node); stroke: var(--bg); stroke-width: 1.5; transition: fill .3s, stroke .3s; }
+.g-node .hit { fill: transparent; stroke: none; }
+.g-node .halo { fill: var(--accent); opacity: 0; transition: opacity .3s, fill .3s; }
+.g-node.is-lit .halo { opacity: .2; }
+.g-node.is-active .halo { fill: var(--amber); opacity: .22; }
+.g-node .ring { fill: none; stroke: var(--fg); stroke-width: 2; opacity: 0; }
+.g-node:focus-visible .ring, .g-node.is-hover .ring { opacity: 1; }
+.g-node.is-seen .dot { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 2; }
+.g-node.is-lit .dot { fill: var(--accent); stroke: var(--bg); stroke-width: 2; }
+.g-node.is-active .dot { fill: var(--amber); stroke: var(--bg); stroke-width: 2; }
+.graph.listing .g-node .dot { fill: var(--amber); }
+.graph.sweep .g-node .dot { transition-delay: var(--d, 0s); }
+.g-label {
+  font-family: var(--mono); font-size: 12.5px; font-weight: 600;
+  fill: var(--fg); stroke: var(--bg); stroke-width: 4px; stroke-linejoin: round; paint-order: stroke;
+  pointer-events: none;
+}
+.g-tip rect { fill: var(--tip-bg); }
+.g-tip text { fill: var(--tip-fg); font-family: var(--mono); font-size: 12px; }
+.g-tip { pointer-events: none; }
+
+/* trace */
+.log { grid-area: log; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+.trace {
+  background: var(--bg-2);
+  border-radius: 12px;
+  padding: 14px 6px 8px;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+}
+.trace-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 12px 8px; }
+.replay {
+  display: inline-flex; align-items: center; gap: 8px;
+  font: 500 12px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase;
+  color: var(--accent); background: transparent;
+  border: 1px solid var(--rule-strong); border-radius: 999px;
+  padding: 7px 12px; cursor: pointer;
+}
+.replay:hover { border-color: var(--accent); }
+.replay svg { width: 12px; height: 12px; }
+.replay path { fill: none; stroke: var(--accent); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.trace ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.step {
+  display: grid; grid-template-columns: 14px 18px minmax(0, 1fr); gap: 2px 8px;
+  width: 100%; text-align: left;
+  font: inherit; color: var(--fg); background: transparent; border: 0; border-radius: 8px;
+  padding: 8px 10px; cursor: pointer;
+  transition: opacity .3s;
+}
+.step:hover { background: var(--bg); }
+.step .pip { width: 9px; height: 9px; border-radius: 50%; margin-top: 5px; background: var(--accent); transition: background .3s; }
+.step .n { color: var(--fg-3); }
+.step .call { overflow-wrap: anywhere; }
+.step .call b { font-weight: 600; }
+.step .args { color: var(--fg-2); }
+.step .out { grid-column: 3; color: var(--fg-2); overflow-wrap: anywhere; }
+.step .out::before { content: "\2192\00a0"; color: var(--fg-3); }
+.step.pending { opacity: .42; }
+.step.pending .pip { background: transparent; box-shadow: inset 0 0 0 1.5px var(--fg-3); }
+.step.active .pip { background: var(--amber); }
+.result { margin: 6px 10px 6px 32px; transition: opacity .3s; }
+.result.pending { opacity: .35; }
+.result table { border-collapse: collapse; width: 100%; }
+.result th { text-align: left; font-weight: 500; color: var(--fg-3); padding: 4px 12px 4px 0; border-bottom: 1px solid var(--rule-strong); }
+.result td { padding: 5px 12px 2px 0; color: var(--fg); overflow-wrap: anywhere; }
+.caption { font-size: 14px; color: var(--fg-2); max-width: 60ch; }
+
+/* ---------- sections ---------- */
+.section {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 20px 48px;
+  padding-block: 64px;
+  border-top: 1px solid var(--rule);
+}
+@media (min-width: 960px) {
+  .section { grid-template-columns: minmax(0, 3fr) minmax(0, 9fr); padding-block: 88px; }
+  .section > .label { padding-top: 10px; }
+}
+.body { min-width: 0; display: flex; flex-direction: column; gap: 28px; }
+h2 {
+  font-size: clamp(28px, 3.2vw, 42px);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -.03em;
+  max-width: 24ch;
+}
+h3 { font-size: 21px; font-weight: 650; letter-spacing: -.012em; line-height: 1.25; }
+.prose { max-width: 65ch; display: flex; flex-direction: column; gap: 16px; color: var(--fg); }
+.prose.muted { color: var(--fg-2); }
+.lead { font-size: clamp(21px, 2vw, 25px); line-height: 1.4; letter-spacing: -.01em; font-weight: 450; max-width: 40ch; }
+.note { font-size: 14px; color: var(--fg-2); max-width: 65ch; }
+.scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; max-width: 100%; }
+
+/* key numbers */
+.stats {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 32px 32px;
+}
+@media (min-width: 460px) { .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px 24px; } }
+@media (min-width: 1100px) { .stats { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.stat { display: flex; flex-direction: column; gap: 6px; min-width: 0; border-top: 1px solid var(--rule-strong); padding-top: 14px; }
+.stat b { font-size: clamp(26px, 3vw, 42px); font-weight: 650; letter-spacing: -.03em; line-height: 1.05; }
+.stat span { font-size: 15px; color: var(--fg-2); line-height: 1.35; }
+.stat.hl b { color: var(--accent); }
+
+/* example */
+.example { display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px; }
+@media (min-width: 760px) { .example { grid-template-columns: 220px minmax(0, 1fr); gap: 40px; } }
+.tabs { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+@media (max-width: 759px) { .tabs { flex-direction: row; flex-wrap: wrap; gap: 6px; } }
+.tab {
+  font: 500 14px/1.3 var(--sans); text-align: left; color: var(--fg-2);
+  background: transparent; border: 0; border-radius: 8px; padding: 8px 12px; cursor: pointer;
+  display: flex; align-items: center; gap: 10px;
+}
+.tab .pip { width: 8px; height: 8px; border-radius: 50%; background: var(--node-soft); flex: none; }
+.tab:hover { color: var(--fg); }
+.tab[aria-selected="true"] { color: var(--fg); background: var(--bg-2); }
+.tab[aria-selected="true"] .pip { background: var(--accent); }
+@media (max-width: 759px) { .tab { border: 1px solid var(--rule); } }
+.panel { min-width: 0; display: flex; flex-direction: column; gap: 20px; }
+.phrasing { font-size: clamp(20px, 2vw, 25px); line-height: 1.38; letter-spacing: -.01em; white-space: pre-line; max-width: 46ch; min-height: 4.2em; }
+.code {
+  background: var(--bg-2); border-radius: 12px; padding: 18px 20px;
+  font-size: 13.5px; line-height: 1.6; margin: 0;
+}
+.code .k { font-weight: 600; color: var(--fg); }
+.code .t { color: var(--accent); font-weight: 600; }
+.code .s { color: var(--fg-2); }
+.code-wrap { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.rowtable { border-collapse: collapse; font-family: var(--mono); font-size: 13px; font-variant-numeric: tabular-nums; }
+.rowtable th { text-align: left; font-weight: 500; color: var(--fg-3); padding: 6px 22px 6px 0; border-bottom: 1px solid var(--rule-strong); }
+.rowtable td { padding: 8px 22px 4px 0; white-space: nowrap; }
+.strip { display: flex; flex-direction: column; gap: 10px; }
+.dots { display: flex; flex-wrap: wrap; gap: 5px; max-width: 640px; }
+.dots i { width: 9px; height: 9px; border-radius: 50%; background: var(--node-soft); }
+.dots i.on { background: var(--accent); }
+
+/* pipeline */
+.pipe { display: flex; flex-direction: column; gap: 28px; min-width: 0; }
+.pipe-svg { display: none; width: 100%; height: auto; overflow: visible; }
+.pipe-svg .box { fill: var(--bg); stroke: var(--fg); stroke-width: 1.25; }
+.pipe-svg .box.last { fill: var(--accent-soft); stroke: var(--accent); }
+.pipe-svg .bn { font: 500 12px var(--mono); fill: var(--fg-3); letter-spacing: .06em; }
+.pipe-svg .bt { font: 650 16px var(--sans); fill: var(--fg); letter-spacing: -.01em; }
+.pipe-svg .fw { stroke: var(--fg); stroke-width: 1.25; fill: none; }
+.pipe-svg .lp { stroke: var(--fg-2); stroke-width: 1.25; fill: none; }
+.pipe-svg .lt { font: 500 12px var(--mono); fill: var(--fg-2); }
+.pipe-svg .ah { fill: var(--fg); }
+.pipe-svg .ah2 { fill: var(--fg-2); }
+.pipe-svg .br { stroke: var(--rule-strong); stroke-width: 1.25; fill: none; }
+.pipe-svg .brt { font: 500 12px var(--mono); fill: var(--fg-3); letter-spacing: .08em; text-transform: uppercase; }
+.stages { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 0; }
+.stages li { position: relative; padding: 0 0 26px 30px; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.stages li::before { content: ""; position: absolute; left: 3px; top: 7px; width: 11px; height: 11px; border-radius: 50%; background: var(--bg); box-shadow: inset 0 0 0 1.5px var(--fg); }
+.stages li::after { content: ""; position: absolute; left: 8px; top: 22px; bottom: 4px; border-left: 1px solid var(--rule-strong); }
+.stages li:last-child::after { display: none; }
+.stages li:last-child::before { background: var(--accent); box-shadow: none; }
+.stages .sn { font-family: var(--mono); font-size: 12px; color: var(--fg-3); letter-spacing: .06em; }
+.stages h3 { font-size: 18px; }
+.stages p { font-size: 15px; color: var(--fg-2); line-height: 1.55; }
+.loop { font-family: var(--mono); font-size: 12px; color: var(--fg-2); display: inline-flex; gap: 8px; align-items: center; }
+.loop svg { width: 14px; height: 14px; flex: none; }
+.loop path { fill: none; stroke: var(--fg-2); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.exec-note { font-family: var(--mono); font-size: 12px; color: var(--fg-3); letter-spacing: .08em; text-transform: uppercase; }
+@media (min-width: 900px) {
+  .pipe-svg { display: block; }
+  .stages { grid-template-columns: repeat(5, minmax(0, 1fr)); column-gap: 4.545%; }
+  .stages li { padding: 0; }
+  .stages li::before, .stages li::after, .stages .loop, .stages .sn, .exec-note { display: none; }
+}
+.section.wide { grid-template-columns: minmax(0, 1fr); }
+.section.wide .head { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px 48px; }
+@media (min-width: 960px) { .section.wide .head { grid-template-columns: minmax(0, 3fr) minmax(0, 9fr); } .section.wide .head > .label { padding-top: 10px; } }
+
+/* tables */
+.dtable { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; font-size: 15px; }
+.dtable th { font: 500 12px/1.3 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--fg-3); text-align: right; padding: 0 0 10px 18px; vertical-align: bottom; border-bottom: 1px solid var(--rule-strong); white-space: nowrap; }
+.dtable th:first-child, .dtable td:first-child { text-align: left; padding-left: 0; }
+.dtable td { text-align: right; padding: 12px 0 12px 18px; border-bottom: 1px solid var(--rule); white-space: nowrap; font-family: var(--mono); font-size: 14px; }
+.dtable td:first-child { font-family: var(--sans); font-size: 15px; font-variant-numeric: normal; }
+.dtable tr.ours td { color: var(--accent); font-weight: 650; }
+.dtable td.barcell { width: 32%; min-width: 180px; }
+.hbar { display: grid; grid-template-columns: 3.4em minmax(0, 1fr); align-items: center; gap: 10px; }
+.hbar .v { text-align: right; }
+.hbar .track { height: 8px; position: relative; }
+.hbar .fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 0 4px 4px 0; background: var(--node); }
+.ours .hbar .fill, .hbar .fill.ours { background: var(--accent); }
+.hbar .fill.trained { background: var(--fg-2); }
+.hbar .fill.base { background: var(--node); }
+.qfacts { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px 32px; max-width: 900px; }
+.qfacts p { font-size: 15px; color: var(--fg-2); }
+.qfacts b { display: block; font-size: 30px; font-weight: 650; letter-spacing: -.03em; color: var(--fg); line-height: 1.1; margin-bottom: 4px; }
+
+/* results */
+.matrix th, .matrix td { text-align: left; }
+.matrix td { padding: 13px 18px 13px 0; }
+.matrix th { padding: 0 18px 10px 0; text-align: left; }
+.matrix td:first-child { width: 1%; }
+.matrix .mname { font-weight: 650; font-size: 16px; }
+.matrix .mdesc { display: block; font-size: 13px; color: var(--fg-3); font-weight: 400; }
+.matrix tr.ours .mdesc { color: var(--fg-2); }
+.matrix .cell { display: grid; grid-template-columns: 2.8em minmax(70px, 1fr); align-items: center; gap: 10px; min-width: 150px; }
+.matrix .cell .v { text-align: right; }
+.matrix .na { color: var(--fg-3); font-size: 13px; font-family: var(--mono); }
+.matrix tr.ref td { border-top: 1px solid var(--rule-strong); }
+.chart-block { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.chart-legend { display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: 13px; color: var(--fg-2); align-items: center; }
+.chart-legend > span { display: inline-flex; align-items: center; gap: 8px; }
+.chart-legend .sw.g2 { background: var(--fg-2); }
+.chart-legend .sw.g3 { background: var(--node-soft); box-shadow: inset 0 0 0 1px var(--node); }
+.chart-legend .sizes svg { height: 26px; width: 120px; }
+.chart-legend .sizes circle { fill: none; stroke: var(--fg-3); stroke-width: 1; }
+.chart-legend .sizes text { font: 11px var(--mono); fill: var(--fg-3); }
+.chart { position: relative; width: 100%; }
+.chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.ax line { stroke: var(--rule); }
+.ax .base { stroke: var(--rule-strong); }
+.ax text { font: 11.5px var(--mono); fill: var(--fg-3); font-variant-numeric: tabular-nums; }
+.ax .title { font: 500 11.5px var(--mono); fill: var(--fg-2); letter-spacing: .04em; }
+.pt { stroke: var(--bg); stroke-width: 1.75; }
+.pt.ours { fill: var(--accent); }
+.pt.trained { fill: var(--fg-2); }
+.pt.base { fill: var(--node-soft); stroke: var(--node); stroke-width: 1; }
+.pt.hover { stroke: var(--fg); stroke-width: 2; }
+.plbl { font: 500 12px var(--sans); fill: var(--fg); }
+.plbl.ours { font-weight: 700; }
+.plbl .pv { fill: var(--fg-2); font-weight: 400; font-family: var(--mono); font-size: 11.5px; }
+.hit { fill: transparent; cursor: crosshair; }
+.tooltip {
+  position: absolute; pointer-events: none; z-index: 2;
+  background: var(--tip-bg); color: var(--tip-fg);
+  font: 12px/1.45 var(--mono); padding: 7px 10px; border-radius: 6px;
+  white-space: nowrap; transform: translate(-50%, calc(-100% - 12px));
+  opacity: 0; transition: opacity .12s;
+  font-variant-numeric: tabular-nums;
+}
+.tooltip.on { opacity: 1; }
+details.data { font-size: 14px; color: var(--fg-2); }
+details.data summary { cursor: pointer; font-family: var(--mono); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--fg-2); padding-block: 4px; }
+details.data .dtable { font-size: 13px; margin-top: 10px; }
+details.data .dtable td { padding: 6px 0 6px 18px; }
+.two { display: grid; grid-template-columns: minmax(0, 1fr); gap: 56px; }
+
+/* findings */
+.finding { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px 48px; padding-top: 28px; border-top: 1px solid var(--rule); }
+.finding:first-child { border-top: 0; padding-top: 0; }
+@media (min-width: 1000px) { .finding { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); } }
+.finding .prose { gap: 12px; }
+.finding .prose p { font-size: 16px; color: var(--fg-2); }
+.glyphs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+@media (max-width: 560px) { .glyphs { grid-template-columns: minmax(0, 1fr); gap: 22px; } }
+.glyph { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+@media (max-width: 560px) { .glyph { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 6px 16px; align-items: end; } .glyph .gl { grid-column: 1 / -1; order: -1; } }
+.glyph svg { width: 100%; max-width: 200px; height: auto; display: block; }
+.glyph .gl { font-family: var(--mono); font-size: 12px; color: var(--fg-2); }
+.glyph .e { stroke: var(--edge); stroke-width: .8; }
+.glyph .e.gold { stroke: var(--accent); stroke-width: 1.6; }
+.glyph .n { fill: var(--node); }
+.glyph .n.gold { fill: var(--accent); }
+.glyph svg.bars { max-width: 180px; }
+.bars .b { fill: var(--fg-2); }
+.bars .b.ours { fill: var(--accent); }
+.bars .base { stroke: var(--rule-strong); stroke-width: 1; }
+.bars .bv { font: 500 11px var(--mono); fill: var(--fg); text-anchor: middle; }
+.bars .bl { font: 500 11px var(--sans); fill: var(--fg-2); text-anchor: middle; }
+.bars .bl.ours { fill: var(--fg); font-weight: 700; }
+.mini { display: flex; flex-direction: column; gap: 6px; font-size: 13px; }
+.mini .v { font-variant-numeric: tabular-nums; }
+.mini .row { display: grid; grid-template-columns: 5.6em minmax(0, 1fr) 2.6em; gap: 8px; align-items: center; }
+.mini .row .v { text-align: right; font-family: var(--mono); font-size: 12.5px; }
+.mini .row.ours { color: var(--accent); font-weight: 650; }
+.mini .row.ours .v { color: var(--fg); }
+.mini .nm { color: var(--fg-2); white-space: nowrap; }
+.mini .row.ours .nm { color: var(--fg); }
+.mini .track { height: 7px; position: relative; }
+.mini .fill { position: absolute; inset: 0 auto 0 0; border-radius: 0 4px 4px 0; background: var(--node); }
+.mini .row.ours .fill { background: var(--accent); }
+.mini .row.trained .fill { background: var(--fg-2); }
+.mini.big { font-size: 15px; gap: 10px; max-width: 560px; }
+.mini.big .row { grid-template-columns: 7.4em minmax(0, 1fr) 3em; }
+.mini.big .track { height: 10px; }
+.dumb { display: flex; flex-direction: column; gap: 18px; max-width: 600px; }
+.drow { display: grid; grid-template-columns: minmax(0, 11em) minmax(0, 1fr); gap: 6px 16px; align-items: center; font-size: 14px; }
+@media (max-width: 520px) { .drow { grid-template-columns: minmax(0, 1fr); } }
+.drow .dl { color: var(--fg-2); }
+.dtrack { position: relative; height: 34px; }
+.dtrack .ln { position: absolute; top: 16px; height: 2px; background: var(--rule-strong); }
+.dtrack .d { position: absolute; top: 11px; width: 12px; height: 12px; border-radius: 50%; transform: translateX(-50%); box-shadow: 0 0 0 2px var(--bg); }
+.dtrack .d.b { background: var(--fg-2); }
+.dtrack .d.s { background: var(--accent); }
+.dtrack .gap { position: absolute; top: -6px; transform: translateX(-50%); font: 600 12.5px var(--mono); color: var(--fg); white-space: nowrap; }
+.daxis { position: relative; height: 18px; font: 11.5px var(--mono); color: var(--fg-3); border-top: 1px solid var(--rule-strong); }
+.daxis span { position: absolute; top: 4px; transform: translateX(-50%); }
+.dkey { display: flex; gap: 18px; font-size: 13px; color: var(--fg-2); flex-wrap: wrap; }
+.dkey > span { display: inline-flex; gap: 8px; align-items: center; }
+.dkey .sw.g2 { background: var(--fg-2); }
+
+/* cite */
+.bib { position: relative; display: flex; flex-direction: column; gap: 12px; }
+.bib pre { margin: 0; background: var(--bg-2); border-radius: 12px; padding: 20px 22px; font-size: 13.5px; line-height: 1.6; color: var(--fg); }
+.copy {
+  align-self: flex-start;
+  display: inline-flex; align-items: center; gap: 8px;
+  font: 500 13px/1 var(--mono); letter-spacing: .04em;
+  color: var(--fg); background: var(--bg); border: 1px solid var(--rule-strong); border-radius: 999px;
+  padding: 9px 14px; cursor: pointer;
+}
+.copy:hover { border-color: var(--accent); color: var(--accent); }
+.copy.done { border-color: var(--accent); color: var(--accent); }
+
+/* footer */
+footer {
+  border-top: 1px solid var(--rule);
+  padding-block: 40px 56px;
+  display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px 48px;
+  font-size: 14px; color: var(--fg-2);
+}
+@media (min-width: 960px) { footer { grid-template-columns: minmax(0, 3fr) minmax(0, 9fr); } }
+footer .fcols { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px 32px; }
+footer .fcols div { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+footer .mail { font-family: var(--mono); font-size: 13px; color: var(--fg); user-select: all; overflow-wrap: anywhere; }
+.wordmark { font-weight: 800; font-size: 26px; letter-spacing: -.05em; color: var(--fg); line-height: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+  .replay { display: none; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="top">
+    <span class="label">Preprint · 2026</span>
+    <nav aria-label="Sections">
+      <a href="#example">Example</a>
+      <a href="#pipeline">Pipeline</a>
+      <a href="#compare">Comparison</a>
+      <a href="#results">Results</a>
+      <a href="#cite">Cite</a>
+    </nav>
+  </header>
+
+  <main>
+  <section class="hero" aria-label="SQaLe">
+    <div class="id">
+      <h1 class="title">SQaLe</h1>
+      <p class="subtitle">A large realistic dataset to empower small specialised text-to-SQL models</p>
+      <p class="authors">
+        <span>Cornelius Wolff<sup>1,2</sup></span>
+        <span>Daniel Gomm<sup>1,2</sup></span>
+        <span>Madelon Hulsebos<sup>2</sup></span>
+      </p>
+      <p class="affs">
+        <span><sup>1</sup>University of Amsterdam</span>
+        <span><sup>2</sup>Centrum Wiskunde &amp; Informatica</span>
+      </p>
+      <nav class="links" aria-label="Project links">
+        <!-- TODO: arXiv URL -->
+        <a class="btn" id="lnk-paper" href="#" target="_blank" rel="noopener"><span class="pip"></span>Paper</a>
+        <a class="btn primary" id="lnk-dataset" href="https://huggingface.co/datasets/trl-lab/SQaLe-text-to-SQL-dataset" target="_blank" rel="noopener"><span class="pip"></span>Dataset</a>
+        <a class="btn" id="lnk-code" href="https://github.com/trl-lab/SQaLe_2" target="_blank" rel="noopener"><span class="pip"></span>Code</a>
+        <a class="btn" id="lnk-model" href="https://huggingface.co/trl-lab/SQaLe-Model" target="_blank" rel="noopener"><span class="pip"></span>Model</a>
+        <a class="btn" href="#cite"><span class="pip"></span>Cite</a>
+      </nav>
+    </div>
+
+    <figure class="episode" aria-labelledby="ep-title">
+      <p class="label" id="ep-kicker">schema_013612 · test split · 87 tables · 8,356 rows</p>
+      <p class="ep-title" id="ep-title">87 tables. The question needs <em>3</em>.</p>
+      <p class="question"><span class="label" id="q-label">Question · verbose phrasing · moderate</span><q id="hero-q"></q></p>
+      <div class="graph-wrap" id="graph"></div>
+      <div class="legend" aria-hidden="true">
+        <span><i class="sw"></i>table, sized by columns</span>
+        <span><i class="sw line"></i>foreign key</span>
+        <span><i class="sw ring"></i>inspected</span>
+        <span><i class="sw teal"></i>in the gold SQL</span>
+        <span><i class="sw amber"></i>step playing now</span>
+      </div>
+    </figure>
+
+    <div class="log">
+      <div class="trace" id="trace">
+        <div class="trace-head">
+          <span class="label">Agent episode · 5 tool calls</span>
+          <button class="replay" id="replay" type="button" aria-label="Replay the episode"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.2 6a3.8 3.8 0 1 0 1.2-2.8M2.2 1.6v2.2h2.2"/></svg>Replay</button>
+        </div>
+        <ol id="steps"></ol>
+        <div class="result" id="result"></div>
+      </div>
+      <p class="caption">The trace is illustrative; the tool outputs are real, produced on the released sample. Select a step to see the graph at that point.</p>
+    </div>
+  </section>
+
+  <section class="section" id="why">
+    <p class="label">Why SQaLe</p>
+    <div class="body">
+      <p class="lead">Frontier language models in agentic pipelines lead text-to-SQL benchmarks, at a high inference cost. Small specialised models would avoid that cost, but training them needs data that reflects the scale, semantics and structure of real databases.</p>
+      <div class="prose">
+        <p>SQaLe is a semi-synthetic text-to-SQL dataset built on 9,259 real-world schemas from SchemaPile. Our generation pipeline extends each schema, fills it with synthetic rows, generates questions and answers them with an agent, and validates every stage by execution. The result is 1,408,056 natural-language questions paired with SQL, over schemas far larger than in any existing dataset.</p>
+        <p>We train Qwen3.5-2B on SQaLe with GRPO alone, and its execution accuracy on the SQaLe test set rises from 24.0% to 54.7%. The model learns to explore the database. It finds the relevant tables in large schemas and reads the values its answer needs, which training on existing datasets elicits far less.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section wide" id="numbers" aria-labelledby="numbers-h">
+    <div class="head"><p class="label" id="numbers-h">The corpus</p></div>
+    <div class="body">
+      <div class="stats">
+        <div class="stat"><b>1,408,056</b><span>natural-language questions paired with SQL</span></div>
+        <div class="stat"><b>176,761</b><span>distinct SQL queries</span></div>
+        <div class="stat"><b>9,259</b><span>real-world schemas from SchemaPile</span></div>
+        <div class="stat"><b>1,103,669</b><span>tables</span></div>
+        <div class="stat"><b>113</b><span>tables per schema (median)</span></div>
+        <div class="stat"><b>538</b><span>columns per schema (median)</span></div>
+        <div class="stat"><b>1,196,078</b><span>foreign-key relations</span></div>
+        <div class="stat"><b>108,708,694</b><span>synthetic rows</span></div>
+      </div>
+      <p class="note">95.2% of tables are populated, with a median of 69 rows per table. 95.1% of foreign-key cells are valid after repair. Every question exists in 8 phrasings. Train and test are split by schema, 95% and 5%.</p>
+    </div>
+  </section>
+
+  <section class="section" id="example" aria-labelledby="example-h">
+    <p class="label">A real record</p>
+    <div class="body">
+      <h2 id="example-h">Every question comes in eight phrasings that share one SQL query.</h2>
+      <div class="example">
+        <div class="tabs" role="tablist" aria-label="Phrasing style" id="tabs"></div>
+        <div class="panel" role="tabpanel" id="tabpanel" aria-live="polite">
+          <p class="phrasing" id="phrasing"></p>
+          <div class="code-wrap">
+            <span class="label">Gold SQL · the same for all eight</span>
+            <div class="scroll"><pre class="code" id="sql"></pre></div>
+          </div>
+          <div class="code-wrap">
+            <span class="label">Result</span>
+            <div class="scroll"><table class="rowtable" id="rowtable"></table></div>
+          </div>
+          <div class="strip">
+            <span class="label" id="strip-label">Tables used · 3 of 87</span>
+            <div class="dots" id="dots" aria-hidden="true"></div>
+            <p class="note" id="strip-note"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section wide" id="pipeline" aria-labelledby="pipeline-h">
+    <div class="head">
+      <p class="label">How it is built</p>
+      <div class="body">
+        <h2 id="pipeline-h">Five stages, each validated by execution.</h2>
+      </div>
+    </div>
+    <div class="pipe">
+      <svg class="pipe-svg" viewBox="0 0 1100 312" role="img" aria-label="Pipeline: five stages in sequence. Value synthesis loops back through an integrity check and repair. Agentic answering loops back on execution errors and on judge rejections.">
+        <defs>
+          <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="ah" d="M0 1 L10 5 L0 9 z"/></marker>
+          <marker id="ah2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="ah2" d="M0 1 L10 5 L0 9 z"/></marker>
+        </defs>
+        <g>
+          <rect class="box" x="0.75" y="100" width="180" height="78" rx="10"/>
+          <text class="bn" x="16" y="124">01</text>
+          <text class="bt" x="16" y="148">Collect and</text>
+          <text class="bt" x="16" y="167">extend schemas</text>
+
+          <rect class="box" x="230" y="100" width="180" height="78" rx="10"/>
+          <text class="bn" x="246" y="124">02</text>
+          <text class="bt" x="246" y="148">Synthesise</text>
+          <text class="bt" x="246" y="167">values</text>
+
+          <rect class="box" x="460" y="100" width="180" height="78" rx="10"/>
+          <text class="bn" x="476" y="124">03</text>
+          <text class="bt" x="476" y="148">Generate</text>
+          <text class="bt" x="476" y="167">questions</text>
+
+          <rect class="box" x="690" y="100" width="180" height="78" rx="10"/>
+          <text class="bn" x="706" y="124">04</text>
+          <text class="bt" x="706" y="148">Rewrite in</text>
+          <text class="bt" x="706" y="167">seven styles</text>
+
+          <rect class="box last" x="920" y="100" width="179.25" height="78" rx="10"/>
+          <text class="bn" x="936" y="124">05</text>
+          <text class="bt" x="936" y="148">Answer with an</text>
+          <text class="bt" x="936" y="167">agent, then judge</text>
+        </g>
+        <g>
+          <path class="fw" d="M186 139 H224" marker-end="url(#ah)"/>
+          <path class="fw" d="M416 139 H454" marker-end="url(#ah)"/>
+          <path class="fw" d="M646 139 H684" marker-end="url(#ah)"/>
+          <path class="fw" d="M876 139 H914" marker-end="url(#ah)"/>
+        </g>
+        <g>
+          <path class="lp" d="M372 99 C372 44, 268 44, 268 94" marker-end="url(#ah2)"/>
+          <text class="lt" x="320" y="34" text-anchor="middle">PK and FK check, repair</text>
+
+          <path class="lp" d="M1062 99 C1062 44, 958 44, 958 94" marker-end="url(#ah2)"/>
+          <text class="lt" x="1010" y="34" text-anchor="middle">execution error</text>
+
+          <path class="lp" d="M1062 179 C1062 234, 958 234, 958 184" marker-end="url(#ah2)"/>
+          <text class="lt" x="1010" y="256" text-anchor="middle">judge rejects, rewrite</text>
+        </g>
+        <g>
+          <path class="br" d="M1 274 V282 H1099 V274"/>
+          <text class="brt" x="550" y="304" text-anchor="middle">every stage is validated by execution</text>
+        </g>
+      </svg>
+
+      <ol class="stages">
+        <li>
+          <span class="sn">01</span>
+          <h3>Schema collection and extension</h3>
+          <p>We start from SchemaPile's real-world schemas, taken from permissively licensed GitHub repositories. A tool-using agent annotates each of the 14,597 source repositories with a domain description. Each schema is extended with LLM-generated tables that keep its naming conventions, normalisation level and foreign-key style.</p>
+        </li>
+        <li>
+          <span class="sn">02</span>
+          <h3>Value synthesis</h3>
+          <p>Tables are filled in foreign-key dependency order, each by a Python function the LLM writes from the table's DDL, its original rows, the allowed foreign-key values and the domain description. Fact and junction tables get more rows and a skewed key distribution. Every table is checked for primary-key uniqueness and referential integrity.</p>
+          <span class="loop"><svg viewBox="0 0 14 14" aria-hidden="true"><path d="M3 7a4 4 0 1 0 1.3-3M3 1.8v2.6h2.6"/></svg>PK and FK check, repair</span>
+        </li>
+        <li>
+          <span class="sn">03</span>
+          <h3>Question generation</h3>
+          <p>We sample a connected subgraph along foreign keys (up to 20 tables) with sample rows, and ask for questions that need every table. There are three difficulty levels (simple, moderate, hard), and every literal is grounded in the data.</p>
+        </li>
+        <li>
+          <span class="sn">04</span>
+          <h3>Style variation</h3>
+          <p>Each question is rewritten into seven styles: casual, structured, requirements list, short and high level, short and ambiguous, spelling and grammar mistakes, evidence supported. All eight phrasings share the gold SQL.</p>
+        </li>
+        <li>
+          <span class="sn">05</span>
+          <h3>Agentic answering and judging</h3>
+          <p>An agent explores the live database with list_tables, describe_table, sample_rows, distinct_values and run_query, and commits with submit_sql. Execution errors go back to the agent. An LLM judge checks the result against the question and sends rejected queries back for a rewrite. 94.5% of the queries the judge accepts are aligned with the question (225 judge calls on 158 BIRD dev questions; 86.2% agreement with human labels, κ = 0.68).</p>
+          <span class="loop"><svg viewBox="0 0 14 14" aria-hidden="true"><path d="M3 7a4 4 0 1 0 1.3-3M3 1.8v2.6h2.6"/></svg>execution error</span>
+          <span class="loop"><svg viewBox="0 0 14 14" aria-hidden="true"><path d="M3 7a4 4 0 1 0 1.3-3M3 1.8v2.6h2.6"/></svg>judge rejects, rewrite</span>
+        </li>
+      </ol>
+      <p class="exec-note">Every stage is validated by execution.</p>
+    </div>
+  </section>
+
+  <section class="section" id="compare" aria-labelledby="compare-h">
+    <p class="label">How it compares</p>
+    <div class="body">
+      <h2 id="compare-h">SQaLe schemas have a median of 113 tables and 538 columns.</h2>
+      <div class="scroll"><table class="dtable" id="compare-table"></table></div>
+      <p class="note">Median columns are drawn on one linear scale. EHRSQL does not report rows per table.</p>
+      <div class="qfacts">
+        <p><b>23.4%</b>of SQaLe queries are nested. In BIRD it is 7.7%.</p>
+        <p><b>40%</b>of SQaLe queries that join chain multiple joins. In BIRD it is 26%.</p>
+        <p><b>3.1%</b>of SQaLe queries touch five or more tables, up to 20. No BIRD or EHRSQL query touches more than four.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="results" aria-labelledby="results-h">
+    <p class="label">Results</p>
+    <div class="body">
+      <h2 id="results-h">Trained on SQaLe, a 2B model reaches 54.7% on the SQaLe test set.</h2>
+      <div class="prose muted">
+        <p>We train Qwen3.5-2B with GRPO directly from the base checkpoint three times: on SQaLe, on SynSQL-2.5M and on BIRD train. Base model, environment, tools, reward, steps, batch size and evaluation are identical. There are no distilled traces, no teacher and no test-time scaffolding. M<sub>SQaLe</sub> is Qwen3.5-2B trained with GRPO on SQaLe; M<sub>BIRD</sub> and M<sub>SynSQL</sub> are the same recipe on BIRD and on SynSQL.</p>
+        <p>The schema is withheld. The model explores the database through tools (list_tables, describe_table, sample_rows, distinct_values, run_query, foreign_keys and join_path). The reward is tiered, with a correct result above a query that executes, above one that parses, above nothing. Partial credit never ranks a wrong query above a correct one.</p>
+      </div>
+      <div class="chart-block">
+        <span class="label">Execution accuracy (%) · 300 SQaLe test questions, BIRD, EHRSQL</span>
+        <div class="scroll"><table class="dtable matrix" id="matrix"></table></div>
+        <p class="note">On the SQaLe test set the gain over the untrained base model is 30.7 points with SQaLe data, 19.7 with BIRD and 13.3 with SynSQL. M<sub>SQaLe</sub> is 3.6 points behind Qwen3.6-27B.</p>
+      </div>
+
+      <div class="chart-block">
+        <span class="label">Accuracy against model size · 100 moderate SQaLe test questions, same agentic harness</span>
+        <div class="chart-legend" aria-hidden="true">
+          <span><i class="sw teal"></i><span>M<sub>SQaLe</sub></span></span>
+          <span><i class="sw g2"></i><span>M<sub>BIRD</sub>, M<sub>SynSQL</sub></span></span>
+          <span><i class="sw g3"></i>general-purpose models</span>
+          <span class="sizes"><svg viewBox="0 0 120 26"><circle cx="8" cy="13" r="5.5"/><circle cx="44" cy="13" r="8.4"/><circle cx="92" cy="13" r="12.3"/></svg><span>TFLOPs per question: 200, 1,000, 3,000</span></span>
+        </div>
+        <div class="chart" id="pareto"><div class="tooltip" id="pareto-tip"></div></div>
+        <p class="note">M<sub>SQaLe</sub> reaches 52% at 224 TFLOPs per question. Qwen3.5-27B reaches 63% at 1,710 TFLOPs. Among general-purpose models from 9B to 12B parameters, only Qwen3.5-9B (58%) is ahead of M<sub>SQaLe</sub>. Circle area shows compute per question.</p>
+        <details class="data">
+          <summary>Data table</summary>
+          <div class="scroll"><table class="dtable" id="pareto-table"></table></div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="findings" aria-labelledby="findings-h">
+    <p class="label">What SQaLe teaches</p>
+    <div class="body">
+      <h2 id="findings-h">A model trained on SQaLe searches the schema and reads the data.</h2>
+
+      <div class="finding">
+        <div class="prose">
+          <h3>Schema size</h3>
+          <p>Accuracy falls for every model as the schema grows, and M<sub>SQaLe</sub> leads at every size. At full schema size M<sub>SQaLe</sub> inspects 71.3% of the gold tables, against 56.5% for M<sub>BIRD</sub> and 60.2% for M<sub>SynSQL</sub>.</p>
+          <p>BIRD and SynSQL training schemas have a median of 5 and 10 tables, so models trained on them never have to search.</p>
+        </div>
+        <div class="chart-block">
+          <div class="glyphs" id="glyphs"></div>
+          <p class="note">Graphs drawn on the example schema. Bars show execution accuracy (%) on one shared scale.</p>
+        </div>
+      </div>
+
+      <div class="finding">
+        <div class="prose">
+          <h3>Populated tables</h3>
+          <p>Before submitting, M<sub>SQaLe</sub> has seen 75% of the string literals its answer depends on, against 45% for M<sub>SynSQL</sub>, 36% for M<sub>BIRD</sub> and 25% for the untrained model.</p>
+          <p>SynSQL's tables hold a median of 2 rows. SQaLe's hold 69.</p>
+        </div>
+        <div class="chart-block">
+          <span class="label">String literals seen before submitting (%)</span>
+          <div class="mini big" id="literals"></div>
+        </div>
+      </div>
+
+      <div class="finding">
+        <div class="prose">
+          <h3>Domains</h3>
+          <p>On SQaLe test questions whose schemas lie outside BIRD's domains, M<sub>SQaLe</sub> leads M<sub>BIRD</sub> by 9.9 points (46.4 vs 36.5). Inside BIRD's domains the lead is 2.8 points (39.3 vs 36.5).</p>
+          <p class="note">The sample covers 108 schemas, too few to call the difference between the two gaps significant.</p>
+        </div>
+        <div class="chart-block">
+          <span class="label">Execution accuracy (%) on the SQaLe test set</span>
+          <div class="dumb" id="domains"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="cite" aria-labelledby="cite-h">
+    <p class="label" id="cite-h">Cite</p>
+    <div class="body">
+      <div class="bib">
+        <div class="scroll"><pre id="bibtex"></pre></div>
+        <button class="copy" id="copy" type="button">Copy BibTeX</button>
+      </div>
+    </div>
+  </section>
+  </main>
+
+  <footer>
+    <span class="wordmark">SQaLe</span>
+    <div class="fcols">
+      <div>
+        <span class="label">Affiliations</span>
+        <span>University of Amsterdam</span>
+        <span>Centrum Wiskunde &amp; Informatica</span>
+      </div>
+      <div>
+        <span class="label">Contact</span>
+        <span class="mail">{cornelius.wolff, daniel.gomm, madelon.hulsebos}@cwi.nl</span>
+      </div>
+      <div>
+        <span class="label">Earlier version</span>
+        <a href="https://arxiv.org/abs/2602.22223" target="_blank" rel="noopener">SQaLe: A Large Text-to-SQL Corpus Grounded in Real Schemas</a>
+        <span>Website content MIT licensed</span>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<script src="assets/sqale-data.js"></script>
+<script>
+(function () {
+  "use strict";
+  var D = window.SQALE;
+  var NS = "http://www.w3.org/2000/svg";
+  var reduceMQ = window.matchMedia("(prefers-reduced-motion: reduce)");
+  var darkMQ = window.matchMedia("(prefers-color-scheme: dark)");
+
+  function $(s) { return document.querySelector(s); }
+  function svgEl(tag, attrs, parent) {
+    var e = document.createElementNS(NS, tag);
+    if (attrs) for (var k in attrs) e.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+  function fmt(n) { return n.toLocaleString("en-US"); }
+  // M_SQaLe -> M<sub>SQaLe</sub>
+  function mName(s) { return /^M_/.test(s) ? "M<sub>" + esc(s.slice(2)) + "</sub>" : esc(s); }
+  function mNameSvg(t, s) {
+    if (/^M_/.test(s)) {
+      t.appendChild(document.createTextNode("M"));
+      var sub = svgEl("tspan", { "baseline-shift": "sub", "font-size": "0.72em" }, t);
+      sub.textContent = s.slice(2);
+      // reset baseline for anything that follows
+      return svgEl("tspan", { "baseline-shift": "0" }, t);
+    }
+    t.appendChild(document.createTextNode(s));
+    return t;
+  }
+
+  // links from data
+  $("#lnk-dataset").href = D.links.dataset;
+  $("#lnk-code").href = D.links.code;
+  $("#lnk-model").href = D.links.model;
+  $("#lnk-paper").href = D.links.paper;
+
+  /* ======================= schema graph ======================= */
+  var S = D.schema, N = S.tables.length;
+  var idx = function (name) { return S.tables.indexOf(name); };
+  var deg = new Array(N).fill(0);
+  var adj = S.tables.map(function () { return []; });
+  S.edges.forEach(function (e) { deg[e[0]]++; deg[e[1]]++; adj[e[0]].push(e[1]); adj[e[1]].push(e[0]); });
+  var gold = S.gold.slice();
+  var goldSet = new Set(gold);
+  function ek(a, b) { return a < b ? a + "-" + b : b + "-" + a; }
+  var goldPairs = S.edges.filter(function (e) { return goldSet.has(e[0]) && goldSet.has(e[1]); });
+  var goldEdges = S.edges.filter(function (e) { return goldSet.has(e[0]) && goldSet.has(e[1]); }).map(function (e) { return ek(e[0], e[1]); });
+
+  // precomputed layout, normalised to [0, 1]
+  var NORM = S.pos;
+
+  // touches per trace step, as node indices
+  var T = D.trace.map(function (st) {
+    return { tool: st.tool, args: st.args, out: st.out, touch: st.touch === "all" ? "all" : st.touch.map(idx) };
+  });
+
+  var G = { host: $("#graph"), svg: null, nodes: [], overs: {}, width: 0, state: [T.length, "done"], timers: [], playing: false };
+
+  function layout(W, H, s) {
+    var padX = 18, padT = 22, padB = 18;
+    var R = S.cols.map(function (c, i) { var r = (2.1 + 1.3 * c) * s; return goldSet.has(i) ? Math.max(r, 7 * s) : r; });
+    var A = NORM.map(function (p) { return [padX + p[0] * (W - 2 * padX), padT + p[1] * (H - padT - padB)]; });
+    var P = A.map(function (p) { return [p[0], p[1]]; });
+    var gap = 2 + 1.5 * s;
+    for (var it = 0; it < 180; it++) {
+      for (var i = 0; i < N; i++) {
+        P[i][0] += (A[i][0] - P[i][0]) * 0.015;
+        P[i][1] += (A[i][1] - P[i][1]) * 0.015;
+      }
+      for (var a = 0; a < N; a++) for (var b = a + 1; b < N; b++) {
+        var dx = P[b][0] - P[a][0], dy = P[b][1] - P[a][1];
+        var d = Math.sqrt(dx * dx + dy * dy) || 0.01, min = R[a] + R[b] + gap;
+        if (d < min) {
+          var push = (min - d) / 2, ux = dx / d, uy = dy / d;
+          P[a][0] -= ux * push; P[a][1] -= uy * push;
+          P[b][0] += ux * push; P[b][1] += uy * push;
+        }
+      }
+      goldPairs.forEach(function (e) {
+        var ax = P[e[0]][0], ay = P[e[0]][1], bx = P[e[1]][0], by = P[e[1]][1];
+        var vx = bx - ax, vy = by - ay, L2 = vx * vx + vy * vy || 1;
+        for (var q = 0; q < N; q++) {
+          if (q === e[0] || q === e[1]) continue;
+          var t = Math.max(0, Math.min(1, ((P[q][0] - ax) * vx + (P[q][1] - ay) * vy) / L2));
+          var cx = ax + t * vx, cy = ay + t * vy, ddx = P[q][0] - cx, ddy = P[q][1] - cy;
+          var dd = Math.sqrt(ddx * ddx + ddy * ddy) || 0.01, need = R[q] + 6 * s;
+          if (dd < need && t > 0 && t < 1) { P[q][0] += ddx / dd * (need - dd); P[q][1] += ddy / dd * (need - dd); }
+        }
+      });
+      for (var j = 0; j < N; j++) {
+        P[j][0] = Math.max(R[j] + 2, Math.min(W - R[j] - 2, P[j][0]));
+        P[j][1] = Math.max(R[j] + 2, Math.min(H - R[j] - 2, P[j][1]));
+      }
+    }
+    return { P: P, R: R };
+  }
+
+  function drawGraph() {
+    var W = Math.round(G.host.clientWidth);
+    if (!W) return;
+    G.width = W;
+    var H = Math.round(W >= 640 ? W * 0.86 : W * 0.96);
+    var s = Math.max(0.6, Math.min(1.1, W / 760));
+    var L = layout(W, H, s), P = L.P, R = L.R;
+    G.host.innerHTML = "";
+    var svg = svgEl("svg", {
+      viewBox: "0 0 " + W + " " + H, width: W, height: H, "class": "graph",
+      role: "group", "aria-label": "Foreign-key graph of schema " + S.id + ", " + N + " tables and " + S.edges.length + " foreign keys. Arrow keys move between tables."
+    }, G.host);
+    G.svg = svg;
+    var gE = svgEl("g", { "aria-hidden": "true" }, svg);
+    S.edges.forEach(function (e) {
+      svgEl("line", { "class": "g-edge", x1: P[e[0]][0], y1: P[e[0]][1], x2: P[e[1]][0], y2: P[e[1]][1] }, gE);
+    });
+    var gO = svgEl("g", { "aria-hidden": "true" }, svg);
+    G.overs = {};
+    S.edges.forEach(function (e) {
+      var k = ek(e[0], e[1]);
+      if (goldEdges.indexOf(k) < 0) return;
+      // draw from the table that the step starts at, towards the other one
+      var a = e[0], b = e[1];
+      var ln = svgEl("line", { "class": "g-over", x1: P[a][0], y1: P[a][1], x2: P[b][0], y2: P[b][1] }, gO);
+      ln._len = Math.hypot(P[b][0] - P[a][0], P[b][1] - P[a][1]);
+      G.overs[k] = ln;
+    });
+    var gN = svgEl("g", {}, svg);
+    G.nodes = [];
+    for (var i = 0; i < N; i++) {
+      var g = svgEl("g", {
+        "class": "g-node", tabindex: i === gold[0] ? "0" : "-1", role: "img",
+        "aria-label": S.tables[i] + ", " + S.cols[i] + " columns" + (goldSet.has(i) ? ", used by the gold SQL" : ""),
+        transform: "translate(" + P[i][0].toFixed(1) + " " + P[i][1].toFixed(1) + ")",
+        style: "--d:" + (P[i][0] / W * 0.45).toFixed(3) + "s"
+      }, gN);
+      g._i = i;
+      svgEl("circle", { "class": "hit", r: Math.max(R[i] + 3, 9) }, g);
+      if (goldSet.has(i)) svgEl("circle", { "class": "halo", r: R[i] + 6 * s }, g);
+      svgEl("circle", { "class": "ring", r: R[i] + 3.5 }, g);
+      svgEl("circle", { "class": "dot", r: R[i] }, g);
+      G.nodes.push(g);
+    }
+    // gold labels, always on
+    var gL = svgEl("g", { "aria-hidden": "true" }, svg);
+    var fs = W < 480 ? 11 : 12.5;
+    var placed = [];
+    gold.forEach(function (i) {
+      var x = P[i][0], y = P[i][1], r = R[i] + 3;
+      var name = S.tables[i];
+      var tw = name.length * fs * 0.62, th = fs;
+      // candidate boxes [left, top] around the node; keep the one that covers the fewest other nodes
+      var c = [
+        [x + r + 4, y - th / 2], [x - r - 4 - tw, y - th / 2],
+        [x - tw / 2, y - r - 4 - th], [x - tw / 2, y + r + 4],
+        [x + r * 0.7, y - r * 0.7 - th - 2], [x - r * 0.7 - tw, y - r * 0.7 - th - 2],
+        [x + r * 0.7, y + r * 0.7 + 2], [x - r * 0.7 - tw, y + r * 0.7 + 2]
+      ];
+      var best = null, bestScore = Infinity;
+      c.forEach(function (b, ci) {
+        var x0 = b[0] - 3, y0 = b[1] - 3, x1 = b[0] + tw + 3, y1 = b[1] + th + 3;
+        var score = ci * 0.01;
+        if (x0 < 0 || x1 > W || y0 < 0 || y1 > H) score += 1000;
+        for (var j = 0; j < N; j++) {
+          if (j === i) continue;
+          var nx = Math.max(x0, Math.min(P[j][0], x1)), ny = Math.max(y0, Math.min(P[j][1], y1));
+          var dd = Math.hypot(P[j][0] - nx, P[j][1] - ny);
+          if (dd < R[j]) score += goldSet.has(j) ? 40 : 4 + R[j];
+        }
+        S.edges.forEach(function (e) {
+          // midpoints of edges as a cheap proxy for crossing lines
+          var mx = (P[e[0]][0] + P[e[1]][0]) / 2, my = (P[e[0]][1] + P[e[1]][1]) / 2;
+          if (mx > x0 && mx < x1 && my > y0 && my < y1) score += 1;
+        });
+        placed.forEach(function (q) { if (x0 < q[2] && x1 > q[0] && y0 < q[3] && y1 > q[1]) score += 500; });
+        if (score < bestScore) { bestScore = score; best = [x0, y0, x1, y1, b]; }
+      });
+      placed.push(best);
+      var t = svgEl("text", { "class": "g-label", "font-size": fs, x: best[4][0].toFixed(1), y: (best[4][1] + th * 0.82).toFixed(1) }, gL);
+      t.textContent = name;
+    });
+    // hover tip
+    var tip = svgEl("g", { "class": "g-tip", visibility: "hidden", "aria-hidden": "true" }, svg);
+    var tipR = svgEl("rect", { rx: 4, height: 22 }, tip);
+    var tipT = svgEl("text", { y: 15, x: 8 }, tip);
+    function showTip(g) {
+      var i = g._i;
+      G.nodes.forEach(function (n) { n.classList.remove("is-hover"); });
+      g.classList.add("is-hover");
+      tipT.textContent = S.tables[i] + " · " + S.cols[i] + " cols";
+      var w = tipT.getComputedTextLength() + 16;
+      tipR.setAttribute("width", w);
+      var x = P[i][0] - w / 2, y = P[i][1] - R[i] - 30;
+      if (y < 0) y = P[i][1] + R[i] + 8;
+      x = Math.max(0, Math.min(W - w, x));
+      tip.setAttribute("transform", "translate(" + x.toFixed(1) + " " + y.toFixed(1) + ")");
+      tip.setAttribute("visibility", "visible");
+    }
+    function hideTip() { tip.setAttribute("visibility", "hidden"); G.nodes.forEach(function (n) { n.classList.remove("is-hover"); }); }
+    G.nodes.forEach(function (g) {
+      g.addEventListener("pointerenter", function () { showTip(g); });
+      g.addEventListener("pointerleave", hideTip);
+      g.addEventListener("focus", function () { showTip(g); });
+      g.addEventListener("blur", hideTip);
+      g.addEventListener("keydown", function (ev) {
+        var i = g._i, next = null;
+        if (ev.key === "ArrowRight" || ev.key === "ArrowDown") next = (i + 1) % N;
+        else if (ev.key === "ArrowLeft" || ev.key === "ArrowUp") next = (i - 1 + N) % N;
+        else if (ev.key === "Home") next = 0;
+        else if (ev.key === "End") next = N - 1;
+        if (next === null) return;
+        ev.preventDefault();
+        g.setAttribute("tabindex", "-1");
+        G.nodes[next].setAttribute("tabindex", "0");
+        G.nodes[next].focus();
+      });
+    });
+    applyState(G.state[0], G.state[1], false);
+  }
+
+  /* ---- episode state ---- */
+  function computeState(k, phase) {
+    var st = { active: new Set(), seen: new Set(), lit: new Set(), eActive: new Set(), eSeen: new Set(), eLit: new Set(), listing: false, result: false };
+    for (var j = 1; j <= k; j++) {
+      var step = T[j - 1], cur = (j === k && phase === "active");
+      if (step.touch === "all") { if (cur) st.listing = true; continue; }
+      if (step.tool === "submit_sql") {
+        step.touch.forEach(function (i) { (cur ? st.active : st.lit).add(i); });
+        goldEdges.forEach(function (e) { (cur ? st.eActive : st.eLit).add(e); });
+        if (!cur) st.result = true;
+        continue;
+      }
+      if (step.touch.length === 2) {
+        var e = ek(step.touch[0], step.touch[1]);
+        (cur ? st.eActive : st.eSeen).add(e);
+      }
+      step.touch.forEach(function (i) { (cur ? st.active : st.seen).add(i); });
+    }
+    return st;
+  }
+
+  function applyState(k, phase, animate) {
+    G.state = [k, phase];
+    var st = computeState(k, phase);
+    if (G.svg) {
+      G.svg.classList.toggle("listing", st.listing);
+      if (st.listing) G.svg.classList.add("sweep");
+      else if (!(k === 1 && phase === "done")) G.svg.classList.remove("sweep");
+      G.nodes.forEach(function (g, i) {
+        var c = st.active.has(i) ? "is-active" : st.lit.has(i) ? "is-lit" : st.seen.has(i) ? "is-seen" : "";
+        g.classList.remove("is-active", "is-lit", "is-seen");
+        if (c) g.classList.add(c);
+      });
+      Object.keys(G.overs).forEach(function (key) {
+        var ln = G.overs[key];
+        var c = st.eActive.has(key) ? "is-active" : st.eLit.has(key) ? "is-lit" : st.eSeen.has(key) ? "is-seen" : "";
+        var wasHidden = !ln.classList.contains("is-active") && !ln.classList.contains("is-seen") && !ln.classList.contains("is-lit");
+        ln.classList.remove("is-active", "is-lit", "is-seen");
+        ln.style.transition = ""; ln.style.strokeDasharray = ""; ln.style.strokeDashoffset = "";
+        if (c) ln.classList.add(c);
+        if (animate && c === "is-active" && wasHidden && !reduceMQ.matches) {
+          var len = ln._len;
+          ln.style.transition = "none";
+          ln.style.strokeDasharray = len + " " + len;
+          ln.style.strokeDashoffset = len;
+          ln.getBoundingClientRect();
+          ln.style.transition = "stroke-dashoffset .75s cubic-bezier(.4,0,.2,1)";
+          ln.style.strokeDashoffset = "0";
+        }
+      });
+    }
+    // trace rows
+    var rows = document.querySelectorAll("#steps .step");
+    rows.forEach(function (row, n) {
+      var j = n + 1;
+      var state = j < k ? "done" : j === k ? (phase === "active" ? "active" : "done") : "pending";
+      row.classList.remove("done", "active", "pending");
+      row.classList.add(state);
+      if (j === k) row.setAttribute("aria-current", "step"); else row.removeAttribute("aria-current");
+    });
+    $("#result").classList.toggle("pending", !st.result);
+  }
+
+  function stopPlay() {
+    G.timers.forEach(clearTimeout); G.timers = []; G.playing = false;
+  }
+  function play() {
+    if (reduceMQ.matches) return;
+    stopPlay();
+    G.playing = true;
+    var seq = [[0, "done", 650]];
+    for (var k = 1; k <= T.length; k++) {
+      seq.push([k, "active", k === 1 ? 1100 : (k === T.length ? 1200 : 1050)]);
+      seq.push([k, "done", k === T.length ? 0 : 380]);
+    }
+    var t = 0;
+    seq.forEach(function (s) {
+      G.timers.push(setTimeout(function () { applyState(s[0], s[1], true); }, t));
+      t += s[2];
+    });
+    G.timers.push(setTimeout(function () { G.playing = false; }, t));
+  }
+
+  /* ---- trace panel ---- */
+  (function buildTrace() {
+    var ol = $("#steps");
+    T.forEach(function (st, n) {
+      var li = document.createElement("li");
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "step done";
+      b.innerHTML = '<span class="pip" aria-hidden="true"></span><span class="n">' + (n + 1) + '</span>' +
+        '<span class="call"><b>' + esc(st.tool) + '</b><span class="args">(' + esc(st.args) + ')</span></span>' +
+        '<span class="out">' + esc(st.out) + '</span>';
+      b.setAttribute("aria-label", "Step " + (n + 1) + ": " + st.tool + ". Show the graph after this step.");
+      b.addEventListener("click", function () { stopPlay(); applyState(n + 1, "done", false); });
+      li.appendChild(b);
+      ol.appendChild(li);
+    });
+    var ex = D.example;
+    var h = '<table><thead><tr>' + ex.resultColumns.map(function (c) { return '<th scope="col">' + esc(c) + '</th>'; }).join("") + '</tr></thead><tbody>' +
+      ex.result.map(function (r) { return '<tr>' + r.map(function (v) { return '<td>' + esc(v) + '</td>'; }).join("") + '</tr>'; }).join("") + '</tbody></table>';
+    $("#result").innerHTML = h;
+    $("#replay").addEventListener("click", play);
+  })();
+
+  // hero copy from data
+  (function heroCopy() {
+    var verbose = D.styles.filter(function (s) { return s.key === "verbose"; })[0] || D.styles[0];
+    $("#hero-q").textContent = verbose.text;
+    $("#q-label").textContent = "Question · verbose phrasing · " + D.example.difficulty;
+    $("#ep-kicker").textContent = S.id + " · test split · " + N + " tables · " + fmt(S.rows) + " rows";
+    $("#ep-title").innerHTML = N + " tables. The question needs <em>" + gold.length + "</em>.";
+  })();
+
+  /* ======================= example ======================= */
+  (function example() {
+    var tabs = $("#tabs"), out = $("#phrasing");
+    var btns = D.styles.map(function (s, n) {
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "tab"; b.setAttribute("role", "tab");
+      b.id = "tab-" + s.key; b.setAttribute("aria-controls", "tabpanel");
+      b.innerHTML = '<span class="pip" aria-hidden="true"></span>' + esc(s.label);
+      b.addEventListener("click", function () { select(n, false); });
+      b.addEventListener("keydown", function (ev) {
+        var m = null;
+        if (ev.key === "ArrowDown" || ev.key === "ArrowRight") m = (n + 1) % D.styles.length;
+        if (ev.key === "ArrowUp" || ev.key === "ArrowLeft") m = (n - 1 + D.styles.length) % D.styles.length;
+        if (m !== null) { ev.preventDefault(); select(m, true); }
+      });
+      tabs.appendChild(b);
+      return b;
+    });
+    function select(n, focus) {
+      btns.forEach(function (b, m) { b.setAttribute("aria-selected", m === n ? "true" : "false"); b.tabIndex = m === n ? 0 : -1; });
+      $("#tabpanel").setAttribute("aria-labelledby", btns[n].id);
+      out.textContent = D.styles[n].text;
+      if (focus) btns[n].focus();
+    }
+    select(0, false);
+
+    var goldNames = gold.map(function (i) { return S.tables[i]; });
+    var h = esc(D.example.sqlPretty)
+      .replace(/'[^']*'/g, function (m) { return '<span class="s">' + m + '</span>'; })
+      .replace(/\b(SELECT|DISTINCT|FROM|JOIN|ON|WHERE|AND)\b/g, '<span class="k">$1</span>')
+      .replace(new RegExp("\\b(" + goldNames.join("|") + ")\\b", "g"), '<span class="t">$1</span>');
+    $("#sql").innerHTML = h;
+
+    var ex = D.example;
+    $("#rowtable").innerHTML = '<thead><tr>' + ex.resultColumns.map(function (c) { return '<th scope="col">' + esc(c) + '</th>'; }).join("") + '</tr></thead><tbody>' +
+      ex.result.map(function (r) { return '<tr>' + r.map(function (v) { return '<td>' + esc(v) + '</td>'; }).join("") + '</tr>'; }).join("") + '</tbody>';
+
+    var dots = $("#dots");
+    for (var i = 0; i < N; i++) {
+      var d = document.createElement("i");
+      if (goldSet.has(i)) d.className = "on";
+      dots.appendChild(d);
+    }
+    $("#strip-label").textContent = "Tables used · " + gold.length + " of " + N;
+    $("#strip-note").innerHTML = "The SQL reads " + goldNames.map(function (n) { return "<code>" + esc(n) + "</code>"; }).join(", ").replace(/, ([^,]*)$/, " and $1") +
+      ". The other " + (N - gold.length) + " tables of " + esc(S.id) + " are not needed for this question.";
+  })();
+
+  /* ======================= compare ======================= */
+  (function compare() {
+    var maxC = Math.max.apply(null, D.compare.map(function (r) { return r.medCols; }));
+    var h = '<thead><tr><th scope="col">Dataset</th><th scope="col">Schemas</th><th scope="col">Median tables</th><th scope="col" style="text-align:left">Median columns</th><th scope="col">Foreign keys</th><th scope="col">Median rows per table</th></tr></thead><tbody>';
+    D.compare.forEach(function (r) {
+      var ours = r.name === "SQaLe";
+      h += '<tr class="' + (ours ? "ours" : "") + '"><td>' + esc(r.name) + '</td><td>' + fmt(r.schemas) + '</td><td>' + (+r.medTables.toFixed(1)) + '</td>' +
+        '<td class="barcell"><span class="hbar"><span class="v">' + fmt(r.medCols) + '</span><span class="track"><span class="fill' + (ours ? " ours" : "") + '" style="width:' + (r.medCols / maxC * 100).toFixed(1) + '%"></span></span></span></td>' +
+        '<td>' + fmt(r.fks) + '</td><td>' + (r.medRows == null ? '<span class="na">n/a</span>' : fmt(r.medRows)) + '</td></tr>';
+    });
+    $("#compare-table").innerHTML = h + '</tbody>';
+  })();
+
+  /* ======================= results matrix ======================= */
+  (function matrix() {
+    var desc = {
+      "M_SQaLe": "Qwen3.5-2B + GRPO on SQaLe",
+      "M_BIRD": "Qwen3.5-2B + GRPO on BIRD train",
+      "M_SynSQL": "Qwen3.5-2B + GRPO on SynSQL-2.5M",
+      "Qwen3.5-2B": "untrained base model",
+      "Qwen3.6-27B": "general-purpose, 27B"
+    };
+    var cols = [["sqale", "SQaLe test"], ["bird", "BIRD"], ["ehrsql", "EHRSQL"]];
+    var h = '<thead><tr><th scope="col">Model</th>' + cols.map(function (c) { return '<th scope="col">' + c[1] + '</th>'; }).join("") + '</tr></thead><tbody>';
+    D.matrix.forEach(function (r) {
+      var cls = r.kind === "ours" ? "ours" : (r.model === "Qwen3.6-27B" ? "ref" : "");
+      var fillCls = r.kind === "ours" ? "ours" : r.kind === "trained" ? "trained" : "base";
+      h += '<tr class="' + cls + '"><td><span class="mname">' + mName(r.model) + '</span><span class="mdesc">' + esc(desc[r.model] || "") + '</span></td>';
+      cols.forEach(function (c) {
+        var v = r[c[0]];
+        h += '<td>' + (v == null ? '<span class="na">not measured</span>' :
+          '<span class="cell"><span class="v">' + v.toFixed(1) + '</span><span class="hbar" style="display:block"><span class="track" style="display:block"><span class="fill ' + fillCls + '" style="width:' + v + '%"></span></span></span></span>') + '</td>';
+      });
+      h += '</tr>';
+    });
+    $("#matrix").innerHTML = h + '</tbody>';
+  })();
+
+  /* ======================= pareto scatter ======================= */
+  var paretoW = 0;
+  function drawPareto() {
+    var host = $("#pareto"), tipEl = $("#pareto-tip");
+    var W = Math.round(host.clientWidth);
+    if (!W) return;
+    paretoW = W;
+    var H = Math.round(Math.max(300, Math.min(440, W * 0.56)));
+    var m = { l: 40, r: 18, t: 22, b: 46 };
+    var x0 = Math.log(1.6), x1 = Math.log(85);
+    var X = function (v) { return m.l + (Math.log(v) - x0) / (x1 - x0) * (W - m.l - m.r); };
+    var Y = function (v) { return H - m.b - v / 0.7 * (H - m.t - m.b); };
+    var k = W < 520 ? 0.78 : 1;
+    var rad = function (tf) { return (3 + 0.17 * Math.sqrt(tf)) * k; };
+    var old = host.querySelector("svg"); if (old) old.remove();
+    var svg = svgEl("svg", { viewBox: "0 0 " + W + " " + H, width: W, height: H, role: "img",
+      "aria-label": "Scatter of output-match rate against parameter count for " + D.pareto.length + " models. The data table below lists every point." });
+    host.insertBefore(svg, tipEl);
+    var ax = svgEl("g", { "class": "ax" }, svg);
+    [0, 0.2, 0.4, 0.6].forEach(function (v) {
+      svgEl("line", { x1: m.l, x2: W - m.r, y1: Y(v), y2: Y(v), "class": v === 0 ? "base" : "" }, ax);
+      var t = svgEl("text", { x: m.l - 8, y: Y(v) + 4, "text-anchor": "end" }, ax); t.textContent = Math.round(v * 100);
+    });
+    var yt = svgEl("text", { x: m.l - 8, y: m.t - 9, "text-anchor": "start", "class": "title" }, ax);
+    yt.textContent = "accuracy (%)";
+    yt.setAttribute("x", 0);
+    [2, 4, 8, 16, 32, 64].forEach(function (v) {
+      svgEl("line", { x1: X(v), x2: X(v), y1: H - m.b, y2: H - m.b + 5, "class": "base" }, ax);
+      var t = svgEl("text", { x: X(v), y: H - m.b + 19, "text-anchor": "middle" }, ax); t.textContent = v;
+    });
+    var xt = svgEl("text", { x: W - m.r, y: H - 6, "text-anchor": "end", "class": "title" }, ax);
+    xt.textContent = "parameters (B, log scale)";
+
+    var pts = D.pareto.slice().sort(function (a, b) {
+      var o = { base: 0, trained: 1, ours: 2 };
+      return (o[a.kind] - o[b.kind]) || (b.tflops - a.tflops);
+    });
+    var gP = svgEl("g", {}, svg);
+    var marks = [];
+    pts.forEach(function (p) {
+      var c = svgEl("circle", { cx: X(p.params), cy: Y(p.acc), r: rad(p.tflops), "class": "pt " + p.kind }, gP);
+      marks.push({ p: p, c: c });
+    });
+    // direct labels, selective
+    var L = {
+      "M_SQaLe": [1, 0, "start", true],
+      "M_BIRD": [1, 0, "start", false],
+      "M_SynSQL": [1, 0, "start", false],
+      "Qwen3.5-9B": [0, -1, "middle", true],
+      "Qwen3.5-27B": [1, -1, "start", true]
+    };
+    var gL = svgEl("g", { "aria-hidden": "true" }, svg);
+    D.pareto.forEach(function (p) {
+      var cfg = L[p.model]; if (!cfg) return;
+      var r = rad(p.tflops), x = X(p.params), y = Y(p.acc);
+      var lx = x + cfg[0] * (r + 6), ly = y + 4 + (cfg[1] < 0 ? -(r + 8) : 0);
+      if (cfg[1] < 0 && cfg[0] > 0) { lx = x + r * 0.4; }
+      var t = svgEl("text", { x: lx.toFixed(1), y: ly.toFixed(1), "text-anchor": cfg[2], "class": "plbl" + (p.kind === "ours" ? " ours" : "") }, gL);
+      var tail = mNameSvg(t, p.model);
+      if (cfg[3]) {
+        var v = svgEl("tspan", { "class": "pv", dx: 5 }, tail === t ? t : t);
+        v.textContent = Math.round(p.acc * 100) + "%";
+      }
+    });
+    // hover layer
+    var gH = svgEl("g", {}, svg);
+    marks.slice().reverse().forEach(function (mk) {
+      var p = mk.p;
+      var h = svgEl("circle", { cx: X(p.params), cy: Y(p.acc), r: Math.max(rad(p.tflops) + 3, 11), "class": "hit" }, gH);
+      h.addEventListener("pointerenter", function () {
+        mk.c.classList.add("hover");
+        tipEl.innerHTML = mName(p.model) + "<br>" + p.params + "B · " + Math.round(p.acc * 100) + "% · " + fmt(Math.round(p.tflops)) + " TFLOPs";
+        tipEl.style.left = (X(p.params) / W * 100) + "%";
+        tipEl.style.top = (Y(p.acc) - rad(p.tflops)) / H * 100 + "%";
+        tipEl.classList.add("on");
+      });
+      h.addEventListener("pointerleave", function () { mk.c.classList.remove("hover"); tipEl.classList.remove("on"); });
+    });
+  }
+  (function paretoTable() {
+    var rows = D.pareto.slice().sort(function (a, b) { return a.params - b.params || b.acc - a.acc; });
+    var h = '<thead><tr><th scope="col">Model</th><th scope="col">Parameters (B)</th><th scope="col">Accuracy (%)</th><th scope="col">TFLOPs per question</th></tr></thead><tbody>';
+    rows.forEach(function (p) {
+      h += '<tr class="' + (p.kind === "ours" ? "ours" : "") + '"><td>' + mName(p.model) + '</td><td>' + p.params + '</td><td>' + Math.round(p.acc * 100) + '</td><td>' + p.tflops.toFixed(1) + '</td></tr>';
+    });
+    $("#pareto-table").innerHTML = h + '</tbody>';
+  })();
+
+  /* ======================= findings ======================= */
+  (function glyphs() {
+    // BFS outward from the gold tables to pick 32 distractors on the example schema
+    var seen = new Set(gold), order = [], q = gold.slice();
+    while (q.length && order.length < 32) {
+      var u = q.shift();
+      adj[u].forEach(function (v) { if (!seen.has(v) && order.length < 32) { seen.add(v); order.push(v); q.push(v); } });
+    }
+    var levels = [
+      { set: new Set(gold), d: D.scale[0] },
+      { set: new Set(gold.concat(order)), d: D.scale[1] },
+      { set: new Set(S.tables.map(function (_, i) { return i; })), d: D.scale[2] }
+    ];
+    var host = $("#glyphs");
+    var GW = 200, GH = 120, pad = 8;
+    levels.forEach(function (lv) {
+      var wrap = document.createElement("div"); wrap.className = "glyph";
+      var svg = svgEl("svg", { viewBox: "0 0 " + GW + " " + GH, "aria-hidden": "true" });
+      var P = NORM.map(function (p) { return [pad + p[0] * (GW - 2 * pad), pad + p[1] * (GH - 2 * pad)]; });
+      S.edges.forEach(function (e) {
+        if (!lv.set.has(e[0]) || !lv.set.has(e[1])) return;
+        var g = goldSet.has(e[0]) && goldSet.has(e[1]);
+        svgEl("line", { x1: P[e[0]][0], y1: P[e[0]][1], x2: P[e[1]][0], y2: P[e[1]][1], "class": "e" + (g ? " gold" : "") }, svg);
+      });
+      lv.set.forEach(function (i) {
+        var g = goldSet.has(i);
+        svgEl("circle", { cx: P[i][0], cy: P[i][1], r: g ? 3.6 : 1.2 + S.cols[i] * 0.32, "class": "n" + (g ? " gold" : "") }, svg);
+      });
+      wrap.appendChild(svg);
+      var lab = document.createElement("span"); lab.className = "gl";
+      lab.textContent = lv.d.level;
+      wrap.appendChild(lab);
+      // execution accuracy as columns on one shared 0 to 60 scale
+      var BW = 160, BH = 122, base = 96, top = 16, bw = 34, bg = 12, x0 = (BW - (3 * bw + 2 * bg)) / 2;
+      var bars = svgEl("svg", { viewBox: "0 0 " + BW + " " + BH, "class": "bars", role: "img",
+        "aria-label": lv.d.level + ": M SQaLe " + lv.d.sqale[0] + ", M BIRD " + lv.d.bird[0] + ", M SynSQL " + lv.d.synsql[0] + " percent" });
+      [["M_SQaLe", "sqale", "ours"], ["M_BIRD", "bird", ""], ["M_SynSQL", "synsql", ""]].forEach(function (m, n) {
+        var v = lv.d[m[1]][0], h = v / 60 * (base - top), x = x0 + n * (bw + bg), y = base - h;
+        svgEl("path", { d: "M" + x + " " + base + "V" + (y + 4) + "Q" + x + " " + y + " " + (x + 4) + " " + y + "H" + (x + bw - 4) + "Q" + (x + bw) + " " + y + " " + (x + bw) + " " + (y + 4) + "V" + base + "Z", "class": "b " + m[2] }, bars);
+        var tv = svgEl("text", { x: x + bw / 2, y: y - 5, "class": "bv" }, bars); tv.textContent = v.toFixed(1);
+        var tl = svgEl("text", { x: x + bw / 2, y: base + 17, "class": "bl " + m[2] }, bars); mNameSvg(tl, m[0]);
+      });
+      svgEl("line", { x1: x0 - 6, x2: BW - x0 + 6, y1: base + 0.5, y2: base + 0.5, "class": "base" }, bars);
+      wrap.appendChild(bars);
+      host.appendChild(wrap);
+    });
+  })();
+
+  (function literals() {
+    var host = $("#literals");
+    D.literalsSeen.forEach(function (r) {
+      var kind = r.model === "M_SQaLe" ? "ours" : /^M_/.test(r.model) ? "trained" : "base";
+      var lbl = r.model;
+      var d = document.createElement("div"); d.className = "row " + kind;
+      d.innerHTML = '<span class="nm">' + mName(lbl) + '</span><span class="track"><span class="fill" style="width:' + r.pct + '%"></span></span><span class="v">' + r.pct + '</span>';
+      host.appendChild(d);
+    });
+    var ax = document.createElement("div"); ax.className = "row";
+    ax.innerHTML = '<span></span><span class="daxis"><span style="left:0%">0</span><span style="left:50%">50</span><span style="left:100%">100</span></span><span></span>';
+    host.appendChild(ax);
+  })();
+
+  (function domains() {
+    var host = $("#domains");
+    var lo = 30, hi = 50, pct = function (v) { return ((v - lo) / (hi - lo) * 100).toFixed(2) + "%"; };
+    var key = document.createElement("div"); key.className = "dkey";
+    key.innerHTML = '<span><i class="sw teal"></i><span>M<sub>SQaLe</sub></span></span><span><i class="sw g2"></i><span>M<sub>BIRD</sub></span></span>';
+    host.appendChild(key);
+    D.domain.forEach(function (r) {
+      var gap = (r.sqale - r.bird).toFixed(1);
+      var row = document.createElement("div"); row.className = "drow";
+      row.innerHTML = '<span class="dl">' + esc(r.split) + '</span>' +
+        '<span class="dtrack" role="img" aria-label="' + esc(r.split) + ": M SQaLe " + r.sqale + ", M BIRD " + r.bird + '">' +
+        '<span class="ln" style="left:' + pct(Math.min(r.bird, r.sqale)) + ';width:calc(' + pct(Math.max(r.bird, r.sqale)) + ' - ' + pct(Math.min(r.bird, r.sqale)) + ')"></span>' +
+        '<span class="d b" style="left:' + pct(r.bird) + '"></span>' +
+        '<span class="d s" style="left:' + pct(r.sqale) + '"></span>' +
+        '<span class="gap num" style="left:calc((' + pct(r.bird) + ' + ' + pct(r.sqale) + ') / 2)">+' + gap + '</span></span>';
+      host.appendChild(row);
+    });
+    var ax = document.createElement("div"); ax.className = "drow";
+    var ticks = [30, 35, 40, 45, 50].map(function (v) { return '<span style="left:' + pct(v) + '">' + v + '</span>'; }).join("");
+    ax.innerHTML = '<span></span><span class="daxis">' + ticks + '</span>';
+    host.appendChild(ax);
+  })();
+
+  /* ======================= BibTeX ======================= */
+  (function bib() {
+    var pre = $("#bibtex"), btn = $("#copy");
+    pre.textContent = D.bibtex;
+    var timer;
+    function flash(msg) {
+      btn.textContent = msg; btn.classList.add("done");
+      clearTimeout(timer);
+      timer = setTimeout(function () { btn.textContent = "Copy BibTeX"; btn.classList.remove("done"); }, 1600);
+    }
+    function selectPre() {
+      var r = document.createRange(); r.selectNodeContents(pre);
+      var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+    }
+    btn.addEventListener("click", function () {
+      var p;
+      try { p = navigator.clipboard.writeText(D.bibtex); } catch (e) { p = Promise.reject(e); }
+      p.then(function () { flash("Copied"); }).catch(function () {
+        selectPre();
+        var ok = false;
+        try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+        flash(ok ? "Copied" : "Selected, press Ctrl+C");
+      });
+    });
+  })();
+
+  /* ======================= boot ======================= */
+  drawGraph();
+  drawPareto();
+  var rt;
+  window.addEventListener("resize", function () {
+    clearTimeout(rt);
+    rt = setTimeout(function () {
+      if (Math.round(G.host.clientWidth) !== G.width) drawGraph();
+      if (Math.round($("#pareto").clientWidth) !== paretoW) drawPareto();
+    }, 120);
+  });
+  // SVG marks take their colours from tokens through CSS; redraw anyway so any computed state follows the theme
+  var onScheme = function () { drawGraph(); drawPareto(); };
+  if (darkMQ.addEventListener) darkMQ.addEventListener("change", onScheme); else if (darkMQ.addListener) darkMQ.addListener(onScheme);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () {
+    if (Math.round(G.host.clientWidth) !== G.width) drawGraph();
+    if (Math.round($("#pareto").clientWidth) !== paretoW) drawPareto();
+  });
+
+  // The end state is on screen from the first paint. Play the episode once, from that state,
+  // when the graph is in view and motion is allowed.
+  var autoplay = !reduceMQ.matches && !/[?&]still\b/.test(location.search);
+  if (autoplay) {
+    var rect = G.host.getBoundingClientRect();
+    if (rect.top < window.innerHeight && rect.bottom > 0) G.timers.push(setTimeout(play, 1400));
+  }
+  reduceMQ.addEventListener && reduceMQ.addEventListener("change", function () { if (reduceMQ.matches) { stopPlay(); applyState(T.length, "done", false); } });
+})();
+</script>
+</body>
+</html>

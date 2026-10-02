@@ -1,0 +1,1225 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SQaLe dataset</title>
+<meta name="description" content="SQaLe is a semi-synthetic text-to-SQL dataset: 1,408,056 questions paired with SQL, built on 9,259 real-world schemas with a median of 113 tables, for training small specialised models.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=DM+Mono:wght@400;500&display=swap">
+<style>
+/*
+  DESIGN PLAN: "To Scale"
+  Layout: a Swiss poster on a strict 12-column grid (labels in cols 1-3, statements in 4-12,
+  figures full width); every comparison is a literal, proportional drawing labelled with its exact number.
+  Colours (4 + derived steps):
+    --bg      white / near-black ground
+    --fg      near-black / off-white type, rules
+    --grey    mid grey for the other datasets and models (--grey-2: context marks, --hair: grid, --surface: code)
+    --accent  highlighter yellow #FFD60A, SQaLe only: solid fills and text-highlight blocks, always black text on it
+  Type: Archivo variable (display: wdth 125 / wght 900; body: wdth 100 / wght 400) and DM Mono (data labels, SQL).
+*/
+:root {
+  --bg: #ffffff;
+  --fg: #111111;
+  --fg-2: #565656;
+  --grey: #8a8a8a;
+  --grey-2: #cdcdcd;
+  --hair: #e3e3e3;
+  --surface: #f4f4f2;
+  --rule: #111111;
+  --accent: #ffd60a;
+  --on-accent: #111111;
+  --accent-line: #111111;
+  --tip-bg: #111111;
+  --tip-fg: #ffffff;
+
+  --sans: "Archivo", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --mono: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --gap: 24px;
+  --fs-lead: clamp(19px, 1.55vw, 22px);
+  --fs-h2: clamp(34px, 4.7vw, 68px);
+  --fs-h3: clamp(20px, 1.75vw, 25px);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e0e0d;
+    --fg: #edece6;
+    --fg-2: #a6a59e;
+    --grey: #7b7b76;
+    --grey-2: #3a3a37;
+    --hair: #272725;
+    --surface: #181817;
+    --rule: #edece6;
+    --accent: #ffd60a;
+    --on-accent: #0e0e0d;
+    --accent-line: #ffd60a;
+    --tip-bg: #edece6;
+    --tip-fg: #0e0e0d;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e0e0d;
+  --fg: #edece6;
+  --fg-2: #a6a59e;
+  --grey: #7b7b76;
+  --grey-2: #3a3a37;
+  --hair: #272725;
+  --surface: #181817;
+  --rule: #edece6;
+  --accent: #ffd60a;
+  --on-accent: #0e0e0d;
+  --accent-line: #ffd60a;
+  --tip-bg: #edece6;
+  --tip-fg: #0e0e0d;
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth }
+body {
+  background: var(--bg); color: var(--fg);
+  margin: 0;
+  padding-left: max(clamp(16px, 3.4vw, 48px), env(safe-area-inset-left));
+  padding-right: max(clamp(16px, 3.4vw, 48px), env(safe-area-inset-right));
+  font-family: var(--sans); font-stretch: 100%; font-weight: 400;
+  font-size: 17px; line-height: 28px;
+  -webkit-font-smoothing: antialiased;
+}
+.page { max-width: 1344px; margin-inline: auto }
+p { margin: 0 }
+a { color: inherit }
+sub { font-size: .66em; line-height: 0; position: relative; vertical-align: baseline; top: .26em }
+sup { font-size: .62em; line-height: 0; position: relative; vertical-align: baseline; top: -.6em }
+:focus-visible { outline: 3px solid var(--fg); outline-offset: 3px }
+::selection { background: var(--accent); color: var(--on-accent) }
+
+/* ---------- grid ---------- */
+.g12 { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gap); row-gap: 32px }
+.g12 > * { min-width: 0 }
+.c1-3 { grid-column: 1 / 4 } .c4-12 { grid-column: 4 / 13 } .c4-10 { grid-column: 4 / 11 }
+.c1-12 { grid-column: 1 / 13 } .c1-7 { grid-column: 1 / 8 } .c8-12 { grid-column: 8 / 13 }
+.c1-6 { grid-column: 1 / 7 } .c7-9 { grid-column: 7 / 10 } .c10-12 { grid-column: 10 / 13 }
+.c1-4 { grid-column: 1 / 5 } .c5-8 { grid-column: 5 / 9 } .c9-12 { grid-column: 9 / 13 }
+.c1-5 { grid-column: 1 / 6 } .c4-6 { grid-column: 4 / 7 } .c6-12 { grid-column: 6 / 13 } .c7-12 { grid-column: 7 / 13 }
+
+/* ---------- type ---------- */
+h1, h2, h3 { margin: 0; text-wrap: balance; font-weight: 800 }
+.label {
+  font-family: var(--mono); font-size: 12px; line-height: 16px; font-weight: 500;
+  letter-spacing: .12em; text-transform: uppercase; color: var(--fg-2);
+}
+.h2 { font-size: var(--fs-h2); line-height: 1; font-weight: 850; font-stretch: 118%; letter-spacing: -.024em }
+.h3 { font-size: var(--fs-h3); line-height: 1.2; font-weight: 750; font-stretch: 108%; letter-spacing: -.01em }
+.lead { font-size: var(--fs-lead); line-height: 1.5; max-width: 62ch }
+.body { max-width: 65ch }
+.small { font-size: 14px; line-height: 20px; color: var(--fg-2) }
+.mono { font-family: var(--mono) }
+.mono, .code, .bib pre, .label, .contact, .readout, .result, .t-mono, .t-val, .fact, .tip { font-variant-ligatures: none }
+.tnum { font-variant-numeric: tabular-nums }
+.nowrap { white-space: nowrap }
+.hl, mark {
+  background: var(--accent); color: var(--on-accent);
+  padding: 0 .14em; -webkit-box-decoration-break: clone; box-decoration-break: clone;
+}
+
+/* ---------- hero ---------- */
+.hero { padding-block: 20px 72px }
+.topbar { display: flex; justify-content: space-between; align-items: baseline; gap: 12px 24px; flex-wrap: wrap }
+.topbar .status { color: var(--fg) }
+.nav { display: flex; flex-wrap: wrap; gap: 4px 20px; list-style: none; margin: 0; padding: 0 }
+.nav a { text-decoration: none; color: var(--fg-2); padding-block: 4px }
+.nav a:hover { color: var(--fg); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px }
+.wordmark {
+  font-weight: 900; font-stretch: 125%; letter-spacing: -.035em;
+  font-size: min(24vw, 320px); line-height: .8;
+  padding-block: .14em .2em; white-space: nowrap;
+}
+.wordmark span { display: inline-block; margin-left: -.035em }
+.hero-block { align-items: start; padding-top: 24px; border-top: 2px solid var(--rule) }
+.subtitle { font-size: clamp(26px, 2.75vw, 40px); line-height: 1.08; font-weight: 750; font-stretch: 112%; letter-spacing: -.015em; text-wrap: balance; max-width: 18ch }
+.authors { display: grid; gap: 4px; list-style: none; margin: 0; padding: 0; font-size: 19px; line-height: 28px; font-weight: 600; font-stretch: 105% }
+.affs { display: grid; gap: 2px; list-style: none; margin: 16px 0 0; padding: 0; font-size: 15px; line-height: 22px; color: var(--fg-2) }
+.links { list-style: none; margin: 0; padding: 0; display: grid }
+.links a {
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  padding: 9px 6px; border-top: 2px solid var(--rule);
+  font-size: 20px; line-height: 28px; font-weight: 750; font-stretch: 115%;
+  text-decoration: none; color: var(--fg);
+}
+.links li:last-child a { border-bottom: 2px solid var(--rule) }
+.links a:hover { background: var(--accent); color: var(--on-accent) }
+.links a:focus-visible { outline-offset: -3px }
+.ico { width: 18px; height: 18px; flex: none }
+
+/* ---------- sections ---------- */
+.sec { border-top: 2px solid var(--rule); padding-block: 20px 104px }
+.sec-head { margin-bottom: 56px; row-gap: 20px }
+.sec-head .label { grid-column: 1 / 4; padding-top: 4px }
+.sec-head .h2 { grid-column: 4 / 13 }
+.sec-head .lead { grid-column: 4 / 12 }
+.cap { display: grid; gap: 4px; margin-bottom: 16px }
+.cap .t { font-weight: 700; font-size: 15px; line-height: 20px; font-stretch: 105% }
+.chart { width: 100%; min-width: 0 }
+.chart svg { display: block; overflow: visible }
+
+/* SVG marks: every fill from a token */
+.m-accent { fill: var(--accent); stroke: var(--accent-line) }
+.m-grey { fill: var(--grey) }
+.m-base { fill: var(--grey-2); stroke: var(--grey); stroke-width: 1 }
+.m-ref { fill: var(--bg); stroke: var(--fg); stroke-width: 1.25 }
+.m-ctx { fill: var(--grey-2) }
+.m-ring { stroke: var(--bg); stroke-width: 1.5 }
+.m-hit { fill: var(--bg); fill-opacity: 0; cursor: crosshair }
+.ax { stroke: var(--fg); stroke-width: 1.5 }
+.gl { stroke: var(--hair); stroke-width: 1 }
+.lead-l { stroke: var(--fg); stroke-width: 1 }
+.t-lab { fill: var(--fg); font-family: var(--sans); font-size: 13px; font-weight: 600; font-stretch: 104% }
+.t-cap { fill: var(--fg); font-family: var(--sans); font-size: 11px; font-weight: 750; letter-spacing: .12em; font-stretch: 112% }
+.t-mono { fill: var(--fg-2); font-family: var(--mono); font-size: 11px; font-variant-numeric: tabular-nums }
+.t-val { fill: var(--fg); font-family: var(--mono); font-size: 12px; font-weight: 500; font-variant-numeric: tabular-nums }
+.t-big { fill: var(--fg); font-family: var(--sans); font-weight: 900; font-stretch: 125%; letter-spacing: -.02em }
+.sq { cursor: default }
+.sq:hover { stroke: var(--fg); stroke-width: 2 }
+
+/* ---------- abstract ---------- */
+.abstract p + p { margin-top: 20px }
+
+/* ---------- numbers band ---------- */
+.nums { display: grid; gap: 48px; container-type: inline-size }
+.nums-a { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gap); row-gap: 40px; align-items: end }
+.nums-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: var(--gap); row-gap: 32px; padding-top: 20px; border-top: 1px solid var(--hair) }
+.n { display: grid; gap: 10px; align-content: start; min-width: 0 }
+.n-xl { font-weight: 900; font-stretch: 125%; font-size: clamp(44px, 9.1cqi, 124px); line-height: .86; letter-spacing: -.035em; font-variant-numeric: tabular-nums; white-space: nowrap }
+.n-l { font-weight: 800; font-stretch: 100%; font-size: clamp(32px, 3.5vw, 50px); line-height: 1; letter-spacing: -.025em; font-variant-numeric: tabular-nums; white-space: nowrap }
+.n .label { color: var(--fg) }
+.n .label + .small { margin-top: -4px }
+
+/* ---------- example ---------- */
+.ex-meta { display: flex; flex-wrap: wrap; gap: 4px 16px }
+.readout { min-height: 20px; font-family: var(--mono); font-size: 13px; line-height: 20px; color: var(--fg-2); margin-top: 16px }
+.readout b { font-weight: 500; color: var(--fg) }
+.phr { display: grid; gap: 20px; align-content: start }
+.phr > * { min-width: 0 }
+.tabs { display: flex; flex-wrap: wrap; gap: 6px }
+.tab {
+  font-family: var(--sans); font-size: 13px; line-height: 16px; font-weight: 600; font-stretch: 105%;
+  padding: 7px 10px; border: 1.5px solid var(--fg); background: var(--bg); color: var(--fg);
+  border-radius: 0; cursor: pointer;
+}
+.tab:hover { background: var(--surface) }
+.tab[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); border-color: var(--accent-line) }
+.qstack { display: grid }
+.qstack > p {
+  grid-area: 1 / 1; visibility: hidden;
+  font-size: clamp(21px, 2vw, 27px); line-height: 1.36; font-weight: 500; font-stretch: 100%;
+  white-space: pre-line; max-width: 40ch; text-wrap: pretty;
+}
+.qstack > p.on { visibility: visible }
+.code {
+  margin: 0; padding: 20px 22px; background: var(--surface); overflow-x: auto;
+  font-family: var(--mono); font-size: 14px; line-height: 22px; white-space: pre; tab-size: 2;
+}
+.code .kw { font-weight: 500 }
+.code .str { color: var(--fg-2) }
+.result { border-collapse: collapse; font-family: var(--mono); font-size: 13px; line-height: 20px }
+.result th { text-align: left; font-weight: 400; color: var(--fg-2); padding: 0 24px 6px 0; border-bottom: 1px solid var(--rule) }
+.result td { padding: 6px 24px 0 0; white-space: nowrap }
+
+/* ---------- pipeline ---------- */
+.stages { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--gap) }
+.stage { border-top: 2px solid var(--rule); padding-top: 14px; display: grid; gap: 14px; align-content: start; grid-template-rows: auto auto 1fr auto; min-width: 0 }
+.stage-n { font-weight: 900; font-stretch: 125%; font-size: 72px; line-height: 64px; letter-spacing: -.03em }
+.stage h3 { font-size: 19px; line-height: 24px; font-weight: 750; font-stretch: 108% }
+.stage p { font-size: 15px; line-height: 23px }
+.stage .fact { font-family: var(--mono); font-size: 12px; line-height: 18px; padding-top: 10px; border-top: 1px solid var(--hair) }
+.validated {
+  display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 24px;
+  background: var(--accent); color: var(--on-accent); padding: 12px 16px;
+  font-weight: 750; font-stretch: 112%; font-size: 17px; line-height: 24px;
+}
+.validated span:last-child { font-family: var(--mono); font-weight: 400; font-size: 13px }
+.pipe { display: grid; gap: 20px }
+
+/* ---------- tables ---------- */
+.tbl { overflow-x: auto }
+.tbl table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; font-size: 15px; line-height: 22px }
+.tbl th, .tbl td { padding: 10px 16px 10px 0; text-align: right; border-bottom: 1px solid var(--hair); white-space: nowrap }
+.tbl th:first-child, .tbl td:first-child { text-align: left }
+.tbl thead th { font-family: var(--mono); font-size: 11px; line-height: 16px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--fg-2); border-bottom: 2px solid var(--rule); vertical-align: bottom }
+.tbl tbody th { font-weight: 600 }
+.tbl tr.ours th, .tbl tr.ours td { font-weight: 750 }
+.tbl .na { color: var(--fg-2); font-family: var(--mono); font-size: 12px }
+.tbl caption { caption-side: top; text-align: left; padding-bottom: 12px }
+
+/* ---------- results ---------- */
+.recipe { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--gap) }
+.recipe > div { display: grid; gap: 8px; align-content: start; min-width: 0 }
+.recipe p:not(.label) { font-size: 15px; line-height: 23px }
+.bench { display: grid; gap: 12px; align-content: start }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 24px; list-style: none; margin: 0; padding: 0; font-size: 14px; line-height: 20px; color: var(--fg-2) }
+.legend li { display: flex; align-items: center; gap: 8px }
+.sw { width: 14px; height: 14px; flex: none; display: inline-block }
+.sw.accent { background: var(--accent); box-shadow: inset 0 0 0 1px var(--accent-line) }
+.sw.grey { background: var(--grey) }
+.sw.base { background: var(--grey-2); box-shadow: inset 0 0 0 1px var(--grey) }
+.sw.ref { background: var(--bg); box-shadow: inset 0 0 0 1.25px var(--fg) }
+.subsec { padding-top: 20px; border-top: 1px solid var(--hair); margin-top: 88px }
+.compute { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 40px 72px }
+.cc { margin: 0; display: flex; flex-wrap: wrap; align-items: flex-end; gap: 16px 22px; min-width: 0 }
+.cc-fig svg { display: block }
+.cc figcaption { display: grid; gap: 6px; padding-bottom: 2px; flex: 1 1 140px; min-width: 0 }
+.cc-acc { font-weight: 900; font-stretch: 125%; font-size: clamp(48px, 7.4vw, 112px); line-height: .82; letter-spacing: -.035em }
+.cc-name { font-weight: 750; font-size: 19px; line-height: 24px; font-stretch: 108% }
+.cc-tf { font-family: var(--mono); font-size: 13px; line-height: 18px; color: var(--fg-2) }
+details.data { margin-top: 20px }
+details.data summary { cursor: pointer; font-family: var(--mono); font-size: 13px; line-height: 20px; color: var(--fg-2); width: max-content; max-width: 100% }
+details.data summary:hover { color: var(--fg) }
+details.data .tbl { margin-top: 12px; max-height: 420px; overflow: auto }
+
+/* ---------- findings & bars ---------- */
+.finding { padding-top: 20px; border-top: 1px solid var(--hair); align-items: start }
+.finding + .finding { margin-top: 72px }
+.finding .txt { display: grid; gap: 14px; align-content: start }
+.hbars { display: grid; gap: 10px }
+.hbar { display: grid; grid-template-columns: minmax(0, 8.5rem) minmax(0, 1fr) 3.4rem; align-items: center; gap: 14px }
+.hbar .nm { font-size: 14px; line-height: 20px; font-weight: 600 }
+.hbar .v { font-family: var(--mono); font-size: 13px; font-weight: 500; text-align: right; font-variant-numeric: tabular-nums }
+.track { height: 16px; background: var(--hair); position: relative }
+.fill { position: absolute; inset: 0 auto 0 0; background: var(--grey) }
+.fill.ours { background: var(--accent); box-shadow: inset 0 0 0 1px var(--accent-line) }
+.fill.base { background: var(--grey-2); box-shadow: inset 0 0 0 1px var(--grey) }
+.scale-ax { display: grid; grid-template-columns: minmax(0, 8.5rem) minmax(0, 1fr) 3.4rem; gap: 14px }
+.scale-ax div { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 11px; color: var(--fg-2) }
+.bt td .cell { display: grid; grid-template-columns: 2.6rem minmax(56px, 1fr); align-items: center; gap: 10px }
+.bt td .track { height: 12px }
+.bt td { text-align: left !important; min-width: 150px }
+.bt thead th { text-align: left }
+.bt thead th.m { text-transform: none; letter-spacing: 0; font-family: var(--sans); font-size: 14px; font-weight: 650; color: var(--fg) }
+.bt td:last-child { padding-right: 0 }
+.dgroup { display: grid; gap: 8px }
+.dgroup + .dgroup { margin-top: 18px }
+.gap-note { font-family: var(--mono); font-size: 12px; line-height: 16px; color: var(--fg-2) }
+.note { font-size: 14px; line-height: 20px; color: var(--fg-2); max-width: 60ch }
+
+/* ---------- cite & footer ---------- */
+.bib { position: relative; background: var(--surface) }
+.bib pre { margin: 0; padding: 24px; padding-right: 110px; overflow-x: auto; font-family: var(--mono); font-size: 14px; line-height: 22px }
+.copy {
+  position: absolute; top: 14px; right: 14px;
+  font-family: var(--sans); font-size: 14px; line-height: 20px; font-weight: 750; font-stretch: 110%;
+  padding: 7px 14px; background: var(--bg); color: var(--fg); border: 2px solid var(--fg); border-radius: 0; cursor: pointer;
+}
+.copy:hover, .copy.done { background: var(--accent); color: var(--on-accent); border-color: var(--accent-line) }
+.foot { border-top: 2px solid var(--rule); padding-block: 24px 64px; row-gap: 28px }
+.foot-mark { font-weight: 900; font-stretch: 125%; font-size: 56px; line-height: 48px; letter-spacing: -.035em }
+.foot ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px }
+.foot .blk { display: grid; gap: 10px; align-content: start; font-size: 15px; line-height: 22px }
+.foot .contact { font-family: var(--mono); font-size: 13px; line-height: 20px; overflow-wrap: anywhere; user-select: all }
+
+/* tooltip (hover enhancement only; every value is also labelled or in a table) */
+.tip {
+  position: fixed; left: 0; top: 0; z-index: 20; pointer-events: none;
+  background: var(--tip-bg); color: var(--tip-fg); padding: 8px 10px; max-width: 260px;
+  font-family: var(--mono); font-size: 12px; line-height: 17px;
+  opacity: 0; transition: opacity .12s;
+}
+.tip.on { opacity: 1 }
+.tip b { font-family: var(--sans); font-weight: 750; font-size: 13px }
+
+/* ---------- responsive ---------- */
+@media (min-width: 1101px) {
+  .stages { grid-template-rows: auto auto 1fr auto; row-gap: 14px }
+  .stage { grid-row: 1 / span 4; grid-template-rows: subgrid }
+}
+@media (max-width: 1100px) {
+  .stages { grid-template-columns: repeat(3, minmax(0, 1fr)) }
+}
+@media (max-width: 900px) {
+  .g12 > *, .nums-a > * { grid-column: 1 / -1 !important }
+  .sec-head { margin-bottom: 40px }
+  .nums-row { grid-template-columns: repeat(2, minmax(0, 1fr)) }
+  .stages { grid-template-columns: 1fr }
+  .stage { grid-template-columns: 64px minmax(0, 1fr); grid-template-rows: none; column-gap: 16px }
+  .stage-n { grid-row: 1 / span 3; font-size: 56px; line-height: 52px }
+  .stage .fact { grid-column: 2 }
+  .recipe { grid-template-columns: 1fr }
+  .subsec { margin-top: 64px }
+  .sec { padding-block: 20px 80px }
+  .subtitle { max-width: none }
+}
+@media (max-width: 560px) {
+  .nums-row { grid-template-columns: 1fr }
+  .hbar, .scale-ax { grid-template-columns: minmax(0, 6.5rem) minmax(0, 1fr) 3rem; gap: 10px }
+  .bib pre { padding: 64px 16px 20px }
+  .links a { font-size: 18px }
+  .compute { gap: 32px }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto }
+  *, *::before, *::after { transition: none !important }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+<header class="hero" id="top">
+  <div class="topbar">
+    <p class="label status">Preprint · 2026</p>
+    <nav aria-label="Sections">
+      <ul class="nav label">
+        <li><a href="#scale">Scale</a></li>
+        <li><a href="#example">Example</a></li>
+        <li><a href="#pipeline">Pipeline</a></li>
+        <li><a href="#results">Results</a></li>
+        <li><a href="#findings">Findings</a></li>
+        <li><a href="#cite">Cite</a></li>
+      </ul>
+    </nav>
+  </div>
+
+  <h1 class="wordmark" id="wordmark" aria-label="SQaLe"><span>SQaLe</span></h1>
+
+  <div class="g12 hero-block">
+    <p class="subtitle c1-6">A large realistic dataset to empower <span class="hl">small specialised</span> text-to-SQL models</p>
+
+    <div class="c7-9">
+      <ul class="authors">
+        <li>Cornelius Wolff<sup>1,2</sup></li>
+        <li>Daniel Gomm<sup>1,2</sup></li>
+        <li>Madelon Hulsebos<sup>2</sup></li>
+      </ul>
+      <ul class="affs">
+        <li><sup>1</sup> University of Amsterdam</li>
+        <li><sup>2</sup> Centrum Wiskunde &amp; Informatica</li>
+      </ul>
+    </div>
+
+    <ul class="links c10-12" aria-label="Links">
+      <!-- TODO: arXiv URL (then add target="_blank" rel="noopener") -->
+      <li><a href="#" data-link="paper">Paper <svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 11.5 11.5 4.5M5.5 4.5h6v6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square"/></svg></a></li>
+      <li><a href="https://huggingface.co/datasets/trl-lab/SQaLe-text-to-SQL-dataset" data-link="dataset" target="_blank" rel="noopener">Dataset <svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 11.5 11.5 4.5M5.5 4.5h6v6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square"/></svg></a></li>
+      <li><a href="https://github.com/trl-lab/SQaLe_2" data-link="code" target="_blank" rel="noopener">Code <svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 11.5 11.5 4.5M5.5 4.5h6v6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square"/></svg></a></li>
+      <li><a href="https://huggingface.co/trl-lab/SQaLe-Model" data-link="model" target="_blank" rel="noopener">Model <svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 11.5 11.5 4.5M5.5 4.5h6v6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square"/></svg></a></li>
+      <li><a href="#cite">Cite <svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2.5v10M3.5 8.5l4.5 4.5 4.5-4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square"/></svg></a></li>
+    </ul>
+  </div>
+</header>
+
+<main>
+
+<!-- ============ ABSTRACT ============ -->
+<section class="sec" id="abstract" aria-labelledby="abs-h">
+  <div class="g12 abstract">
+    <h2 class="label c1-3" id="abs-h">Abstract</h2>
+    <div class="c4-10">
+      <p class="lead">Frontier language models in agentic pipelines lead text-to-SQL benchmarks, at a high inference cost. Small specialised models would avoid that cost, but training them needs data that reflects the scale, semantics and structure of real databases.</p>
+      <p class="lead">SQaLe is a semi-synthetic text-to-SQL dataset built on 9,259 real-world schemas from SchemaPile. Our generation pipeline extends each schema, fills it with synthetic rows, generates questions and answers them with an agent, and validates every stage by execution. The result is <span class="hl">1,408,056 natural-language questions paired with SQL</span>, over schemas far larger than in any existing dataset. We train Qwen3.5-2B on SQaLe with GRPO alone, and its execution accuracy on the SQaLe test set rises <span class="hl">from 24.0% to 54.7%</span>. The model learns to explore the database: it finds the relevant tables in large schemas and reads the values its answer needs, which training on existing datasets elicits far less.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SIGNATURE FIGURE ============ -->
+<section class="sec" id="scale" aria-labelledby="scale-h">
+  <div class="g12 sec-head">
+    <p class="label">Scale</p>
+    <h2 class="h2" id="scale-h">The median schema, drawn to scale.</h2>
+    <p class="lead">One square is one table, and the square is the same size in every grid. The median BIRD schema has 5 tables, the median SynSQL schema 10, EHRSQL 13.5 and SQaLe 113.</p>
+  </div>
+  <div class="g12">
+    <figure class="c1-7" style="margin:0">
+      <figcaption class="cap"><span class="label">Median tables per schema</span></figcaption>
+      <div class="chart" id="ch-waffle"></div>
+    </figure>
+    <div class="c8-12" style="display:grid;gap:40px;align-content:start">
+      <figure style="margin:0">
+        <figcaption class="cap"><span class="label">Median columns per schema</span></figcaption>
+        <div class="chart" id="ch-cols"></div>
+      </figure>
+      <figure style="margin:0">
+        <figcaption class="cap"><span class="label">Median rows per table · log scale</span></figcaption>
+        <div class="chart" id="ch-rows"></div>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ============ NUMBERS ============ -->
+<section class="sec" id="numbers" aria-labelledby="num-h">
+  <div class="g12 sec-head">
+    <h2 class="label" id="num-h" style="grid-column:1/4">Corpus</h2>
+  </div>
+  <div class="nums">
+    <div class="nums-a">
+      <div class="n" style="grid-column:1/9">
+        <span class="n-xl" data-count="questions">1,408,056</span>
+        <span class="label">Questions paired with SQL</span>
+      </div>
+      <div class="n" style="grid-column:9/13">
+        <span class="n-xl" data-count="schemas">9,259</span>
+        <span class="label">Real-world schemas from SchemaPile</span>
+      </div>
+    </div>
+    <div class="nums-row">
+      <div class="n"><span class="n-l" data-count="tables">1,103,669</span><span class="label">Tables</span></div>
+      <div class="n"><span class="n-l" data-count="sql">176,761</span><span class="label">Distinct SQL queries</span></div>
+      <div class="n"><span class="n-l" data-count="fks">1,196,078</span><span class="label">Foreign-key relations</span></div>
+      <div class="n"><span class="n-l" data-count="rowsPopulated">108,708,694</span><span class="label">Synthetic rows</span></div>
+    </div>
+    <div class="nums-row">
+      <div class="n"><span class="n-l" data-count="medTables">113</span><span class="label">Median tables per schema</span></div>
+      <div class="n"><span class="n-l" data-count="medCols">538</span><span class="label">Median columns per schema</span></div>
+      <div class="n"><span class="n-l" data-count="medRowsPerTable">69</span><span class="label">Median rows per table</span></div>
+      <div class="n"><span class="n-l">95.2%</span><span class="label">Of tables populated</span><span class="small">95.1% of foreign-key cells valid after repair. Train and test are split by schema, 95% / 5%.</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ EXAMPLE ============ -->
+<section class="sec" id="example" aria-labelledby="ex-h">
+  <div class="g12 sec-head">
+    <p class="label">Example</p>
+    <h2 class="h2" id="ex-h">The question needs 3 of 87 tables.</h2>
+    <p class="lead">A real record from the SQaLe test split. Its schema has 87 tables and the gold SQL joins 3 of them. Every question exists in 8 phrasings that share one SQL query.</p>
+  </div>
+  <div class="g12" style="align-items:start">
+    <figure class="c1-5" style="margin:0">
+      <figcaption class="cap">
+        <span class="label" id="ex-schema-cap">schema_013612 · 87 tables</span>
+      </figcaption>
+      <div class="chart" id="ch-schema"></div>
+      <p class="readout" id="schema-readout" aria-live="polite"></p>
+    </figure>
+
+    <div class="c6-12 phr">
+      <p class="ex-meta label" id="ex-meta">Test split</p>
+      <div>
+        <p class="label" id="tabs-l" style="margin-bottom:10px">Phrasing</p>
+        <div class="tabs" id="tabs" role="group" aria-labelledby="tabs-l"></div>
+      </div>
+      <div class="qstack" id="qstack" aria-live="polite"></div>
+      <div style="display:grid;gap:10px">
+        <p class="label">Gold SQL · the same for all 8 phrasings</p>
+        <pre class="code" id="sql" tabindex="0" aria-label="Gold SQL"></pre>
+      </div>
+      <div style="display:grid;gap:10px">
+        <p class="label">Result</p>
+        <div style="overflow-x:auto"><table class="result" id="result"></table></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PIPELINE ============ -->
+<section class="sec" id="pipeline" aria-labelledby="pipe-h">
+  <div class="g12 sec-head">
+    <p class="label">Pipeline</p>
+    <h2 class="h2" id="pipe-h">How SQaLe is built.</h2>
+    <p class="lead">Five stages turn a SchemaPile schema into question and SQL pairs. Every stage is validated by execution.</p>
+  </div>
+  <div class="pipe">
+    <ol class="stages">
+      <li class="stage">
+        <span class="stage-n" aria-hidden="true">1</span>
+        <h3>Schema collection and extension</h3>
+        <p>We start from SchemaPile's real-world schemas, mined from permissively licensed GitHub repositories. A tool-using agent annotates each source repository with a domain description. LLM-generated tables extend each schema and keep its naming conventions, normalisation level and foreign-key style.</p>
+        <p class="fact">14,597 source repositories annotated</p>
+      </li>
+      <li class="stage">
+        <span class="stage-n" aria-hidden="true">2</span>
+        <h3>Value synthesis</h3>
+        <p>Tables are filled in foreign-key dependency order. For each table the LLM writes a Python function from its DDL, its original rows, the allowed foreign-key values and the domain description. Fact and junction tables get more rows and a skewed key distribution. Every table is checked for primary-key uniqueness and referential integrity.</p>
+        <p class="fact">95.2% of tables populated · 95.1% of foreign-key cells valid after repair</p>
+      </li>
+      <li class="stage">
+        <span class="stage-n" aria-hidden="true">3</span>
+        <h3>Question generation</h3>
+        <p>We sample a connected subgraph along foreign keys, with sample rows, and ask for questions that need every table. Questions come at three difficulty levels (simple, moderate, hard), and every literal is grounded in the data.</p>
+        <p class="fact">Subgraphs of up to 20 tables</p>
+      </li>
+      <li class="stage">
+        <span class="stage-n" aria-hidden="true">4</span>
+        <h3>Style variation</h3>
+        <p>Each question is rewritten into seven styles: casual, structured, requirements list, short and high level, short and ambiguous, spelling and grammar mistakes, and evidence supported. All eight phrasings share the gold SQL.</p>
+        <p class="fact">8 phrasings · 1 gold SQL</p>
+      </li>
+      <li class="stage">
+        <span class="stage-n" aria-hidden="true">5</span>
+        <h3>Agentic answering and judging</h3>
+        <p>An agent explores the live database with list_tables, describe_table, sample_rows, distinct_values and run_query, and commits with submit_sql. Execution errors go back to the agent. An LLM judge checks the result against the question and sends rejected queries back for a rewrite.</p>
+        <p class="fact">94.5% of judge-accepted queries are aligned with the question (225 judge calls on 158 BIRD dev questions; 86.2% agreement with human labels, κ = 0.68)</p>
+      </li>
+    </ol>
+    <p class="validated"><span>Validated by execution at every stage</span><span>1,408,056 pairs · 9,259 schemas</span></p>
+  </div>
+</section>
+
+<!-- ============ COMPARISON ============ -->
+<section class="sec" id="compare" aria-labelledby="cmp-h">
+  <div class="g12 sec-head">
+    <p class="label">Comparison</p>
+    <h2 class="h2" id="cmp-h">How SQaLe compares.</h2>
+    <p class="lead">23.4% of SQaLe queries are nested, against 7.7% in BIRD. 40% of joining queries chain multiple joins (BIRD 26%). 3.1% of queries touch five or more tables, up to 20. No BIRD or EHRSQL query touches more than four.</p>
+  </div>
+  <div class="g12" style="row-gap:56px">
+    <div class="c4-12 tbl">
+      <table id="tbl-compare">
+        <caption class="label">Schema statistics</caption>
+      </table>
+    </div>
+    <div class="c4-12 tbl">
+      <table id="tbl-query">
+        <caption class="label">Query statistics · share of SQL queries using each construct, %</caption>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============ RESULTS ============ -->
+<section class="sec" id="results" aria-labelledby="res-h">
+  <div class="g12 sec-head">
+    <p class="label">Results</p>
+    <h2 class="h2" id="res-h">Trained on SQaLe, <span class="nowrap">Qwen3.5-2B</span> rises from 24.0% to 54.7%.</h2>
+    <p class="lead">M<sub>SQaLe</sub> is Qwen3.5-2B trained with GRPO on SQaLe. M<sub>BIRD</sub> and M<sub>SynSQL</sub> are the same model trained with the same recipe on BIRD train and on SynSQL-2.5M. Only the data differs.</p>
+  </div>
+
+  <div class="g12" style="margin-bottom:64px">
+    <div class="c4-12 recipe">
+      <div>
+        <p class="label">Recipe</p>
+        <p>GRPO directly from the base checkpoint. Base model, environment, tools, reward, steps, batch size and evaluation are identical across the three runs. No distilled traces, no teacher, no test-time scaffolding.</p>
+      </div>
+      <div>
+        <p class="label">Environment</p>
+        <p>The schema is withheld. The model explores the database through tools: list_tables, describe_table, sample_rows, distinct_values, run_query, foreign_keys and join_path.</p>
+      </div>
+      <div>
+        <p class="label">Reward</p>
+        <p>Tiered: a correct result ranks above a query that executes, which ranks above one that parses. Partial credit never ranks a wrong query above a correct one.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="g12">
+    <div class="c1-12 cap" style="margin:0"><span class="label">Execution accuracy, % · one shared 0–100 axis per benchmark</span></div>
+    <figure class="c1-4 bench" style="margin:0"><figcaption class="t h3" style="font-size:18px">SQaLe test <span class="small mono">300 questions</span></figcaption><div class="chart" id="ch-b-sqale"></div></figure>
+    <figure class="c5-8 bench" style="margin:0"><figcaption class="t h3" style="font-size:18px">BIRD</figcaption><div class="chart" id="ch-b-bird"></div></figure>
+    <figure class="c9-12 bench" style="margin:0"><figcaption class="t h3" style="font-size:18px">EHRSQL</figcaption><div class="chart" id="ch-b-ehrsql"></div></figure>
+    <ul class="legend c1-12" aria-label="Legend">
+      <li><span class="sw accent"></span><span>M<sub>SQaLe</sub></span></li>
+      <li><span class="sw grey"></span><span>M<sub>BIRD</sub>, M<sub>SynSQL</sub></span></li>
+      <li><span class="sw base"></span><span>Qwen3.5-2B, untrained base model</span></li>
+      <li><span class="sw ref"></span><span>Qwen3.6-27B, general-purpose reference</span></li>
+    </ul>
+    <p class="c4-12 body">On the SQaLe test set, training on SQaLe adds 30.7 points to the base model. Training on BIRD adds 19.7 and training on SynSQL adds 13.3. M<sub>SQaLe</sub> is 3.6 points behind Qwen3.6-27B.</p>
+  </div>
+
+  <!-- compute -->
+  <div class="subsec">
+    <div class="g12 sec-head" style="margin-bottom:48px">
+      <p class="label">Compute</p>
+      <h3 class="h2" style="grid-column:4/13;font-size:clamp(28px,3.4vw,48px)">Compute per question, drawn to scale.</h3>
+      <p class="lead">Circle area is proportional to the TFLOPs spent per question on 100 moderate SQaLe test questions, with the same agentic harness for every model.</p>
+    </div>
+    <div class="compute" id="compute">
+      <figure class="cc" id="cc-a">
+        <div class="cc-fig"></div>
+        <figcaption><span class="cc-acc">52%</span><span class="cc-name">M<sub>SQaLe</sub></span><span class="cc-tf">224 TFLOPs per question</span></figcaption>
+      </figure>
+      <figure class="cc" id="cc-b">
+        <div class="cc-fig"></div>
+        <figcaption><span class="cc-acc">63%</span><span class="cc-name">Qwen3.5-27B</span><span class="cc-tf">1,710 TFLOPs per question</span></figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <!-- pareto -->
+  <div class="subsec">
+    <div class="g12 sec-head" style="margin-bottom:40px">
+      <p class="label">Size and compute</p>
+      <h3 class="h2" style="grid-column:4/13;font-size:clamp(28px,3.4vw,48px)">Accuracy against model size.</h3>
+      <p class="lead">M<sub>SQaLe</sub> is ahead of every general-purpose model in the 9–12B range except <span class="nowrap">Qwen3.5-9B</span> (58%). Dot area is compute per question.</p>
+    </div>
+    <div class="chart" id="ch-pareto"></div>
+    <div style="display:flex;flex-wrap:wrap;gap:16px 40px;align-items:center;margin-top:16px">
+      <ul class="legend" aria-label="Colour legend">
+        <li><span class="sw accent" style="border-radius:50%"></span><span>M<sub>SQaLe</sub></span></li>
+        <li><span class="sw grey" style="border-radius:50%"></span><span>M<sub>BIRD</sub>, M<sub>SynSQL</sub></span></li>
+        <li><span class="sw base" style="border-radius:50%"></span><span>General-purpose models</span></li>
+      </ul>
+      <div style="display:flex;align-items:flex-end;gap:16px"><p class="label">TFLOPs per question</p><div class="chart" id="ch-pareto-size" style="width:auto"></div></div>
+    </div>
+    <details class="data">
+      <summary>Show the data (25 models)</summary>
+      <div class="tbl"><table id="tbl-pareto"></table></div>
+    </details>
+  </div>
+</section>
+
+<!-- ============ FINDINGS ============ -->
+<section class="sec" id="findings" aria-labelledby="fin-h">
+  <div class="g12 sec-head">
+    <p class="label">Findings</p>
+    <h2 class="h2" id="fin-h">What SQaLe teaches.</h2>
+  </div>
+
+  <article class="g12 finding" aria-labelledby="f1-h">
+    <div class="c1-5 txt">
+      <p class="label">Schema size</p>
+      <h3 class="h3" id="f1-h">Accuracy falls as the schema grows. M<sub>SQaLe</sub> leads at every size.</h3>
+      <p>At full schema size M<sub>SQaLe</sub> inspects 71.3% of the gold tables, against 56.5% for M<sub>BIRD</sub> and 60.2% for M<sub>SynSQL</sub>. BIRD and SynSQL training schemas have a median of 5 and 10 tables, so models trained on them never have to search.</p>
+    </div>
+    <div class="c6-12" style="display:grid;gap:32px">
+      <div class="tbl"><table class="bt" id="tbl-scale-acc"><caption class="label">Execution accuracy, %</caption></table></div>
+      <div class="tbl"><table class="bt" id="tbl-scale-insp"><caption class="label">Share of gold tables inspected, %</caption></table></div>
+    </div>
+  </article>
+
+  <article class="g12 finding" aria-labelledby="f2-h">
+    <div class="c1-5 txt">
+      <p class="label">Populated tables</p>
+      <h3 class="h3" id="f2-h">M<sub>SQaLe</sub> reads the values its answer needs.</h3>
+      <p>Before submitting, M<sub>SQaLe</sub> has seen 75% of the string literals its answer depends on, against 45% for M<sub>SynSQL</sub>, 36% for M<sub>BIRD</sub> and 25% for the untrained model. SynSQL's tables hold a median of 2 rows; SQaLe's hold 69.</p>
+    </div>
+    <div class="c6-12">
+      <p class="label" style="margin-bottom:16px">String literals seen before submitting, %</p>
+      <div class="hbars" id="bars-literals"></div>
+    </div>
+  </article>
+
+  <article class="g12 finding" aria-labelledby="f3-h">
+    <div class="c1-5 txt">
+      <p class="label">Domains</p>
+      <h3 class="h3" id="f3-h">The lead over M<sub>BIRD</sub> is larger outside BIRD's domains.</h3>
+      <p>On SQaLe test questions whose schemas lie outside BIRD's domains, M<sub>SQaLe</sub> leads M<sub>BIRD</sub> by 9.9 points (46.4 vs 36.5). Inside BIRD's domains it leads by 2.8 points (39.3 vs 36.5).</p>
+      <p class="note">The sample covers 108 schemas, too few to call the difference between the two gaps significant.</p>
+    </div>
+    <div class="c6-12">
+      <p class="label" style="margin-bottom:16px">Execution accuracy on the SQaLe test set, %</p>
+      <div id="bars-domain"></div>
+    </div>
+  </article>
+</section>
+
+<!-- ============ CITE ============ -->
+<section class="sec" id="cite" aria-labelledby="cite-h">
+  <div class="g12 sec-head">
+    <p class="label">Cite</p>
+    <h2 class="h2" id="cite-h">BibTeX</h2>
+  </div>
+  <div class="g12">
+    <div class="c4-12 bib">
+      <pre id="bibtex" tabindex="0" aria-label="BibTeX entry"></pre>
+      <button class="copy" id="copy" type="button">Copy</button>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="g12 foot">
+  <p class="foot-mark c1-3" aria-hidden="true">SQaLe</p>
+  <div class="blk c4-6">
+    <p class="label">Affiliations</p>
+    <ul>
+      <li>University of Amsterdam</li>
+      <li>Centrum Wiskunde &amp; Informatica</li>
+    </ul>
+  </div>
+  <div class="blk c7-9" style="grid-column:7/10">
+    <p class="label">Contact</p>
+    <p class="contact">{cornelius.wolff, daniel.gomm, madelon.hulsebos}@cwi.nl</p>
+  </div>
+  <div class="blk c10-12">
+    <p class="label">Earlier version</p>
+    <p><a href="https://arxiv.org/abs/2602.22223" target="_blank" rel="noopener">SQaLe: A Large Text-to-SQL Corpus Grounded in Real Schemas</a></p>
+    <p class="small">Website content MIT licensed</p>
+  </div>
+</footer>
+
+</div>
+
+<div class="tip" id="tip" aria-hidden="true"></div>
+
+<script src="assets/sqale-data.js"></script>
+<script>
+(function () {
+  'use strict';
+  var S = window.SQALE;
+  if (!S) return;
+  var NS = 'http://www.w3.org/2000/svg';
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var fmt = function (n) { return Number(n).toLocaleString('en-US'); };
+  var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+  var mHTML = function (name) { return name.indexOf('M_') === 0 ? 'M<sub>' + esc(name.slice(2)) + '</sub>' : esc(name); };
+
+  function E(tag, attrs, parent) {
+    var e = document.createElementNS(NS, tag);
+    if (attrs) for (var k in attrs) e.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  function T(parent, x, y, str, cls, extra) {
+    var a = { x: x, y: y, 'class': cls };
+    if (extra) for (var k in extra) a[k] = extra[k];
+    var t = E('text', a, parent); t.textContent = str; return t;
+  }
+  // model label with a real subscript (M_SQaLe -> M + sub "SQaLe")
+  function TM(parent, x, y, name, cls, extra, suffix, fs) {
+    var a = { x: x, y: y, 'class': cls };
+    if (extra) for (var k in extra) a[k] = extra[k];
+    var t = E('text', a, parent); fs = fs || 13;
+    if (name.indexOf('M_') === 0) {
+      t.appendChild(document.createTextNode('M'));
+      var s = E('tspan', { dy: (fs * 0.26).toFixed(1), 'font-size': (fs * 0.72).toFixed(1) }, t);
+      s.textContent = name.slice(2);
+      if (suffix) { var s2 = E('tspan', { dy: (-fs * 0.26).toFixed(1) }, t); s2.textContent = suffix; }
+    } else { t.textContent = name + (suffix || ''); }
+    return t;
+  }
+  function root(host, W, H, label) {
+    host.textContent = '';
+    var svg = E('svg', { width: W, height: H, viewBox: '0 0 ' + W + ' ' + H, role: 'img', 'aria-label': label }, host);
+    return svg;
+  }
+  function markCls(model) {
+    if (model === 'M_SQaLe' || model === 'SQaLe') return 'm-accent';
+    if (model === 'M_BIRD' || model === 'M_SynSQL') return 'm-grey';
+    if (model === 'Qwen3.6-27B') return 'm-ref';
+    return 'm-base';
+  }
+
+  /* tooltip */
+  var tip = $('#tip');
+  function moveTip(e) {
+    var pad = 14, r = tip.getBoundingClientRect();
+    var x = e.clientX + pad, y = e.clientY + pad;
+    if (x + r.width > window.innerWidth - 8) x = e.clientX - r.width - pad;
+    if (y + r.height > window.innerHeight - 8) y = e.clientY - r.height - pad;
+    tip.style.transform = 'translate(' + Math.max(8, x) + 'px,' + Math.max(8, y) + 'px)';
+  }
+  function showTip(e, html) { tip.innerHTML = html; tip.classList.add('on'); moveTip(e); }
+  function hideTip() { tip.classList.remove('on'); }
+
+  /* chart registry: draw at real pixel width, redraw on resize */
+  var charts = [];
+  function chart(sel, fn) {
+    var host = $(sel); if (!host) return;
+    var last = -1;
+    var run = function (force) {
+      var w = Math.floor(host.clientWidth);
+      if (!w || (w === last && !force)) return;
+      last = w; fn(host, w);
+    };
+    charts.push(run); run(true);
+  }
+  var raf = 0;
+  window.addEventListener('resize', function () {
+    cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(function () { fitWordmark(); charts.forEach(function (f) { f(false); }); });
+  });
+
+  /* ---------- wordmark: fill the grid width ---------- */
+  function fitWordmark() {
+    var h = $('#wordmark'), s = h && h.firstElementChild; if (!s) return;
+    h.style.fontSize = '100px';
+    var w = s.getBoundingClientRect().width, box = h.clientWidth;
+    if (!w || !box) return;
+    h.style.fontSize = Math.min(400, Math.floor(100 * box / w * 0.985 * 10) / 10) + 'px';
+  }
+  fitWordmark();
+
+  /* ---------- counts from data ---------- */
+  document.querySelectorAll('[data-count]').forEach(function (n) {
+    var v = S.counts[n.getAttribute('data-count')];
+    if (v != null) n.textContent = fmt(v);
+  });
+  document.querySelectorAll('[data-link]').forEach(function (a) {
+    var v = S.links[a.getAttribute('data-link')]; if (v) a.setAttribute('href', v);
+  });
+
+  var byTables = S.compare.slice().sort(function (a, b) { return a.medTables - b.medTables; });
+
+  /* ---------- 1. waffle towers: median tables per schema ---------- */
+  chart('#ch-waffle', function (host, W) {
+    var data = byTables, n = data.length, axisW = 30;
+    var per = W < 560 ? 5 : 10; // rows of 5 on phones keep the squares legible
+    var gapT = W < 560 ? 14 : 30;
+    var pitch = Math.min(19, (W - axisW - gapT * (n - 1)) / (per * n));
+    var g = Math.max(1.5, pitch * 0.18), sq = pitch - g;
+    var towerW = per * pitch - g;
+    var maxT = Math.max.apply(null, data.map(function (d) { return d.medTables; }));
+    var rows = Math.ceil(maxT / per);
+    var top = 30, base = top + rows * pitch;
+    var big = Math.max(22, Math.min(46, towerW * 0.27));
+    var H = Math.round(base + 14 + 18 + big + 6);
+    var right = axisW + n * towerW + (n - 1) * gapT;
+    var svg = root(host, W, H, 'Median tables per schema, one square per table: ' + data.map(function (d) { return d.name + ' ' + d.medTables; }).join(', ') + '.');
+    var sw = pitch < 12 ? 0.6 : 0.75;
+    // key
+    E('rect', { x: axisW, y: 4, width: sq, height: sq, 'class': 'm-grey' }, svg);
+    T(svg, axisW + sq + 7, 4 + sq - 1.5, '= 1 table', 't-mono');
+    // reference lines at 50 and 100 tables
+    [50, 100].forEach(function (v) {
+      var y = base - 2 - (v / per) * pitch + g / 2;
+      E('line', { x1: axisW - 4, x2: right, y1: y, y2: y, 'class': 'gl' }, svg);
+      T(svg, axisW - 8, y + 4, String(v), 't-mono', { 'text-anchor': 'end' });
+    });
+    T(svg, axisW - 8, base + 2, '0', 't-mono', { 'text-anchor': 'end' });
+    data.forEach(function (d, i) {
+      var x0 = axisW + i * (towerW + gapT), ours = d.name === 'SQaLe';
+      var cls = ours ? 'm-accent' : 'm-grey';
+      var full = Math.floor(d.medTables), part = d.medTables - full;
+      var gEl = E('g', {}, svg);
+      var yOf = function (r) { return base - 2 - (r + 1) * pitch + g; };
+      for (var k = 0; k < full; k++) {
+        var r = Math.floor(k / per), c = k % per;
+        var rc = E('rect', { x: (x0 + c * pitch).toFixed(2), y: yOf(r).toFixed(2), width: sq.toFixed(2), height: sq.toFixed(2), 'class': cls }, gEl);
+        if (ours) rc.setAttribute('stroke-width', sw);
+      }
+      if (part > 0) {
+        var r2 = Math.floor(full / per), c2 = full % per;
+        E('rect', { x: (x0 + c2 * pitch).toFixed(2), y: yOf(r2).toFixed(2), width: (sq * part).toFixed(2), height: sq.toFixed(2), 'class': cls }, gEl);
+      }
+      T(svg, x0, base + 22, d.name.toUpperCase(), 't-cap');
+      T(svg, x0 - big * 0.03, base + 22 + 10 + big * 0.8, String(d.medTables), 't-big', { style: 'font-size:' + big.toFixed(1) + 'px' });
+    });
+    E('line', { x1: axisW - 4, x2: right, y1: base - 0.75, y2: base - 0.75, 'class': 'ax' }, svg);
+  });
+
+  /* ---------- 2. median columns per schema (linear, exact lengths) ---------- */
+  chart('#ch-cols', function (host, W) {
+    var data = byTables, labelW = 70, valW = 42, bw = W - labelW - valW;
+    var max = Math.max.apply(null, data.map(function (d) { return d.medCols; }));
+    var rowH = 30, barH = 16, top = 2, y0 = top + data.length * rowH + 4;
+    var svg = root(host, W, y0 + 22, 'Median columns per schema: ' + data.map(function (d) { return d.name + ' ' + d.medCols; }).join(', ') + '.');
+    for (var t = 0; t <= max; t += 100) {
+      var x = labelW + t / max * bw;
+      E('line', { x1: x, x2: x, y1: top, y2: y0, 'class': 'gl' }, svg);
+      T(svg, x, y0 + 16, String(t), 't-mono', { 'text-anchor': 'middle' });
+    }
+    data.forEach(function (d, i) {
+      var cy = top + i * rowH + rowH / 2, w = d.medCols / max * bw;
+      T(svg, 0, cy + 4.5, d.name, 't-lab');
+      E('rect', { x: labelW, y: cy - barH / 2, width: w.toFixed(2), height: barH, 'class': d.name === 'SQaLe' ? 'm-accent' : 'm-grey' }, svg);
+      T(svg, labelW + w + 6, cy + 4.5, fmt(d.medCols), 't-val');
+    });
+    E('line', { x1: labelW, x2: labelW, y1: top - 2, y2: y0, 'class': 'ax' }, svg);
+  });
+
+  /* ---------- 3. median rows per table (log scale) ---------- */
+  chart('#ch-rows', function (host, W) {
+    var data = byTables, labelW = 70, rpad = 6;
+    var lo = 0, hi = 4; // 10^0 .. 10^4
+    var x = function (v) { return labelW + (Math.log10(v) - lo) / (hi - lo) * (W - labelW - rpad); };
+    var rowH = 30, top = 2, y0 = top + data.length * rowH + 4;
+    var svg = root(host, W, y0 + 22, 'Median rows per table on a log scale: ' + data.map(function (d) { return d.name + ' ' + (d.medRows == null ? 'not reported' : d.medRows); }).join(', ') + '.');
+    [1, 10, 100, 1000, 10000].forEach(function (v, i, a) {
+      var xx = x(v);
+      E('line', { x1: xx, x2: xx, y1: top, y2: y0, 'class': i === 0 ? 'ax' : 'gl' }, svg);
+      T(svg, xx, y0 + 16, fmt(v), 't-mono', { 'text-anchor': i === a.length - 1 ? 'end' : (i === 0 ? 'start' : 'middle') });
+    });
+    data.forEach(function (d, i) {
+      var cy = top + i * rowH + rowH / 2;
+      T(svg, 0, cy + 4.5, d.name, 't-lab');
+      if (d.medRows == null) { T(svg, labelW + 10, cy + 4, 'not reported', 't-mono'); return; }
+      var xx = x(d.medRows), ours = d.name === 'SQaLe';
+      E('circle', { cx: xx, cy: cy, r: 6.5, 'class': ours ? 'm-accent' : 'm-grey' }, svg);
+      var leftSide = xx > W - 64;
+      T(svg, leftSide ? xx - 12 : xx + 12, cy + 4.5, fmt(d.medRows), 't-val', { 'text-anchor': leftSide ? 'end' : 'start' });
+    });
+  });
+
+  /* ---------- 4. example schema: 87 squares, 3 gold ---------- */
+  var sc = S.schema, ex = S.example;
+  var goldIdx = sc.gold.slice().sort(function (a, b) { return a - b; });
+  var goldSet = {}; goldIdx.forEach(function (i) { goldSet[i] = true; });
+  var goldNames = goldIdx.map(function (i) { return sc.tables[i]; });
+  var readout = $('#schema-readout');
+  var readDefault = 'Gold tables <b>' + goldNames.join(', ') + '</b>. Hover a square for its table.';
+  readout.innerHTML = readDefault;
+  $('#ex-schema-cap').textContent = sc.id + ' · ' + sc.tables.length + ' tables · ' + fmt(sc.rows) + ' rows';
+  chart('#ch-schema', function (host, W) {
+    var n = sc.tables.length, cols = 10;
+    var side = W >= 460 ? 190 : 0;
+    var pitch = Math.min(34, (W - side) / cols);
+    var g = Math.max(2, pitch * 0.15), sq = pitch - g;
+    var rows = Math.ceil(n / cols), gridW = cols * pitch - g, H = Math.ceil(rows * pitch);
+    var svg = root(host, W, H, 'The ' + n + ' tables of ' + sc.id + ', one square each. The gold SQL uses ' + goldIdx.length + ': ' + goldNames.join(', ') + '.');
+    for (var i = 0; i < n; i++) {
+      var r = Math.floor(i / cols), c = i % cols, gold = !!goldSet[i];
+      var rc = E('rect', { x: (c * pitch).toFixed(2), y: (r * pitch).toFixed(2), width: sq.toFixed(2), height: sq.toFixed(2), 'class': 'sq ' + (gold ? 'm-accent' : 'm-ctx'), 'data-i': i }, svg);
+      if (gold) rc.setAttribute('stroke-width', 1);
+    }
+    svg.addEventListener('pointerover', function (e) {
+      var t = e.target; if (!t.hasAttribute || !t.hasAttribute('data-i')) return;
+      var k = +t.getAttribute('data-i');
+      readout.innerHTML = '<b>' + esc(sc.tables[k]) + '</b> · ' + sc.cols[k] + ' columns' + (goldSet[k] ? ' · in the gold SQL' : '');
+    });
+    svg.addEventListener('pointerleave', function () { readout.innerHTML = readDefault; });
+    if (side) {
+      var byRow = {};
+      goldIdx.forEach(function (k) { var r = Math.floor(k / cols); (byRow[r] = byRow[r] || []).push(sc.tables[k]); });
+      Object.keys(byRow).forEach(function (r) {
+        var y = r * pitch + sq / 2;
+        E('line', { x1: gridW + 8, x2: gridW + 26, y1: y, y2: y, 'class': 'lead-l' }, svg);
+        T(svg, gridW + 32, y + 4, byRow[r].join(' · '), 't-val');
+      });
+    }
+  });
+
+  /* ---------- phrasings + SQL + result ---------- */
+  $('#ex-meta').textContent = 'Test split · ' + ex.difficulty + ' difficulty';
+  var tabs = $('#tabs'), qstack = $('#qstack');
+  S.styles.forEach(function (st, i) {
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'tab'; b.textContent = st.label;
+    b.setAttribute('aria-pressed', i === 0 ? 'true' : 'false');
+    b.setAttribute('data-k', st.key);
+    tabs.appendChild(b);
+    var p = document.createElement('p');
+    p.textContent = st.text; p.setAttribute('data-k', st.key);
+    if (i === 0) p.className = 'on'; else p.setAttribute('aria-hidden', 'true');
+    qstack.appendChild(p);
+  });
+  tabs.addEventListener('click', function (e) {
+    var b = e.target.closest('.tab'); if (!b) return;
+    var k = b.getAttribute('data-k');
+    tabs.querySelectorAll('.tab').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+    qstack.querySelectorAll('p').forEach(function (p) {
+      var on = p.getAttribute('data-k') === k;
+      p.classList.toggle('on', on);
+      if (on) p.removeAttribute('aria-hidden'); else p.setAttribute('aria-hidden', 'true');
+    });
+  });
+
+  var KW = 'SELECT DISTINCT FROM JOIN ON WHERE AND OR AS IN NOT NULL GROUP BY ORDER HAVING LIMIT LEFT INNER COUNT'.split(' ');
+  var goldWord = {}; goldNames.forEach(function (n) { goldWord[n] = true; });
+  $('#sql').innerHTML = ex.sqlPretty.replace(/('[^']*')|([A-Za-z_][A-Za-z_0-9]*)|([^'A-Za-z_]+)/g, function (m, str, word, other) {
+    if (str) return '<span class="str">' + esc(str) + '</span>';
+    if (word) {
+      if (KW.indexOf(word.toUpperCase()) >= 0 && word === word.toUpperCase()) return '<span class="kw">' + word + '</span>';
+      if (goldWord[word]) return '<mark>' + word + '</mark>';
+      return esc(word);
+    }
+    return esc(other);
+  });
+  $('#result').innerHTML = '<thead><tr>' + ex.resultColumns.map(function (c) { return '<th scope="col">' + esc(c) + '</th>'; }).join('') + '</tr></thead><tbody>' +
+    ex.result.map(function (row) { return '<tr>' + row.map(function (v) { return '<td>' + esc(v) + '</td>'; }).join('') + '</tr>'; }).join('') + '</tbody>';
+
+  /* ---------- comparison tables ---------- */
+  var tc = $('#tbl-compare');
+  tc.insertAdjacentHTML('beforeend', '<thead><tr><th scope="col">Dataset</th><th scope="col">Schemas</th><th scope="col">Median tables</th><th scope="col">Median columns</th><th scope="col">Foreign keys</th><th scope="col">Median rows per table</th></tr></thead><tbody>' +
+    S.compare.map(function (d) {
+      var ours = d.name === 'SQaLe';
+      return '<tr' + (ours ? ' class="ours"' : '') + '><th scope="row">' + (ours ? '<span class="hl">SQaLe</span>' : esc(d.name)) + '</th><td>' + fmt(d.schemas) + '</td><td>' + d.medTables + '</td><td>' + fmt(d.medCols) + '</td><td>' + fmt(d.fks) + '</td><td>' + (d.medRows == null ? '<span class="na">not reported</span>' : fmt(d.medRows)) + '</td></tr>';
+    }).join('') + '</tbody>');
+  var tq = $('#tbl-query');
+  tq.insertAdjacentHTML('beforeend', '<thead><tr><th scope="col">Dataset</th><th scope="col">SQL queries</th><th scope="col">Questions</th><th scope="col">Functions</th><th scope="col">WHERE</th><th scope="col">JOIN</th><th scope="col">Nested</th><th scope="col">Aggregation</th></tr></thead><tbody>' +
+    S.queryStats.map(function (d) {
+      var ours = d.name === 'SQaLe';
+      return '<tr' + (ours ? ' class="ours"' : '') + '><th scope="row">' + (ours ? '<span class="hl">SQaLe</span>' : esc(d.name)) + '</th><td>' + fmt(d.sql) + '</td><td>' + fmt(d.nl) + '</td><td>' + d.func.toFixed(1) + '</td><td>' + d.where.toFixed(1) + '</td><td>' + d.join.toFixed(1) + '</td><td>' + d.nested.toFixed(1) + '</td><td>' + d.agg.toFixed(1) + '</td></tr>';
+    }).join('') + '</tbody>');
+
+  /* ---------- results matrix: one 0-100 axis per benchmark ---------- */
+  function bench(sel, key, title) {
+    chart(sel, function (host, W) {
+      var rows = S.matrix, labelW = 104, valW = 42, bw = W - labelW - valW;
+      var rowH = 32, barH = 18, top = 2, y0 = top + rows.length * rowH + 2;
+      var svg = root(host, W, y0 + 22, title + ', execution accuracy: ' + rows.map(function (d) { return d.model.replace('M_', 'M ') + ' ' + (d[key] == null ? 'not measured' : d[key]); }).join(', ') + '.');
+      [0, 25, 50, 75, 100].forEach(function (t, i, a) {
+        var x = labelW + t / 100 * bw;
+        E('line', { x1: x, x2: x, y1: top, y2: y0, 'class': i === 0 ? 'ax' : 'gl' }, svg);
+        T(svg, x, y0 + 16, String(t), 't-mono', { 'text-anchor': i === a.length - 1 ? 'end' : (i === 0 ? 'start' : 'middle') });
+      });
+      rows.forEach(function (d, i) {
+        var cy = top + i * rowH + rowH / 2, v = d[key];
+        TM(svg, 0, cy + 4.5, d.model, 't-lab', null, '', 13);
+        if (v == null) { T(svg, labelW + 8, cy + 4, 'not measured', 't-mono'); return; }
+        var w = v / 100 * bw, cls = markCls(d.model);
+        var rc = E('rect', { x: labelW + 0.75, y: cy - barH / 2, width: Math.max(0, w - 0.75).toFixed(2), height: barH, 'class': cls }, svg);
+        var tt = E('title', {}, rc); tt.textContent = d.model.replace('M_', 'M ') + ': ' + v.toFixed(1) + '%';
+        T(svg, labelW + w + 6, cy + 4.5, v.toFixed(1), 't-val');
+      });
+    });
+  }
+  bench('#ch-b-sqale', 'sqale', 'SQaLe test');
+  bench('#ch-b-bird', 'bird', 'BIRD');
+  bench('#ch-b-ehrsql', 'ehrsql', 'EHRSQL');
+
+  /* ---------- compute circles: area proportional to TFLOPs ---------- */
+  var pA = S.pareto.filter(function (d) { return d.model === 'M_SQaLe'; })[0];
+  var pB = S.pareto.filter(function (d) { return d.model === 'Qwen3.5-27B'; })[0];
+  [[pA, '#cc-a'], [pB, '#cc-b']].forEach(function (pair) {
+    var fig = $(pair[1]);
+    fig.querySelector('.cc-acc').textContent = Math.round(pair[0].acc * 100) + '%';
+    fig.querySelector('.cc-tf').textContent = fmt(Math.round(pair[0].tflops)) + ' TFLOPs per question';
+  });
+  chart('#compute', function (host, W) {
+    var R = W < 720 ? Math.min(110, W * 0.24) : Math.min(165, W * 0.13);
+    var k = R / Math.sqrt(pB.tflops);
+    [[pA, '#cc-a'], [pB, '#cc-b']].forEach(function (pair) {
+      var d = pair[0], r = k * Math.sqrt(d.tflops);
+      var slot = $(pair[1] + ' .cc-fig');
+      var w = Math.ceil(2 * r) + 2, h = Math.ceil(2 * R) + 2;
+      var svg = root(slot, w, h, (d.model === 'M_SQaLe' ? 'M SQaLe' : d.model) + ': ' + fmt(Math.round(d.tflops)) + ' TFLOPs per question, drawn as circle area.');
+      E('circle', { cx: w / 2, cy: h - 1 - r, r: r, 'class': d.model === 'M_SQaLe' ? 'm-accent' : 'm-grey', 'stroke-width': 1 }, svg);
+    });
+  });
+
+  /* ---------- pareto: accuracy vs size (log x), compute as dot area ---------- */
+  var P = S.pareto;
+  var maxTF = Math.max.apply(null, P.map(function (d) { return d.tflops; }));
+  var kTF = 0;
+  chart('#ch-pareto', function (host, W) {
+    var narrow = W < 640;
+    var H = Math.round(Math.max(360, Math.min(540, W * 0.5)));
+    var m = { l: 44, r: 14, t: narrow ? 36 : 26, b: 52 };
+    var pw = W - m.l - m.r, ph = H - m.t - m.b;
+    var lo = narrow ? 1.55 : 1.25, hi = 88;
+    var lx = function (v) { return m.l + Math.log(v / lo) / Math.log(hi / lo) * pw; };
+    var ly = function (a) { return m.t + (1 - a / 0.7) * ph; };
+    var rMax = narrow ? 17 : 26;
+    kTF = rMax / Math.sqrt(maxTF);
+    var rad = function (tf) { return Math.max(3.5, kTF * Math.sqrt(tf)); };
+    var svg = root(host, W, H, 'Execution accuracy on 100 moderate SQaLe test questions against model size in billions of parameters, log scale. Dot area is compute per question. M SQaLe: 2B, 52%, 224 TFLOPs. Qwen3.5-9B: 58%. Qwen3.5-27B: 63%, 1,710 TFLOPs.');
+    [0, 0.2, 0.4, 0.6].forEach(function (a) {
+      var y = ly(a);
+      E('line', { x1: m.l, x2: W - m.r, y1: y, y2: y, 'class': a === 0 ? 'ax' : 'gl' }, svg);
+      T(svg, m.l - 8, y + 4, Math.round(a * 100) + '%', 't-mono', { 'text-anchor': 'end' });
+    });
+    T(svg, m.l - 8, 12, 'Accuracy', 't-mono', { 'text-anchor': 'start', x: 0 });
+    var ticks = [2, 3, 5, 10, 20, 30, 50, 70], lastX = -1e9;
+    ticks.forEach(function (v) {
+      var x = lx(v); if (x - lastX < 30) return; lastX = x;
+      E('line', { x1: x, x2: x, y1: ly(0), y2: ly(0) + 5, 'class': 'ax' }, svg);
+      T(svg, x, ly(0) + 19, v + 'B', 't-mono', { 'text-anchor': 'middle' });
+    });
+    T(svg, W - m.r, H - 6, 'Parameters, log scale', 't-mono', { 'text-anchor': 'end' });
+
+    var order = P.slice().sort(function (a, b) { return b.tflops - a.tflops; });
+    var groups = [order.filter(function (d) { return d.kind === 'base'; }), order.filter(function (d) { return d.kind === 'trained'; }), order.filter(function (d) { return d.kind === 'ours'; })];
+    var gDots = E('g', {}, svg);
+    groups.forEach(function (grp) {
+      grp.forEach(function (d) {
+        var cls = d.kind === 'ours' ? 'm-accent' : (d.kind === 'trained' ? 'm-grey m-ring' : 'm-base');
+        var c = E('circle', { cx: lx(d.params).toFixed(2), cy: ly(d.acc).toFixed(2), r: rad(d.tflops).toFixed(2), 'class': cls }, gDots);
+        if (d.kind === 'ours') c.setAttribute('stroke-width', 1.25);
+      });
+    });
+    // labels
+    var L = [
+      { m: 'M_SQaLe', side: 'left', suffix: ' 52%' },
+      { m: 'Qwen3.5-9B', side: 'above', suffix: narrow ? '' : ' 58%' },
+      { m: 'Qwen3.5-27B', side: narrow ? 'aboveL' : 'left', suffix: narrow ? '' : ' 63%' }
+    ];
+    if (!narrow) L.push({ m: 'M_BIRD', side: 'left' }, { m: 'M_SynSQL', side: 'left' }, { m: 'Qwen3.5-2B', side: 'left' });
+    var gLab = E('g', {}, svg);
+    L.forEach(function (l) {
+      var d = P.filter(function (p) { return p.model === l.m; })[0]; if (!d) return;
+      var x = lx(d.params), y = ly(d.acc), r = rad(d.tflops), t;
+      var strong = l.m === 'M_SQaLe' || l.m === 'Qwen3.5-27B' || l.m === 'Qwen3.5-9B';
+      var cls = strong ? 't-lab' : 't-mono';
+      if (l.side === 'left') t = TM(gLab, x - r - 6, y + 4, l.m, cls, { 'text-anchor': 'end' }, l.suffix, strong ? 13 : 11);
+      else if (l.side === 'above') t = TM(gLab, x, y - r - 7, l.m, cls, { 'text-anchor': 'middle' }, l.suffix, 13);
+      else if (l.side === 'below') t = TM(gLab, x + r + 4, y + r + 14, l.m, cls, { 'text-anchor': 'start' }, l.suffix, 13);
+      else if (l.side === 'aboveL') t = TM(gLab, x + r, y - r - 7, l.m, cls, { 'text-anchor': 'end' }, l.suffix, 13);
+    });
+    if (narrow) {
+      // M_SQaLe label sits left of x=2 on narrow screens only if it fits
+      var mq = P.filter(function (p) { return p.model === 'M_SQaLe'; })[0];
+      if (lx(mq.params) - rad(mq.tflops) - 6 < 70) {
+        gLab.removeChild(gLab.firstChild);
+        TM(gLab, lx(mq.params) + rad(mq.tflops) + 5, ly(mq.acc) - rad(mq.tflops) - 4, 'M_SQaLe', 't-lab', { 'text-anchor': 'start' }, ' 52%', 13);
+      }
+    }
+    // hit layer
+    var gHit = E('g', {}, svg);
+    P.forEach(function (d) {
+      var c = E('circle', { cx: lx(d.params).toFixed(2), cy: ly(d.acc).toFixed(2), r: Math.max(12, rad(d.tflops) + 3).toFixed(2), 'class': 'm-hit' }, gHit);
+      var html = '<b>' + mHTML(d.model) + '</b><br>' + d.params + 'B parameters<br>' + Math.round(d.acc * 100) + '% accuracy<br>' + fmt(Math.round(d.tflops)) + ' TFLOPs per question';
+      c.addEventListener('pointerenter', function (e) { showTip(e, html); });
+      c.addEventListener('pointermove', moveTip);
+      c.addEventListener('pointerleave', hideTip);
+    });
+    drawSizeLegend();
+  });
+  function drawSizeLegend() {
+    var host = $('#ch-pareto-size'); if (!host || !kTF) return;
+    var vals = [250, 1000, 3000], rs = vals.map(function (v) { return kTF * Math.sqrt(v); });
+    var yb = Math.ceil(2 * rs[2]) + 2, cx = [], x = Math.max(rs[0], 22);
+    rs.forEach(function (r, i) { if (i) x += Math.max(rs[i - 1] + r + 14, 62); cx.push(x); });
+    var W = Math.ceil(x + Math.max(rs[2], 26) + 2), H = yb + 18;
+    var svg = root(host, W, H, 'Dot size legend: 250, 1,000 and 3,000 TFLOPs per question.');
+    vals.forEach(function (v, i) {
+      E('circle', { cx: cx[i], cy: yb - rs[i], r: rs[i], 'class': 'm-base' }, svg);
+      T(svg, cx[i], H - 2, fmt(v), 't-mono', { 'text-anchor': 'middle' });
+    });
+  }
+  // data table twin
+  $('#tbl-pareto').innerHTML = '<thead><tr><th scope="col">Model</th><th scope="col">Parameters (B)</th><th scope="col">Accuracy, %</th><th scope="col">TFLOPs per question</th></tr></thead><tbody>' +
+    P.slice().sort(function (a, b) { return a.params - b.params || b.acc - a.acc; }).map(function (d) {
+      return '<tr' + (d.kind === 'ours' ? ' class="ours"' : '') + '><th scope="row">' + mHTML(d.model) + '</th><td>' + d.params + '</td><td>' + Math.round(d.acc * 100) + '</td><td>' + fmt(Math.round(d.tflops)) + '</td></tr>';
+    }).join('') + '</tbody>';
+
+  /* ---------- findings ---------- */
+  function cellBar(v, cls) {
+    return '<div class="cell"><span class="mono tnum" style="font-size:13px">' + v.toFixed(1) + '</span><span class="track"><span class="fill ' + cls + '" style="width:' + v + '%"></span></span></div>';
+  }
+  function scaleTable(sel, idx) {
+    var t = $(sel);
+    t.insertAdjacentHTML('beforeend', '<thead><tr><th scope="col">Schema shown</th><th scope="col" class="m">M<sub>SQaLe</sub></th><th scope="col" class="m">M<sub>BIRD</sub></th><th scope="col" class="m">M<sub>SynSQL</sub></th></tr></thead><tbody>' +
+      S.scale.map(function (r) {
+        return '<tr><th scope="row">' + esc(r.level) + '</th><td>' + cellBar(r.sqale[idx], 'ours') + '</td><td>' + cellBar(r.bird[idx], '') + '</td><td>' + cellBar(r.synsql[idx], '') + '</td></tr>';
+      }).join('') + '</tbody>');
+  }
+  scaleTable('#tbl-scale-acc', 0);
+  scaleTable('#tbl-scale-insp', 1);
+
+  function hbar(name, v, cls, suffix) {
+    return '<div class="hbar"><span class="nm">' + name + '</span><span class="track" role="img" aria-label="' + v + suffix + '"><span class="fill ' + cls + '" style="width:' + v + '%"></span></span><span class="v">' + v + suffix + '</span></div>';
+  }
+  var axis = '<div class="scale-ax" aria-hidden="true"><span></span><div><span>0</span><span>25</span><span>50</span><span>75</span><span>100</span></div><span></span></div>';
+  $('#bars-literals').innerHTML = S.literalsSeen.map(function (d) {
+    var cls = d.model === 'M_SQaLe' ? 'ours' : (d.model.indexOf('M_') === 0 ? '' : 'base');
+    return hbar(mHTML(d.model) + (d.model === 'Qwen3.5-2B' ? ' <span class="small">untrained</span>' : ''), d.pct, cls, '%');
+  }).join('') + axis;
+  $('#bars-domain').innerHTML = S.domain.map(function (d) {
+    var gap = (d.sqale - d.bird).toFixed(1);
+    return '<div class="dgroup"><p class="label" style="color:var(--fg)">' + esc(d.split) + '</p>' +
+      '<div class="hbars">' + hbar('M<sub>SQaLe</sub>', d.sqale.toFixed(1), 'ours', '') + hbar('M<sub>BIRD</sub>', d.bird.toFixed(1), '', '') + '</div>' +
+      '<p class="gap-note">M<sub>SQaLe</sub> leads by ' + gap + ' points</p></div>';
+  }).join('') + '<div style="margin-top:10px">' + axis + '</div>';
+
+  /* ---------- BibTeX + copy ---------- */
+  var pre = $('#bibtex'), btn = $('#copy'), timer = 0;
+  pre.textContent = S.bibtex;
+  function flash(label) {
+    btn.textContent = label; btn.classList.add('done');
+    clearTimeout(timer);
+    timer = setTimeout(function () { btn.textContent = 'Copy'; btn.classList.remove('done'); }, 1600);
+  }
+  function selectBib() {
+    var r = document.createRange(); r.selectNodeContents(pre);
+    var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+    flash('Selected');
+  }
+  btn.addEventListener('click', function () {
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(S.bibtex).then(function () { flash('Copied'); }, selectBib);
+      } else { selectBib(); }
+    } catch (err) { selectBib(); }
+  });
+
+  /* fonts change text metrics: refit once they are ready */
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(function () { fitWordmark(); charts.forEach(function (f) { f(true); }); });
+  }
+})();
+</script>
+</body>
+</html>

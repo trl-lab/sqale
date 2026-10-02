@@ -1,0 +1,557 @@
+panel,series,label,step,value
+Episode shape,train/mean_steps,turns,6,6.6469907407407405
+Episode shape,train/mean_steps,turns,12,6.6342592592592595
+Episode shape,train/mean_steps,turns,18,6.4259259259259265
+Episode shape,train/mean_steps,turns,24,6.270833333333333
+Episode shape,train/mean_steps,turns,30,6.222222222222222
+Episode shape,train/mean_steps,turns,36,6.277777777777778
+Episode shape,train/mean_steps,turns,42,6.297453703703703
+Episode shape,train/mean_steps,turns,48,6.825231481481482
+Episode shape,train/mean_steps,turns,54,6.6157407407407405
+Episode shape,train/mean_steps,turns,60,6.369212962962963
+Episode shape,train/mean_steps,turns,66,6.49537037037037
+Episode shape,train/mean_steps,turns,72,6.523148148148148
+Episode shape,train/mean_steps,turns,78,6.520833333333333
+Episode shape,train/mean_steps,turns,84,6.598379629629629
+Episode shape,train/mean_steps,turns,90,6.581018518518519
+Episode shape,train/mean_steps,turns,96,6.501157407407408
+Episode shape,train/mean_steps,turns,102,6.53125
+Episode shape,train/mean_steps,turns,108,6.5509259259259265
+Episode shape,train/mean_steps,turns,114,6.497685185185186
+Episode shape,train/mean_steps,turns,120,6.34837962962963
+Episode shape,train/mean_steps,turns,126,6.501157407407407
+Episode shape,train/mean_steps,turns,132,6.506944444444444
+Episode shape,train/mean_steps,turns,138,6.584490740740741
+Episode shape,train/mean_steps,turns,144,6.556712962962963
+Episode shape,train/mean_steps,turns,150,6.46412037037037
+Episode shape,train/mean_steps,turns,156,6.594907407407407
+Episode shape,train/mean_steps,turns,162,6.572916666666667
+Episode shape,train/mean_steps,turns,168,6.52662037037037
+Episode shape,train/mean_steps,turns,174,6.460648148148148
+Episode shape,train/mean_steps,turns,180,6.579861111111111
+Episode shape,train/mean_steps,turns,186,6.512731481481481
+Episode shape,train/mean_steps,turns,192,6.5
+Episode shape,train/mean_steps,turns,198,6.486111111111112
+Episode shape,train/mean_steps,turns,204,6.504629629629629
+Episode shape,train/mean_steps,turns,210,6.555555555555556
+Episode shape,train/mean_steps,turns,216,6.520833333333333
+Episode shape,train/mean_steps,turns,222,6.575231481481482
+Episode shape,train/mean_steps,turns,228,6.296296296296295
+Episode shape,train/mean_steps,turns,234,5.981481481481481
+Episode shape,train/mean_steps,turns,240,6.407407407407408
+Episode shape,train/mean_steps,turns,246,6.4375
+Episode shape,train/mean_steps,turns,252,6.47337962962963
+Episode shape,train/mean_steps,turns,258,6.2303240740740735
+Episode shape,train/mean_steps,turns,264,6.502314814814816
+Episode shape,train/mean_steps,turns,270,6.438657407407407
+Episode shape,train/mean_steps,turns,276,6.442129629629629
+Episode shape,train/mean_steps,turns,282,6.4756944444444455
+Episode shape,train/mean_steps,turns,288,6.556712962962963
+Episode shape,train/mean_steps,turns,294,6.545138888888889
+Episode shape,train/mean_steps,turns,300,6.5196759259259265
+Episode shape,train/mean_steps,turns,306,6.487268518518519
+Episode shape,train/mean_steps,turns,312,6.454861111111112
+Episode shape,train/mean_steps,turns,318,6.3506944444444455
+Episode shape,train/mean_steps,turns,324,6.335648148148148
+Episode shape,train/mean_steps,turns,330,6.484953703703703
+Episode shape,train/mean_steps,turns,336,6.4155092592592595
+Episode shape,train/mean_steps,turns,342,6.174768518518519
+Episode shape,train/mean_steps,turns,348,6.049768518518518
+Episode shape,train/mean_steps,turns,354,6.371527777777778
+Episode shape,train/mean_steps,turns,360,6.502314814814814
+Episode shape,train/mean_steps,turns,366,6.399305555555556
+Episode shape,train/mean_steps,turns,372,6.359953703703702
+Episode shape,train/mean_steps,turns,378,6.409722222222221
+Episode shape,train/mean_steps,turns,384,6.408564814814816
+Episode shape,train/mean_steps,turns,390,6.376157407407408
+Episode shape,train/mean_steps,turns,396,6.2928240740740735
+Episode shape,train/mean_steps,turns,402,6.418981481481481
+Episode shape,train/mean_steps,turns,408,6.306712962962963
+Episode shape,train/mean_steps,turns,414,6.364583333333333
+Episode shape,train/mean_steps,turns,420,6.451388888888888
+Episode shape,train/mean_steps,turns,426,6.377314814814814
+Episode shape,train/mean_steps,turns,432,6.268518518518518
+Episode shape,train/mean_steps,turns,438,6.421296296296297
+Episode shape,train/mean_steps,turns,444,6.479166666666668
+Episode shape,train/mean_steps,turns,450,6.391203703703703
+Episode shape,train/mean_steps,turns,456,6.258101851851851
+Episode shape,train/mean_steps,turns,462,6.027777777777778
+Episode shape,train/mean_steps,turns,468,6.516203703703703
+Episode shape,train/mean_steps,turns,474,6.3553240740740735
+Episode shape,train/mean_steps,turns,480,6.27662037037037
+Episode shape,train/mean_steps,turns,486,6.486111111111112
+Episode shape,train/mean_steps,turns,492,6.489583333333333
+Episode shape,train/mean_steps,turns,498,6.407407407407407
+Episode shape,train/mean_steps,turns,504,6.375
+Episode shape,train/mean_steps,turns,510,6.385416666666667
+Episode shape,train/mean_steps,turns,516,6.385416666666667
+Episode shape,train/mean_steps,turns,522,6.447916666666667
+Episode shape,train/mean_steps,turns,528,6.427083333333333
+Episode shape,train/mean_steps,turns,534,6.3506944444444455
+Episode shape,train/mean_steps,turns,540,6.4594907407407405
+Episode shape,train/mean_steps,turns,546,6.290509259259259
+Episode shape,train/mean_steps,turns,552,6.434027777777778
+Episode shape,train/mean_steps,turns,558,6.253472222222222
+Episode shape,train/mean_steps,turns,564,6.208333333333333
+Episode shape,train/mean_steps,turns,570,6.152777777777778
+Episode shape,train/mean_steps,turns,576,5.765046296296297
+Episode shape,train/mean_steps,turns,582,5.739583333333332
+Episode shape,train/mean_steps,turns,588,6.482638888888889
+Episode shape,train/mean_steps,turns,594,6.548611111111112
+Episode shape,train/mean_steps,turns,600,6.416666666666667
+Episode shape,train/mean_steps,turns,606,6.37962962962963
+Episode shape,train/mean_steps,turns,612,6.331018518518518
+Episode shape,train/mean_steps,turns,618,6.334490740740741
+Episode shape,train/mean_steps,turns,624,6.377314814814814
+Episode shape,train/mean_steps,turns,630,6.269675925925925
+Episode shape,train/mean_steps,turns,636,6.34375
+Episode shape,train/mean_steps,turns,642,6.315972222222221
+Episode shape,train/mean_steps,turns,648,6.443287037037037
+Episode shape,train/mean_steps,turns,654,6.451388888888889
+Episode shape,train/mean_steps,turns,660,6.525462962962963
+Episode shape,train/mean_steps,turns,666,6.340277777777779
+Episode shape,train/mean_steps,turns,672,6.410879629629629
+Episode shape,train/mean_steps,turns,678,6.078703703703703
+Episode shape,train/mean_steps,turns,684,6.1134259259259265
+Episode shape,train/mean_steps,turns,690,5.971064814814814
+Episode shape,train/mean_steps,turns,696,5.638888888888888
+Episode shape,train/mean_steps,turns,702,6.034722222222221
+Episode shape,train/mean_steps,turns,708,6.372685185185184
+Episode shape,train/mean_steps,turns,714,6.336805555555556
+Episode shape,train/mean_steps,turns,720,6.131944444444444
+Episode shape,train/mean_steps,turns,726,6.16087962962963
+Episode shape,train/mean_steps,turns,732,6.2592592592592595
+Episode shape,train/mean_steps,turns,738,6.030092592592593
+Episode shape,train/mean_steps,turns,744,5.967592592592593
+Episode shape,train/mean_steps,turns,750,6.0844907407407405
+Episode shape,train/mean_steps,turns,756,6.086805555555556
+Episode shape,train/mean_steps,turns,762,6.138888888888889
+Episode shape,train/mean_steps,turns,768,6.2696759259259265
+Episode shape,train/mean_steps,turns,774,6.157407407407407
+Episode shape,train/mean_steps,turns,780,6.380787037037037
+Episode shape,train/mean_steps,turns,786,6.2256944444444455
+Episode shape,train/mean_steps,turns,792,6.403935185185184
+Episode shape,train/mean_steps,turns,798,6.277777777777778
+Episode shape,train/mean_steps,turns,804,6.180555555555556
+Episode shape,train/mean_steps,turns,810,6.204861111111112
+Episode shape,train/mean_steps,turns,816,6.049768518518519
+Episode shape,train/mean_steps,turns,822,5.751157407407407
+Episode shape,train/mean_steps,turns,828,5.7280092592592595
+Episode shape,train/mean_steps,turns,834,6.4178240740740735
+Episode shape,train/mean_steps,turns,840,6.208333333333333
+Episode shape,train/mean_steps,turns,846,6.130787037037038
+Episode shape,train/mean_steps,turns,852,6.096064814814814
+Episode shape,train/mean_steps,turns,858,5.90625
+Episode shape,train/mean_steps,turns,864,5.910879629629629
+Episode shape,train/mean_steps,turns,870,5.929398148148148
+Episode shape,train/mean_steps,turns,876,5.898148148148149
+Episode shape,train/mean_steps,turns,882,5.950231481481482
+Episode shape,train/mean_steps,turns,888,6.075231481481481
+Episode shape,train/mean_steps,turns,894,6.185185185185184
+Episode shape,train/mean_steps,turns,900,6.247685185185186
+Episode shape,train/mean_steps,turns,906,6.202546296296297
+Episode shape,train/mean_steps,turns,912,6.077546296296295
+Episode shape,train/mean_steps,turns,918,6.121527777777778
+Episode shape,train/mean_steps,turns,924,6.06712962962963
+Episode shape,train/mean_steps,turns,930,5.96412037037037
+Episode shape,train/mean_steps,turns,936,5.851851851851852
+Episode shape,train/mean_steps,turns,942,5.840277777777778
+Episode shape,train/mean_steps,turns,948,5.905092592592593
+Episode shape,train/mean_steps,turns,954,6.268518518518519
+Episode shape,train/mean_steps,turns,960,6.3553240740740735
+Episode shape,train/mean_steps,turns,966,6.231481481481481
+Episode shape,train/mean_steps,turns,972,6.008101851851852
+Episode shape,train/mean_steps,turns,978,6.201388888888888
+Episode shape,train/mean_steps,turns,984,6.041666666666667
+Episode shape,train/mean_steps,turns,990,5.900462962962963
+Episode shape,train/mean_steps,turns,996,5.795138888888888
+Episode shape,train/mean_steps,turns,1002,5.7430555555555545
+Episode shape,train/mean_steps,turns,1008,5.6030092592592595
+Episode shape,train/mean_steps,turns,1014,5.693287037037037
+Episode shape,train/mean_steps,turns,1020,5.768518518518518
+Episode shape,train/mean_steps,turns,1026,5.701388888888889
+Episode shape,train/mean_steps,turns,1032,5.743055555555556
+Episode shape,train/mean_steps,turns,1038,5.837962962962963
+Episode shape,train/mean_steps,turns,1044,5.752314814814814
+Episode shape,train/mean_steps,turns,1050,5.737268518518518
+Episode shape,train/mean_steps,turns,1056,5.841435185185186
+Episode shape,train/mean_steps,turns,1062,5.729166666666667
+Episode shape,train/mean_steps,turns,1068,5.640046296296297
+Episode shape,train/mean_steps,turns,1074,5.7928240740740735
+Episode shape,train/mean_steps,turns,1080,5.7407407407407405
+Episode shape,train/mean_steps,turns,1086,5.804398148148148
+Episode shape,train/mean_steps,turns,1092,5.828703703703703
+Episode shape,train/mean_steps,turns,1098,5.835648148148148
+Episode shape,train/mean_steps,turns,1104,5.84375
+Episode shape,train/mean_steps,turns,1110,5.782407407407407
+Episode shape,train/mean_steps,turns,1116,5.78125
+Episode shape,train/mean_steps,turns,1122,5.905092592592593
+Episode shape,train/mean_steps,turns,1128,5.77662037037037
+Episode shape,train/mean_steps,turns,1134,5.8321759259259265
+Episode shape,train/mean_steps,turns,1140,5.818287037037037
+Episode shape,train/mean_steps,turns,1146,5.825231481481481
+Episode shape,train/mean_steps,turns,1152,5.637731481481482
+Episode shape,train/mean_steps,turns,1158,5.880787037037038
+Episode shape,train/mean_steps,turns,1164,5.739583333333333
+Episode shape,train/mean_steps,turns,1170,5.640046296296297
+Episode shape,train/mean_steps,turns,1176,5.80787037037037
+Episode shape,train/mean_steps,turns,1182,5.8657407407407405
+Episode shape,train/mean_steps,turns,1188,5.849537037037037
+Episode shape,train/mean_steps,turns,1194,5.868055555555556
+Episode shape,train/mean_steps,turns,1200,5.981481481481481
+Episode shape,train/mean_steps,turns,1206,5.939814814814814
+Episode shape,train/mean_steps,turns,1212,5.935185185185186
+Episode shape,train/mean_steps,turns,1218,6.034722222222221
+Episode shape,train/mean_steps,turns,1224,5.939814814814816
+Episode shape,train/mean_steps,turns,1230,6.0509259259259265
+Episode shape,train/mean_steps,turns,1236,5.986111111111112
+Episode shape,train/mean_steps,turns,1242,6.0532407407407405
+Episode shape,train/mean_steps,turns,1248,5.976851851851852
+Episode shape,train/mean_steps,turns,1254,5.931712962962963
+Episode shape,train/mean_steps,turns,1260,5.9490740740740735
+Episode shape,train/mean_steps,turns,1266,5.922453703703703
+Episode shape,train/mean_steps,turns,1272,5.881944444444444
+Episode shape,train/mean_steps,turns,1278,6.012731481481481
+Episode shape,train/mean_steps,turns,1284,5.820601851851852
+Episode shape,train/mean_steps,turns,1290,5.791666666666667
+Episode shape,train/mean_steps,turns,1296,5.75462962962963
+Episode shape,train/mean_steps,turns,1302,6.107638888888888
+Episode shape,train/mean_steps,turns,1308,5.836805555555557
+Episode shape,train/mean_steps,turns,1314,5.793981481481481
+Episode shape,train/mean_steps,turns,1320,5.954861111111111
+Episode shape,train/mean_steps,turns,1326,5.8819444444444455
+Episode shape,train/mean_steps,turns,1332,6.013888888888889
+Episode shape,train/mean_steps,turns,1338,5.965277777777778
+Episode shape,train/mean_steps,turns,1344,5.831018518518519
+Episode shape,train/mean_steps,turns,1350,5.822916666666667
+Episode shape,train/mean_steps,turns,1356,6.047453703703703
+Episode shape,train/mean_steps,turns,1362,5.813657407407408
+Episode shape,train/mean_steps,turns,1368,5.791666666666667
+Episode shape,train/mean_steps,turns,1374,5.827546296296297
+Episode shape,train/mean_steps,turns,1380,5.881944444444444
+Episode shape,train/mean_steps,turns,1386,6.106481481481481
+Episode shape,train/mean_steps,turns,1392,5.939814814814814
+Episode shape,train/mean_steps,turns,1398,6.004629629629629
+Episode shape,train/mean_steps,turns,1404,5.950231481481482
+Episode shape,train/mean_steps,turns,1410,5.960648148148148
+Episode shape,train/mean_steps,turns,1416,5.90162037037037
+Episode shape,train/mean_steps,turns,1422,5.997685185185184
+Episode shape,train/mean_steps,turns,1428,6.011574074074075
+Episode shape,train/mean_steps,turns,1434,5.954861111111111
+Episode shape,train/mean_steps,turns,1440,5.914351851851851
+Episode shape,train/mean_steps,turns,1446,5.954861111111112
+Episode shape,train/mean_steps,turns,1452,5.90625
+Episode shape,train/mean_steps,turns,1458,6.005787037037037
+Episode shape,train/mean_steps,turns,1464,6.069444444444444
+Episode shape,train/mean_steps,turns,1470,6.0196759259259265
+Episode shape,train/mean_steps,turns,1476,6.101851851851852
+Episode shape,train/mean_steps,turns,1482,6.135416666666667
+Episode shape,train/mean_steps,turns,1488,6.0405092592592595
+Episode shape,train/mean_steps,turns,1494,6.003472222222222
+Episode shape,train/mean_steps,turns,1500,6.204861111111111
+Episode shape,train/mean_steps,turns,1506,5.972222222222222
+Episode shape,train/mean_steps,turns,1512,5.960648148148148
+Episode shape,train/mean_steps,turns,1518,6.072916666666667
+Episode shape,train/mean_steps,turns,1524,6.010416666666667
+Episode shape,train/mean_steps,turns,1530,5.94212962962963
+Episode shape,train/mean_steps,turns,1536,6.039351851851852
+Episode shape,train/mean_steps,turns,1542,5.989583333333333
+Episode shape,train/mean_steps,turns,1548,6.018518518518518
+Episode shape,train/mean_steps,turns,1554,6.0740740740740735
+Episode shape,train/mean_steps,turns,1560,6.030092592592593
+Episode shape,train/mean_steps,turns,1566,5.905092592592593
+Episode shape,train/mean_steps,turns,1572,5.916666666666667
+Episode shape,train/mean_steps,turns,1578,6.078703703703703
+Episode shape,train/mean_steps,turns,1584,6.107638888888889
+Episode shape,train/mean_steps,turns,1590,6.083333333333333
+Episode shape,train/mean_steps,turns,1596,5.97337962962963
+Episode shape,train/mean_steps,turns,1602,5.94212962962963
+Episode shape,train/mean_steps,turns,1608,6.075231481481481
+Episode shape,train/mean_steps,turns,1614,6.0625
+Episode shape,train/mean_steps,turns,1620,5.975694444444444
+Episode shape,train/mean_steps,turns,1626,6.0555555555555545
+Episode shape,train/mean_steps,turns,1632,6.05787037037037
+Episode shape,train/mean_steps,turns,1638,6.0532407407407405
+Episode shape,train/mean_steps,turns,1644,6.0
+Episode shape,train/mean_steps,turns,1650,6.069444444444444
+Episode shape,train/mean_steps,turns,1656,6.078703703703703
+Episode shape,train/mean_steps,turns,1658,6.118055555555555
+Episode shape,train/mean_steps,turns,1658,6.090277777777778
+Episode shape,train/mean_tool_calls,tool calls,6,7.302083333333333
+Episode shape,train/mean_tool_calls,tool calls,12,6.085648148148149
+Episode shape,train/mean_tool_calls,tool calls,18,6.359953703703703
+Episode shape,train/mean_tool_calls,tool calls,24,6.206018518518518
+Episode shape,train/mean_tool_calls,tool calls,30,5.526620370370371
+Episode shape,train/mean_tool_calls,tool calls,36,5.275462962962963
+Episode shape,train/mean_tool_calls,tool calls,42,5.219907407407407
+Episode shape,train/mean_tool_calls,tool calls,48,5.929398148148148
+Episode shape,train/mean_tool_calls,tool calls,54,5.893518518518519
+Episode shape,train/mean_tool_calls,tool calls,60,5.836805555555556
+Episode shape,train/mean_tool_calls,tool calls,66,5.782407407407407
+Episode shape,train/mean_tool_calls,tool calls,72,6.082175925925925
+Episode shape,train/mean_tool_calls,tool calls,78,5.900462962962962
+Episode shape,train/mean_tool_calls,tool calls,84,5.6319444444444455
+Episode shape,train/mean_tool_calls,tool calls,90,6.4131944444444455
+Episode shape,train/mean_tool_calls,tool calls,96,5.960648148148148
+Episode shape,train/mean_tool_calls,tool calls,102,6.479166666666667
+Episode shape,train/mean_tool_calls,tool calls,108,7.1365740740740735
+Episode shape,train/mean_tool_calls,tool calls,114,5.681712962962963
+Episode shape,train/mean_tool_calls,tool calls,120,5.376157407407407
+Episode shape,train/mean_tool_calls,tool calls,126,5.491898148148148
+Episode shape,train/mean_tool_calls,tool calls,132,5.524305555555556
+Episode shape,train/mean_tool_calls,tool calls,138,5.65162037037037
+Episode shape,train/mean_tool_calls,tool calls,144,6.1134259259259265
+Episode shape,train/mean_tool_calls,tool calls,150,5.658564814814814
+Episode shape,train/mean_tool_calls,tool calls,156,5.618055555555556
+Episode shape,train/mean_tool_calls,tool calls,162,5.601851851851852
+Episode shape,train/mean_tool_calls,tool calls,168,5.609953703703703
+Episode shape,train/mean_tool_calls,tool calls,174,5.69212962962963
+Episode shape,train/mean_tool_calls,tool calls,180,5.732638888888888
+Episode shape,train/mean_tool_calls,tool calls,186,5.508101851851852
+Episode shape,train/mean_tool_calls,tool calls,192,5.506944444444444
+Episode shape,train/mean_tool_calls,tool calls,198,5.6655092592592595
+Episode shape,train/mean_tool_calls,tool calls,204,6.041666666666667
+Episode shape,train/mean_tool_calls,tool calls,210,5.584490740740741
+Episode shape,train/mean_tool_calls,tool calls,216,5.543981481481482
+Episode shape,train/mean_tool_calls,tool calls,222,5.7094907407407405
+Episode shape,train/mean_tool_calls,tool calls,228,5.998842592592593
+Episode shape,train/mean_tool_calls,tool calls,234,6.1655092592592595
+Episode shape,train/mean_tool_calls,tool calls,240,5.890046296296297
+Episode shape,train/mean_tool_calls,tool calls,246,5.6875
+Episode shape,train/mean_tool_calls,tool calls,252,6.185185185185184
+Episode shape,train/mean_tool_calls,tool calls,258,6.047453703703705
+Episode shape,train/mean_tool_calls,tool calls,264,6.091435185185184
+Episode shape,train/mean_tool_calls,tool calls,270,6.152777777777779
+Episode shape,train/mean_tool_calls,tool calls,276,5.888888888888889
+Episode shape,train/mean_tool_calls,tool calls,282,5.820601851851852
+Episode shape,train/mean_tool_calls,tool calls,288,6.100694444444444
+Episode shape,train/mean_tool_calls,tool calls,294,6.410879629629629
+Episode shape,train/mean_tool_calls,tool calls,300,6.1446759259259265
+Episode shape,train/mean_tool_calls,tool calls,306,5.954861111111111
+Episode shape,train/mean_tool_calls,tool calls,312,5.9618055555555545
+Episode shape,train/mean_tool_calls,tool calls,318,5.822916666666667
+Episode shape,train/mean_tool_calls,tool calls,324,6.1875
+Episode shape,train/mean_tool_calls,tool calls,330,5.793981481481481
+Episode shape,train/mean_tool_calls,tool calls,336,5.898148148148148
+Episode shape,train/mean_tool_calls,tool calls,342,5.664351851851852
+Episode shape,train/mean_tool_calls,tool calls,348,5.65625
+Episode shape,train/mean_tool_calls,tool calls,354,5.951388888888889
+Episode shape,train/mean_tool_calls,tool calls,360,5.871527777777778
+Episode shape,train/mean_tool_calls,tool calls,366,5.97337962962963
+Episode shape,train/mean_tool_calls,tool calls,372,5.916666666666667
+Episode shape,train/mean_tool_calls,tool calls,378,5.8217592592592595
+Episode shape,train/mean_tool_calls,tool calls,384,5.72337962962963
+Episode shape,train/mean_tool_calls,tool calls,390,5.986111111111111
+Episode shape,train/mean_tool_calls,tool calls,396,6.06712962962963
+Episode shape,train/mean_tool_calls,tool calls,402,5.9155092592592595
+Episode shape,train/mean_tool_calls,tool calls,408,5.673611111111112
+Episode shape,train/mean_tool_calls,tool calls,414,5.739583333333333
+Episode shape,train/mean_tool_calls,tool calls,420,6.072916666666667
+Episode shape,train/mean_tool_calls,tool calls,426,6.018518518518519
+Episode shape,train/mean_tool_calls,tool calls,432,6.077546296296297
+Episode shape,train/mean_tool_calls,tool calls,438,5.7928240740740735
+Episode shape,train/mean_tool_calls,tool calls,444,5.689814814814814
+Episode shape,train/mean_tool_calls,tool calls,450,5.5717592592592595
+Episode shape,train/mean_tool_calls,tool calls,456,5.385416666666667
+Episode shape,train/mean_tool_calls,tool calls,462,5.148148148148148
+Episode shape,train/mean_tool_calls,tool calls,468,5.6678240740740735
+Episode shape,train/mean_tool_calls,tool calls,474,5.575231481481481
+Episode shape,train/mean_tool_calls,tool calls,480,5.47337962962963
+Episode shape,train/mean_tool_calls,tool calls,486,5.604166666666667
+Episode shape,train/mean_tool_calls,tool calls,492,5.606481481481481
+Episode shape,train/mean_tool_calls,tool calls,498,5.532407407407408
+Episode shape,train/mean_tool_calls,tool calls,504,5.6759259259259265
+Episode shape,train/mean_tool_calls,tool calls,510,5.703703703703703
+Episode shape,train/mean_tool_calls,tool calls,516,5.789351851851852
+Episode shape,train/mean_tool_calls,tool calls,522,5.758101851851852
+Episode shape,train/mean_tool_calls,tool calls,528,5.579861111111112
+Episode shape,train/mean_tool_calls,tool calls,534,5.537037037037037
+Episode shape,train/mean_tool_calls,tool calls,540,5.563657407407407
+Episode shape,train/mean_tool_calls,tool calls,546,5.503472222222222
+Episode shape,train/mean_tool_calls,tool calls,552,5.671296296296297
+Episode shape,train/mean_tool_calls,tool calls,558,5.516203703703703
+Episode shape,train/mean_tool_calls,tool calls,564,5.7303240740740735
+Episode shape,train/mean_tool_calls,tool calls,570,6.28587962962963
+Episode shape,train/mean_tool_calls,tool calls,576,7.892361111111111
+Episode shape,train/mean_tool_calls,tool calls,582,7.1759259259259265
+Episode shape,train/mean_tool_calls,tool calls,588,5.525462962962963
+Episode shape,train/mean_tool_calls,tool calls,594,5.592592592592593
+Episode shape,train/mean_tool_calls,tool calls,600,5.625
+Episode shape,train/mean_tool_calls,tool calls,606,5.837962962962963
+Episode shape,train/mean_tool_calls,tool calls,612,5.7615740740740735
+Episode shape,train/mean_tool_calls,tool calls,618,5.483796296296297
+Episode shape,train/mean_tool_calls,tool calls,624,5.422453703703703
+Episode shape,train/mean_tool_calls,tool calls,630,5.319444444444445
+Episode shape,train/mean_tool_calls,tool calls,636,5.3993055555555545
+Episode shape,train/mean_tool_calls,tool calls,642,5.412037037037037
+Episode shape,train/mean_tool_calls,tool calls,648,5.570601851851852
+Episode shape,train/mean_tool_calls,tool calls,654,5.583333333333333
+Episode shape,train/mean_tool_calls,tool calls,660,5.805555555555556
+Episode shape,train/mean_tool_calls,tool calls,666,6.039351851851852
+Episode shape,train/mean_tool_calls,tool calls,672,6.231481481481481
+Episode shape,train/mean_tool_calls,tool calls,678,6.125
+Episode shape,train/mean_tool_calls,tool calls,684,7.138888888888888
+Episode shape,train/mean_tool_calls,tool calls,690,7.722222222222222
+Episode shape,train/mean_tool_calls,tool calls,696,8.72800925925926
+Episode shape,train/mean_tool_calls,tool calls,702,7.435185185185184
+Episode shape,train/mean_tool_calls,tool calls,708,5.581018518518518
+Episode shape,train/mean_tool_calls,tool calls,714,6.4259259259259265
+Episode shape,train/mean_tool_calls,tool calls,720,7.568287037037035
+Episode shape,train/mean_tool_calls,tool calls,726,6.189814814814814
+Episode shape,train/mean_tool_calls,tool calls,732,6.079861111111111
+Episode shape,train/mean_tool_calls,tool calls,738,5.829861111111111
+Episode shape,train/mean_tool_calls,tool calls,744,5.967592592592592
+Episode shape,train/mean_tool_calls,tool calls,750,6.9907407407407405
+Episode shape,train/mean_tool_calls,tool calls,756,7.924768518518519
+Episode shape,train/mean_tool_calls,tool calls,762,7.262731481481481
+Episode shape,train/mean_tool_calls,tool calls,768,7.3819444444444455
+Episode shape,train/mean_tool_calls,tool calls,774,7.141203703703703
+Episode shape,train/mean_tool_calls,tool calls,780,7.035879629629631
+Episode shape,train/mean_tool_calls,tool calls,786,6.541666666666667
+Episode shape,train/mean_tool_calls,tool calls,792,6.622685185185186
+Episode shape,train/mean_tool_calls,tool calls,798,6.670138888888889
+Episode shape,train/mean_tool_calls,tool calls,804,7.059027777777779
+Episode shape,train/mean_tool_calls,tool calls,810,8.361111111111112
+Episode shape,train/mean_tool_calls,tool calls,816,8.630787037037036
+Episode shape,train/mean_tool_calls,tool calls,822,11.641203703703702
+Episode shape,train/mean_tool_calls,tool calls,828,13.718749999999998
+Episode shape,train/mean_tool_calls,tool calls,834,5.8321759259259265
+Episode shape,train/mean_tool_calls,tool calls,840,6.138888888888889
+Episode shape,train/mean_tool_calls,tool calls,846,7.835648148148146
+Episode shape,train/mean_tool_calls,tool calls,852,9.972222222222221
+Episode shape,train/mean_tool_calls,tool calls,858,9.78587962962963
+Episode shape,train/mean_tool_calls,tool calls,864,9.712962962962964
+Episode shape,train/mean_tool_calls,tool calls,870,9.560185185185185
+Episode shape,train/mean_tool_calls,tool calls,876,8.70949074074074
+Episode shape,train/mean_tool_calls,tool calls,882,8.957175925925926
+Episode shape,train/mean_tool_calls,tool calls,888,8.126157407407407
+Episode shape,train/mean_tool_calls,tool calls,894,7.773148148148149
+Episode shape,train/mean_tool_calls,tool calls,900,7.953703703703703
+Episode shape,train/mean_tool_calls,tool calls,906,8.310185185185185
+Episode shape,train/mean_tool_calls,tool calls,912,8.45138888888889
+Episode shape,train/mean_tool_calls,tool calls,918,9.538194444444443
+Episode shape,train/mean_tool_calls,tool calls,924,9.987268518518517
+Episode shape,train/mean_tool_calls,tool calls,930,10.712962962962962
+Episode shape,train/mean_tool_calls,tool calls,936,12.17824074074074
+Episode shape,train/mean_tool_calls,tool calls,942,15.064814814814817
+Episode shape,train/mean_tool_calls,tool calls,948,13.818287037037038
+Episode shape,train/mean_tool_calls,tool calls,954,6.325231481481481
+Episode shape,train/mean_tool_calls,tool calls,960,6.871527777777778
+Episode shape,train/mean_tool_calls,tool calls,966,7.609953703703705
+Episode shape,train/mean_tool_calls,tool calls,972,8.488425925925926
+Episode shape,train/mean_tool_calls,tool calls,978,9.325231481481483
+Episode shape,train/mean_tool_calls,tool calls,984,9.495370370370372
+Episode shape,train/mean_tool_calls,tool calls,990,9.586805555555555
+Episode shape,train/mean_tool_calls,tool calls,996,9.6875
+Episode shape,train/mean_tool_calls,tool calls,1002,9.793981481481481
+Episode shape,train/mean_tool_calls,tool calls,1008,10.586805555555555
+Episode shape,train/mean_tool_calls,tool calls,1014,11.189814814814815
+Episode shape,train/mean_tool_calls,tool calls,1020,11.85300925925926
+Episode shape,train/mean_tool_calls,tool calls,1026,12.114583333333334
+Episode shape,train/mean_tool_calls,tool calls,1032,13.135416666666666
+Episode shape,train/mean_tool_calls,tool calls,1038,12.799768518518519
+Episode shape,train/mean_tool_calls,tool calls,1044,13.148148148148147
+Episode shape,train/mean_tool_calls,tool calls,1050,13.568287037037036
+Episode shape,train/mean_tool_calls,tool calls,1056,14.621527777777779
+Episode shape,train/mean_tool_calls,tool calls,1062,14.664351851851853
+Episode shape,train/mean_tool_calls,tool calls,1068,14.805555555555555
+Episode shape,train/mean_tool_calls,tool calls,1074,16.33564814814815
+Episode shape,train/mean_tool_calls,tool calls,1080,16.06134259259259
+Episode shape,train/mean_tool_calls,tool calls,1086,16.40509259259259
+Episode shape,train/mean_tool_calls,tool calls,1092,16.180555555555554
+Episode shape,train/mean_tool_calls,tool calls,1098,15.825231481481483
+Episode shape,train/mean_tool_calls,tool calls,1104,16.02662037037037
+Episode shape,train/mean_tool_calls,tool calls,1110,15.670138888888891
+Episode shape,train/mean_tool_calls,tool calls,1116,16.05324074074074
+Episode shape,train/mean_tool_calls,tool calls,1122,17.58449074074074
+Episode shape,train/mean_tool_calls,tool calls,1128,16.635416666666664
+Episode shape,train/mean_tool_calls,tool calls,1134,17.571759259259256
+Episode shape,train/mean_tool_calls,tool calls,1140,17.694444444444446
+Episode shape,train/mean_tool_calls,tool calls,1146,15.818287037037038
+Episode shape,train/mean_tool_calls,tool calls,1152,15.950231481481483
+Episode shape,train/mean_tool_calls,tool calls,1158,15.944444444444443
+Episode shape,train/mean_tool_calls,tool calls,1164,15.246527777777779
+Episode shape,train/mean_tool_calls,tool calls,1170,14.28125
+Episode shape,train/mean_tool_calls,tool calls,1176,15.412037037037038
+Episode shape,train/mean_tool_calls,tool calls,1182,15.496527777777777
+Episode shape,train/mean_tool_calls,tool calls,1188,14.41550925925926
+Episode shape,train/mean_tool_calls,tool calls,1194,14.945601851851853
+Episode shape,train/mean_tool_calls,tool calls,1200,15.920138888888888
+Episode shape,train/mean_tool_calls,tool calls,1206,15.284722222222221
+Episode shape,train/mean_tool_calls,tool calls,1212,15.509259259259258
+Episode shape,train/mean_tool_calls,tool calls,1218,16.89351851851852
+Episode shape,train/mean_tool_calls,tool calls,1224,16.928240740740744
+Episode shape,train/mean_tool_calls,tool calls,1230,18.0625
+Episode shape,train/mean_tool_calls,tool calls,1236,16.974537037037038
+Episode shape,train/mean_tool_calls,tool calls,1242,18.488425925925927
+Episode shape,train/mean_tool_calls,tool calls,1248,16.836805555555554
+Episode shape,train/mean_tool_calls,tool calls,1254,17.114583333333332
+Episode shape,train/mean_tool_calls,tool calls,1260,17.4375
+Episode shape,train/mean_tool_calls,tool calls,1266,18.315972222222225
+Episode shape,train/mean_tool_calls,tool calls,1272,18.74537037037037
+Episode shape,train/mean_tool_calls,tool calls,1278,19.49189814814815
+Episode shape,train/mean_tool_calls,tool calls,1284,19.052083333333332
+Episode shape,train/mean_tool_calls,tool calls,1290,18.37384259259259
+Episode shape,train/mean_tool_calls,tool calls,1296,17.91087962962963
+Episode shape,train/mean_tool_calls,tool calls,1302,20.11226851851852
+Episode shape,train/mean_tool_calls,tool calls,1308,18.100694444444443
+Episode shape,train/mean_tool_calls,tool calls,1314,17.332175925925924
+Episode shape,train/mean_tool_calls,tool calls,1320,18.24884259259259
+Episode shape,train/mean_tool_calls,tool calls,1326,17.88425925925926
+Episode shape,train/mean_tool_calls,tool calls,1332,19.03125
+Episode shape,train/mean_tool_calls,tool calls,1338,19.020833333333332
+Episode shape,train/mean_tool_calls,tool calls,1344,17.35648148148148
+Episode shape,train/mean_tool_calls,tool calls,1350,17.604166666666668
+Episode shape,train/mean_tool_calls,tool calls,1356,19.082175925925927
+Episode shape,train/mean_tool_calls,tool calls,1362,17.983796296296294
+Episode shape,train/mean_tool_calls,tool calls,1368,18.069444444444446
+Episode shape,train/mean_tool_calls,tool calls,1374,17.582175925925924
+Episode shape,train/mean_tool_calls,tool calls,1380,19.5625
+Episode shape,train/mean_tool_calls,tool calls,1386,19.80787037037037
+Episode shape,train/mean_tool_calls,tool calls,1392,18.94212962962963
+Episode shape,train/mean_tool_calls,tool calls,1398,19.100694444444446
+Episode shape,train/mean_tool_calls,tool calls,1404,19.378472222222218
+Episode shape,train/mean_tool_calls,tool calls,1410,18.694444444444443
+Episode shape,train/mean_tool_calls,tool calls,1416,18.77314814814815
+Episode shape,train/mean_tool_calls,tool calls,1422,19.015046296296294
+Episode shape,train/mean_tool_calls,tool calls,1428,20.327546296296298
+Episode shape,train/mean_tool_calls,tool calls,1434,19.666666666666668
+Episode shape,train/mean_tool_calls,tool calls,1440,19.318287037037035
+Episode shape,train/mean_tool_calls,tool calls,1446,19.656250000000004
+Episode shape,train/mean_tool_calls,tool calls,1452,17.927083333333332
+Episode shape,train/mean_tool_calls,tool calls,1458,18.66087962962963
+Episode shape,train/mean_tool_calls,tool calls,1464,20.246527777777775
+Episode shape,train/mean_tool_calls,tool calls,1470,18.952546296296294
+Episode shape,train/mean_tool_calls,tool calls,1476,19.584490740740744
+Episode shape,train/mean_tool_calls,tool calls,1482,20.36574074074074
+Episode shape,train/mean_tool_calls,tool calls,1488,19.255787037037035
+Episode shape,train/mean_tool_calls,tool calls,1494,19.56134259259259
+Episode shape,train/mean_tool_calls,tool calls,1500,20.55439814814815
+Episode shape,train/mean_tool_calls,tool calls,1506,19.12037037037037
+Episode shape,train/mean_tool_calls,tool calls,1512,19.572916666666668
+Episode shape,train/mean_tool_calls,tool calls,1518,20.746527777777775
+Episode shape,train/mean_tool_calls,tool calls,1524,19.028935185185187
+Episode shape,train/mean_tool_calls,tool calls,1530,18.86689814814815
+Episode shape,train/mean_tool_calls,tool calls,1536,19.149305555555554
+Episode shape,train/mean_tool_calls,tool calls,1542,19.771990740740744
+Episode shape,train/mean_tool_calls,tool calls,1548,19.29050925925926
+Episode shape,train/mean_tool_calls,tool calls,1554,20.509259259259256
+Episode shape,train/mean_tool_calls,tool calls,1560,19.777777777777775
+Episode shape,train/mean_tool_calls,tool calls,1566,19.51736111111111
+Episode shape,train/mean_tool_calls,tool calls,1572,19.155092592592595
+Episode shape,train/mean_tool_calls,tool calls,1578,19.408564814814817
+Episode shape,train/mean_tool_calls,tool calls,1584,20.203703703703702
+Episode shape,train/mean_tool_calls,tool calls,1590,18.89699074074074
+Episode shape,train/mean_tool_calls,tool calls,1596,18.89699074074074
+Episode shape,train/mean_tool_calls,tool calls,1602,19.122685185185187
+Episode shape,train/mean_tool_calls,tool calls,1608,20.484953703703702
+Episode shape,train/mean_tool_calls,tool calls,1614,19.865740740740744
+Episode shape,train/mean_tool_calls,tool calls,1620,18.69560185185185
+Episode shape,train/mean_tool_calls,tool calls,1626,19.498842592592588
+Episode shape,train/mean_tool_calls,tool calls,1632,20.80787037037037
+Episode shape,train/mean_tool_calls,tool calls,1638,19.96875
+Episode shape,train/mean_tool_calls,tool calls,1644,19.15277777777778
+Episode shape,train/mean_tool_calls,tool calls,1650,19.583333333333332
+Episode shape,train/mean_tool_calls,tool calls,1656,20.201388888888886
+Episode shape,train/mean_tool_calls,tool calls,1658,20.64236111111111
+Episode shape,train/mean_tool_calls,tool calls,1658,20.270833333333332

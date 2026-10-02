@@ -1,0 +1,1120 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SQaLe dataset</title>
+<meta name="description" content="SQaLe is a semi-synthetic text-to-SQL dataset of 1,408,056 natural-language questions paired with SQL on 9,259 real-world database schemas.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Martian+Mono:wdth,wght@75..112.5,100..800&family=Public+Sans:ital,wght@0,300..700;1,300..700&display=swap">
+<style>
+/*
+  Design plan: "Query Session"
+  Layout: the page is a typeset psql session. Every section is an SQL-comment <h2>, then a
+  query at the sqale=> prompt and its rendered result on a white result sheet (left column),
+  with short proportional prose alongside (right column). On phones the prose stacks under
+  each query and result tables scroll inside their own container.
+  Colours (light / dark):
+    paper   #F6F7F9 / #11151C   ground
+    ink     #141922 / #E3E7ED   text
+    chrome  #5F6776 / #8C95A3   psql chrome: prompts, borders, (n rows)
+    rule    #D5DAE1 / #283040   box-drawing lines
+    plum    #8C2D6A / #E58BC4   the single accent: SQL keywords, M_SQaLe, links
+    derived string #2F6A5C / #8DCBB9, number #3B5B8C / #A3BBE3 (syntax only)
+  Type: Martian Mono for prompts, queries, results and display (wdth 75-87.5 in tables,
+  112.5 for the name); Public Sans for prose.
+*/
+:root{
+  --bg:#F6F7F9;
+  --surface:#FFFFFF;
+  --fg:#141922;
+  --fg-2:#434B59;
+  --muted:#5F6776;
+  --rule:#D5DAE1;
+  --rule-2:#B4BBC6;
+  --accent:#8C2D6A;
+  --accent-tint:#F5E8F1;
+  --accent-ink:#FFFFFF;
+  --str:#2F6A5C;
+  --num:#3B5B8C;
+  --bar:#848D9C;
+  --bar-2:#5F6878;
+  --track:#E8EBEF;
+  color-scheme:light;
+
+  --mono:"Martian Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace;
+  --sans:"Public Sans", system-ui, -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --fs-label:12px;
+  --fs-res:13.5px;
+  --fs-q:14.5px;
+  --fs-prose:16.5px;
+  --fs-h2:clamp(19px, 1.2rem + .5vw, 24px);
+  --fs-h3:16px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#11151C;
+    --surface:#161B24;
+    --fg:#E3E7ED;
+    --fg-2:#B3BAC5;
+    --muted:#8C95A3;
+    --rule:#283040;
+    --rule-2:#3A4354;
+    --accent:#E58BC4;
+    --accent-tint:#2A1B27;
+    --accent-ink:#11151C;
+    --str:#8DCBB9;
+    --num:#A3BBE3;
+    --bar:#5F6B7E;
+    --bar-2:#98A2B3;
+    --track:#212835;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#11151C;
+  --surface:#161B24;
+  --fg:#E3E7ED;
+  --fg-2:#B3BAC5;
+  --muted:#8C95A3;
+  --rule:#283040;
+  --rule-2:#3A4354;
+  --accent:#E58BC4;
+  --accent-tint:#2A1B27;
+  --accent-ink:#11151C;
+  --str:#8DCBB9;
+  --num:#A3BBE3;
+  --bar:#5F6B7E;
+  --bar-2:#98A2B3;
+  --track:#212835;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--fg);
+  font-family:var(--sans);
+  font-size:var(--fs-prose);
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:var(--accent);text-decoration-thickness:1px;text-underline-offset:.2em}
+a:hover{text-decoration-thickness:2px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px}
+sub{font-size:.72em;line-height:0;vertical-align:-.28em}
+code{font-family:var(--mono);font-size:.86em;font-stretch:87.5%}
+p{margin:0}
+
+.wrap{
+  max-width:1280px;
+  margin-inline:auto;
+  padding-inline:clamp(16px, 4vw, 56px);
+}
+
+/* ---------- Hero ---------- */
+.hero{padding-block:clamp(36px, 6vw, 88px) clamp(28px, 4vw, 56px);display:grid;gap:clamp(20px, 2.4vw, 32px)}
+.status{
+  font-family:var(--mono);font-size:var(--fs-label);font-stretch:100%;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
+  display:flex;flex-wrap:wrap;gap:.6em 1.2em;align-items:center;
+}
+.status .db{letter-spacing:.02em;text-transform:none}
+h1{margin:0;display:grid;gap:clamp(14px, 1.8vw, 26px)}
+.name{
+  font-family:var(--mono);font-stretch:112.5%;font-weight:700;
+  font-size:clamp(72px, 14.5vw, 196px);line-height:1;letter-spacing:-.035em;padding-bottom:.05em;
+  color:var(--fg);
+}
+.name .lc{color:var(--accent)}
+.subtitle{
+  font-family:var(--sans);font-weight:400;
+  font-size:clamp(21px, 1rem + 1.4vw, 33px);line-height:1.22;letter-spacing:-.01em;
+  max-width:28ch;text-wrap:balance;color:var(--fg);
+}
+.byline{display:grid;gap:4px;font-size:16px;color:var(--fg-2)}
+.authors{font-size:17.5px;color:var(--fg)}
+.authors sup,.affs sup{font-family:var(--mono);font-size:.62em;font-stretch:87.5%;color:var(--muted);margin-left:1px}
+.affs{display:flex;flex-wrap:wrap;gap:0 1.4em}
+
+.meta{display:flex;flex-wrap:wrap;gap:10px;padding-top:4px}
+.mc{
+  display:grid;gap:3px;min-width:9.25rem;
+  padding:11px 16px 10px;
+  border:1px solid var(--rule-2);border-radius:5px;
+  background:var(--surface);color:var(--fg);text-decoration:none;
+  transition:border-color .15s, background-color .15s;
+}
+.mc .cmd{font-family:var(--mono);font-size:17px;font-weight:600;font-stretch:100%;color:var(--accent);line-height:1.3}
+.mc .lbl{font-size:12.5px;color:var(--muted);line-height:1.3}
+.mc:hover{border-color:var(--accent);background:var(--accent-tint)}
+.mc.primary{background:var(--accent);border-color:var(--accent)}
+.mc.primary .cmd,.mc.primary .lbl{color:var(--accent-ink)}
+.mc.primary:hover{background:var(--fg);border-color:var(--fg)}
+.mc.primary:hover .cmd,.mc.primary:hover .lbl{color:var(--bg)}
+
+/* ---------- Section frame ---------- */
+.sec{
+  display:grid;gap:clamp(20px, 2.4vw, 30px);
+  padding-block:clamp(44px, 6vw, 84px);
+  border-top:1px solid var(--rule);
+}
+.row{
+  display:grid;
+  grid-template-columns:minmax(0, 1fr) minmax(0, 27rem);
+  gap:clamp(24px, 4vw, 64px);
+  align-items:start;
+}
+.row > *,.sec > *,.stack > *,.hero > *,h1 > *{min-width:0}
+div[id^="r-"]{display:grid;gap:6px;min-width:0}
+#r-count{gap:12px}
+.stack{display:grid;gap:clamp(40px, 5vw, 64px)}
+.cmt{
+  margin:0;font-family:var(--mono);font-weight:600;font-stretch:100%;
+  font-size:var(--fs-h2);line-height:1.3;color:var(--fg);text-wrap:balance;
+}
+.cmt .dd{color:var(--muted);font-weight:400}
+h3.cmt{font-size:var(--fs-h3)}
+
+/* ---------- Session: prompts, queries, output ---------- */
+.sess{display:grid;gap:26px;min-width:0}
+.cmd-block{display:grid;gap:10px;min-width:0}
+.sess > *,.cmd-block > *{min-width:0}
+.q{
+  display:grid;grid-template-columns:max-content minmax(0, 1fr);column-gap:1ch;
+  font-family:var(--mono);font-size:var(--fs-q);font-stretch:87.5%;line-height:1.7;
+  color:var(--fg);white-space:pre-wrap;
+}
+.q .ps{color:var(--muted);-webkit-user-select:none;user-select:none}
+.q code{font:inherit;white-space:pre-wrap;overflow-wrap:anywhere}
+.k,.m{color:var(--accent);font-weight:600}
+.s{color:var(--str)}
+.n{color:var(--num)}
+.c{color:var(--muted)}
+.p{color:var(--fg-2)}
+.out{font-family:var(--mono);font-size:var(--fs-res);font-stretch:87.5%;color:var(--fg-2);line-height:1.6}
+.notice{font-family:var(--mono);font-size:var(--fs-res);font-stretch:87.5%;color:var(--fg-2);line-height:1.6;max-width:72ch}
+.notice b{font-weight:600;color:var(--fg)}
+.caret{
+  display:inline-block;width:.62em;height:1.2em;vertical-align:-.25em;
+  background:var(--accent);
+  animation:blink 1.2s steps(1, end) infinite;
+}
+@keyframes blink{50%{opacity:0}}
+
+/* ---------- psql result tables (\pset linestyle unicode, border 2) ---------- */
+.res{overflow-x:auto;max-width:100%;-webkit-overflow-scrolling:touch}
+.psql{
+  border-collapse:collapse;
+  font-family:var(--mono);font-size:var(--fs-res);font-stretch:80%;line-height:1.5;
+  font-variant-numeric:tabular-nums;
+  background:var(--surface);color:var(--fg);
+  border:1px solid var(--rule-2);
+}
+.psql caption{
+  caption-side:top;text-align:center;color:var(--fg-2);font-weight:600;padding-bottom:.4em;
+}
+.psql th,.psql td{
+  padding:.42em 1.2ch;
+  border-inline:1px solid var(--rule);
+  text-align:left;vertical-align:top;
+}
+.psql th{font-weight:500;color:var(--fg-2);text-align:center;white-space:nowrap;border-bottom:1px solid var(--rule-2)}
+.psql td.num{text-align:right;white-space:nowrap}
+.psql td.nw{white-space:nowrap}
+.psql td.wrapcell{white-space:pre-line;min-width:24ch;max-width:64ch}
+.psql tr.ours td{background:var(--accent-tint)}
+.psql .model{font-weight:600}
+.psql tr.ours .model{color:var(--accent)}
+.psql .sub2{display:block;font-weight:400;color:var(--muted);font-size:.88em}
+.psql .null{color:var(--muted)}
+.psql td.acc{color:var(--accent);font-weight:600}
+.psql.full{width:100%}
+.psql.big td{font-size:clamp(19px, .8rem + 1vw, 27px);font-stretch:75%;font-weight:500;padding:.28em 1.1ch;line-height:1.25}
+.psql.plain{border:0;background:none}
+.psql.plain th,.psql.plain td{border-inline:0;padding-inline:1ch}
+.psql.plain th{border-bottom:1px solid var(--rule-2)}
+.psql.cnt th{padding:.2em 1ch}
+.psql.cnt td{font-size:clamp(44px, 1.6rem + 5vw, 96px);font-stretch:87.5%;font-weight:500;line-height:1.08;padding:.06em .08ch 0;letter-spacing:-.02em}
+.rc{font-family:var(--mono);font-size:var(--fs-res);font-stretch:87.5%;color:var(--muted)}
+
+/* inline bars inside cells */
+.cb{display:grid;grid-template-columns:5rem 4.5ch;align-items:center;column-gap:1ch}
+.cb .trk{display:block;height:8px;background:var(--track)}
+.cb .fl{display:block;height:100%;background:var(--bar);border-radius:0 3px 3px 0}
+.ours .cb .fl,.cb.ours .fl{background:var(--accent)}
+.cb .v{text-align:right}
+
+/* ---------- Expanded display (\x) ---------- */
+.pane{background:var(--surface);border:1px solid var(--rule-2);min-width:0}
+.xrec{
+  display:grid;grid-template-columns:16ch 1ch minmax(0, 1fr);
+  font-family:var(--mono);font-size:var(--fs-res);font-stretch:80%;line-height:1.6;
+  padding:10px 1.5ch 12px;
+}
+.xrec > *{min-width:0}
+.xrec .hd{white-space:nowrap;overflow:hidden;color:var(--muted)}
+.xrec .f{color:var(--fg-2);padding-block:.3em;padding-right:1ch}
+.xrec .sep{background:linear-gradient(var(--rule-2), var(--rule-2)) center / 1px 100% no-repeat}
+.xrec .v{padding:.3em 0 .3em 1ch;white-space:pre-wrap;overflow-wrap:anywhere;color:var(--fg)}
+.xrec .v.sql{white-space:pre-wrap}
+.xrec .row-gap{grid-column:1 / -1;height:0}
+.tmap{display:flex;flex-wrap:wrap;gap:3px;max-width:calc(29 * 12px);padding-top:.55em}
+.tmap i{display:block;width:9px;height:9px;background:var(--rule-2)}
+.tmap i.on{background:var(--accent)}
+.tmap-cap{display:block;color:var(--muted);padding-top:.3em}
+.mini{margin-top:.2em}
+
+/* ---------- EXPLAIN plan ---------- */
+.plan{
+  --arw:4ch;--step:3ch;
+  font-family:var(--mono);font-size:var(--fs-res);font-stretch:87.5%;line-height:1.55;
+  padding:12px 2ch 16px;
+}
+.plan-head{text-align:center;color:var(--fg-2);font-weight:600;border-bottom:1px solid var(--rule-2);padding-bottom:.35em;margin-bottom:.4em}
+.plan ol{list-style:none;margin:0;padding:0}
+.plan ol ol{padding-left:var(--step)}
+.node{display:grid;gap:0}
+.nh{display:grid;grid-template-columns:var(--arw) minmax(0, 1fr);padding-top:.75em}
+.root > .nh{grid-template-columns:0 minmax(0,1fr)}
+.nh .arw{color:var(--muted)}
+.nt{position:relative;display:flex;flex-wrap:wrap;gap:.1em 1.2ch;align-items:baseline;padding-right:9ch}
+.nn{font-weight:600;color:var(--fg)}
+.nf{color:var(--muted)}
+.nf b{font-weight:500;color:var(--num)}
+.st{position:absolute;top:.3em;right:0;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);font-stretch:100%}
+.nd{display:grid;gap:.3em;padding-left:var(--arw);padding-top:.25em}
+.root > .nd{padding-left:0}
+.nd .fl{color:var(--fg-2)}
+.nd .fl .k{font-weight:500}
+.nd p{font-family:var(--sans);font-stretch:normal;font-size:14.5px;line-height:1.55;color:var(--fg-2);max-width:62ch}
+.nd p code{font-size:.9em;color:var(--fg)}
+
+/* ---------- Prose alongside ---------- */
+.aside{display:grid;gap:14px;font-size:var(--fs-prose);line-height:1.62;color:var(--fg-2);max-width:60ch}
+.aside strong{color:var(--fg);font-weight:600}
+.aside .note{font-size:14.5px;color:var(--muted)}
+.aside .cmt{margin-bottom:2px}
+
+/* ---------- Chart ---------- */
+.figpane{padding:14px 1.5ch 10px;display:grid;gap:10px}
+.chart{width:100%;min-width:0}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.ch .grid{stroke:var(--rule);stroke-width:1;shape-rendering:crispEdges}
+.ch .axis{stroke:var(--rule-2);stroke-width:1;shape-rendering:crispEdges}
+.ch text{fill:var(--muted);font-family:var(--mono);font-size:11px;font-stretch:80%;font-variant-numeric:tabular-nums}
+.ch text.lab{fill:var(--fg);font-size:11.5px}
+.ch text.lab-ours{fill:var(--accent);font-weight:700;font-size:12px}
+.ch text.ttl{fill:var(--fg-2)}
+.c-ours{fill:var(--accent)}
+.c-trained{fill:var(--bar-2)}
+.c-base{fill:var(--bar)}
+.ch .dot{stroke:var(--surface);stroke-width:2;transition:stroke .12s}
+.ch .dot.on{stroke:var(--fg)}
+.ch .hit{fill:var(--bg);fill-opacity:0;cursor:pointer}
+.key{display:flex;flex-wrap:wrap;gap:8px 20px;align-items:center;font-family:var(--mono);font-size:12px;font-stretch:87.5%;color:var(--fg-2)}
+.key > span{display:inline-flex;align-items:center;gap:7px}
+.key svg{display:block;overflow:visible}
+.key .ring{fill:var(--track);stroke:var(--muted);stroke-width:1}
+.key text{fill:var(--muted);font-family:var(--mono);font-size:10.5px;font-stretch:80%}
+.readout{font-family:var(--mono);font-size:var(--fs-res);font-stretch:87.5%;color:var(--fg);font-variant-numeric:tabular-nums;min-height:1.6em}
+.readout .ps{color:var(--muted)}
+details.tv summary{
+  font-family:var(--mono);font-size:var(--fs-res);font-stretch:87.5%;color:var(--accent);
+  cursor:pointer;width:max-content;max-width:100%;
+}
+details.tv[open] summary{margin-bottom:10px}
+
+/* ---------- Citation ---------- */
+.bibbar{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 8px 8px 2ch;border-bottom:1px solid var(--rule);font-family:var(--mono);font-size:11px;font-stretch:100%;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.bib{
+  margin:0;padding:16px 2ch;overflow-x:auto;
+  font-family:var(--mono);font-size:var(--fs-res);font-stretch:75%;line-height:1.65;color:var(--fg);
+}
+.bib .ln{display:block;white-space:pre-wrap;padding-left:12ch;text-indent:-12ch}
+.bib .bk{color:var(--accent);font-weight:600}
+.bib .bf{color:var(--fg-2)}
+.copy{
+  font-family:var(--mono);font-size:13px;font-weight:600;font-stretch:100%;
+  color:var(--accent);background:var(--surface);
+  border:1px solid var(--rule-2);border-radius:4px;
+  padding:5px 12px;cursor:pointer;letter-spacing:0;text-transform:none;
+}
+.copy:hover{border-color:var(--accent);background:var(--accent-tint)}
+
+/* ---------- Footer ---------- */
+.foot{border-top:1px solid var(--rule);padding-block:clamp(36px, 5vw, 64px) clamp(40px, 6vw, 72px);display:grid;gap:28px}
+.foot-grid{display:grid;grid-template-columns:minmax(0, 1fr) minmax(0, 1.2fr) minmax(0, 1.6fr);gap:24px 40px;font-size:15px;color:var(--fg-2)}
+.foot-grid > div{display:grid;gap:6px;align-content:start;min-width:0}
+.foot h2{margin:0;font-family:var(--mono);font-size:11px;font-weight:500;font-stretch:100%;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.foot .mono{font-family:var(--mono);font-size:13px;font-stretch:80%;color:var(--fg);overflow-wrap:anywhere;-webkit-user-select:all;user-select:all}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1020px){
+  .row{grid-template-columns:minmax(0, 1fr)}
+  .foot-grid{grid-template-columns:repeat(2, minmax(0, 1fr))}
+  .foot-grid .wide{grid-column:1 / -1}
+}
+@media (max-width: 600px){
+  :root{--fs-res:12.5px;--fs-q:13px;--fs-prose:16px}
+  .plan{--arw:3ch;--step:1.5ch;padding-inline:1.25ch}
+  .xrec{grid-template-columns:15.5ch 1ch minmax(0, 1fr);padding-inline:1ch}
+  .mc{min-width:0;flex:1 1 calc(50% - 5px)}
+  .foot-grid{grid-template-columns:minmax(0, 1fr)}
+  .cb{grid-template-columns:4.5rem 4.5ch}
+  .psql.big td{font-size:17px}
+  .psql td.stl{white-space:normal;min-width:11ch}
+}
+@media (prefers-reduced-motion: reduce){
+  .caret{animation:none}
+  .mc,.ch .dot{transition:none}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <p class="status"><span>Preprint · 2026</span></p>
+  <h1>
+    <span class="name">SQ<span class="lc">a</span>L<span class="lc">e</span></span>
+    <span class="subtitle">A large realistic dataset to empower small specialised text-to-SQL models</span>
+  </h1>
+  <div class="byline">
+    <p class="authors">Cornelius Wolff<sup>1,2</sup> · Daniel Gomm<sup>1,2</sup> · Madelon Hulsebos<sup>2</sup></p>
+    <p class="affs"><span><sup>1</sup>University of Amsterdam</span><span><sup>2</sup>Centrum Wiskunde &amp; Informatica</span></p>
+  </div>
+  <nav class="meta" aria-label="Project links">
+    <!-- TODO: arXiv URL (then add target="_blank" rel="noopener") -->
+    <a class="mc" href="#"><span class="cmd">\paper</span><span class="lbl">Paper · arXiv</span></a>
+    <a class="mc primary" href="https://huggingface.co/datasets/trl-lab/SQaLe-text-to-SQL-dataset" target="_blank" rel="noopener"><span class="cmd">\dataset</span><span class="lbl">Dataset · Hugging Face</span></a>
+    <a class="mc" href="https://github.com/trl-lab/SQaLe_2" target="_blank" rel="noopener"><span class="cmd">\code</span><span class="lbl">Code · GitHub</span></a>
+    <a class="mc" href="https://huggingface.co/trl-lab/SQaLe-Model" target="_blank" rel="noopener"><span class="cmd">\model</span><span class="lbl">Model · Hugging Face</span></a>
+    <a class="mc" href="#cite"><span class="cmd">\cite</span><span class="lbl">Cite · BibTeX</span></a>
+  </nav>
+</header>
+
+<section class="sec" id="tldr" aria-labelledby="h-tldr" style="border-top:0;padding-top:0">
+  <div class="row">
+    <div class="sess">
+      <div class="cmd-block">
+        <div class="q" data-q>SELECT count(*) FROM questions;</div>
+        <div id="r-count"></div>
+      </div>
+      <div class="q" aria-hidden="true"><span class="ps">sqale=&gt;</span><code><span class="caret"></span></code></div>
+    </div>
+    <div class="aside">
+      <h2 class="cmt" id="h-tldr"><span class="dd" aria-hidden="true">-- </span>TL;DR</h2>
+      <p>Frontier language models in agentic pipelines lead text-to-SQL benchmarks, at a high inference cost. Small specialised models would avoid that cost, but training them needs data that reflects the scale, semantics and structure of real databases.</p>
+      <p>SQaLe is a semi-synthetic text-to-SQL dataset built on <strong>9,259</strong> real-world schemas from SchemaPile. Our generation pipeline extends each schema, fills it with synthetic rows, generates questions and answers them with an agent, and validates every stage by execution. The result is <strong>1,408,056</strong> natural-language questions paired with SQL, over schemas far larger than in any existing dataset.</p>
+      <p>We train Qwen3.5-2B on SQaLe with GRPO alone, and its execution accuracy on the SQaLe test set rises from <strong>24.0%</strong> to <strong>54.7%</strong>. The model learns to explore the database: it finds the relevant tables in large schemas and reads the values its answer needs, which training on existing datasets elicits far less.</p>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="numbers" aria-labelledby="h-numbers">
+  <h2 class="cmt" id="h-numbers"><span class="dd" aria-hidden="true">-- </span>Key numbers</h2>
+  <div class="row">
+    <div class="sess">
+      <div class="cmd-block">
+        <div class="q" data-q>SELECT schemas, tables, questions, distinct_sql
+  FROM corpus;</div>
+        <div id="r-corpus"></div>
+      </div>
+      <div class="cmd-block">
+        <div class="q" data-q>SELECT med_tables, med_cols, foreign_keys,
+       synthetic_rows, med_rows
+  FROM schema_stats;</div>
+        <div id="r-schema"></div>
+      </div>
+    </div>
+    <div class="aside">
+      <p>SQaLe pairs <strong>1,408,056</strong> natural-language questions with <strong>176,761</strong> distinct SQL queries on <strong>9,259</strong> schemas. The median schema has <strong>113</strong> tables and <strong>538</strong> columns.</p>
+      <p>The schemas hold 1,103,669 tables, 1,196,078 foreign-key relations and 108,708,694 synthetic rows, a median of 69 rows per table. 95.2% of tables are populated, and 95.1% of foreign-key cells are valid after repair.</p>
+      <p>Train and test are split by schema, 95% and 5%.</p>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="example" aria-labelledby="h-example">
+  <h2 class="cmt" id="h-example"><span class="dd" aria-hidden="true">-- </span>A real example</h2>
+  <div class="row">
+    <div class="sess">
+      <div class="cmd-block">
+        <div class="q" data-q>\x</div>
+        <div class="out">Expanded display is on.</div>
+      </div>
+      <div class="cmd-block">
+        <div class="q" data-q>SELECT * FROM questions
+ WHERE question_id = 'schema_013612_s1_q3_658f5d35fd';</div>
+        <div id="r-example"></div>
+      </div>
+    </div>
+    <div class="aside">
+      <p>One record from the test split. Its schema, <code>schema_013612</code>, has <strong>87</strong> tables and 8,356 rows.</p>
+      <p>The gold SQL reads <strong>3 of the 87 tables</strong> (feedback_session, employee and department). In the squares under <code>relevant_tables</code>, each square is one table of the schema and the three plum ones are the tables the SQL uses.</p>
+      <p>The schema is withheld from the model, so it has to find those 3 tables with its tools before it can write the query.</p>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="phrasings" aria-labelledby="h-phrasings">
+  <h2 class="cmt" id="h-phrasings"><span class="dd" aria-hidden="true">-- </span>Eight phrasings, one SQL query</h2>
+  <div class="row">
+    <div class="sess">
+      <div class="cmd-block">
+        <div class="q" data-q>\x</div>
+        <div class="out">Expanded display is off.</div>
+      </div>
+      <div class="cmd-block">
+        <div class="q" data-q>SELECT style, question FROM phrasings
+ WHERE question_id = 'schema_013612_s1_q3_658f5d35fd';</div>
+        <div id="r-styles"></div>
+      </div>
+    </div>
+    <div class="aside">
+      <p>Every question exists in <strong>8 phrasings</strong>, the original plus 7 styles. All eight share the gold SQL above.</p>
+      <p>The styles run from a casual request and a requirements list to a short ambiguous version and one with spelling mistakes. The evidence-supported style adds a sentence that ties the question to the data.</p>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="pipeline" aria-labelledby="h-pipeline">
+  <h2 class="cmt" id="h-pipeline"><span class="dd" aria-hidden="true">-- </span>How it is built</h2>
+  <div class="row">
+    <div class="sess">
+      <div class="cmd-block">
+        <div class="q" data-q>EXPLAIN SELECT * FROM sqale;</div>
+        <div class="pane plan" role="region" aria-label="The generation pipeline as a query plan, read from the bottom up">
+          <div class="plan-head">QUERY PLAN</div>
+          <ol>
+            <li class="node root">
+              <div class="nh"><span class="arw"></span><span class="nt"><span class="nn">Result on sqale</span><span class="nf">(pairs=<b>1,408,056</b> distinct_sql=<b>176,761</b>)</span></span></div>
+              <div class="nd">
+                <span class="fl">Output: (question, schema, sql), split by schema, train <span class="n">95%</span> / test <span class="n">5%</span></span>
+              </div>
+              <ol>
+                <li class="node">
+                  <div class="nh"><span class="arw">-&gt;</span><span class="nt"><span class="nn">Agentic Answering and Judging</span><span class="nf">(judge_aligned=<b>94.5%</b>)</span><span class="st">Stage 5</span></span></div>
+                  <div class="nd">
+                    <span class="fl">Filter: (executes) <span class="k">AND</span> (judge accepts)</span>
+                    <p>An agent explores the live database with <code>list_tables</code>, <code>describe_table</code>, <code>sample_rows</code>, <code>distinct_values</code> and <code>run_query</code>, and commits with <code>submit_sql</code>. Execution errors go back to the agent. An LLM judge checks the result against the question and sends rejected queries back for a rewrite. 94.5% of the queries the judge accepts are aligned with the question (225 judge calls on 158 BIRD dev questions; 86.2% agreement with human labels, κ = 0.68).</p>
+                  </div>
+                  <ol>
+                    <li class="node">
+                      <div class="nh"><span class="arw">-&gt;</span><span class="nt"><span class="nn">Style Variation</span><span class="nf">(phrasings=<b>8</b>)</span><span class="st">Stage 4</span></span></div>
+                      <div class="nd">
+                        <span class="fl">Output: 7 rewrites + original, one shared gold SQL</span>
+                        <p>Each question is rewritten into seven styles: casual, structured, requirements list, short and high level, short and ambiguous, spelling and grammar mistakes, evidence supported. All eight phrasings share the gold SQL.</p>
+                      </div>
+                      <ol>
+                        <li class="node">
+                          <div class="nh"><span class="arw">-&gt;</span><span class="nt"><span class="nn">Question Generation</span><span class="nf">(max_tables=<b>20</b> levels=<b>3</b>)</span><span class="st">Stage 3</span></span></div>
+                          <div class="nd">
+                            <span class="fl">Filter: every literal grounded in the data</span>
+                            <p>A connected subgraph of up to 20 tables is sampled along foreign keys, with sample rows. The LLM is asked for questions that need every table, at three difficulty levels (simple, moderate, hard), with every literal grounded in the data.</p>
+                          </div>
+                          <ol>
+                            <li class="node">
+                              <div class="nh"><span class="arw">-&gt;</span><span class="nt"><span class="nn">Value Synthesis</span><span class="nf">(rows=<b>108,708,694</b> populated=<b>95.2%</b>)</span><span class="st">Stage 2</span></span></div>
+                              <div class="nd">
+                                <span class="fl">Filter: unique primary keys <span class="k">AND</span> referential integrity</span>
+                                <p>Tables are filled in foreign-key dependency order, each by a Python function the LLM writes from the table's DDL, its original rows, the allowed foreign-key values and the domain description. Fact and junction tables get more rows and a skewed key distribution. 95.1% of foreign-key cells are valid after repair.</p>
+                              </div>
+                              <ol>
+                                <li class="node">
+                                  <div class="nh"><span class="arw">-&gt;</span><span class="nt"><span class="nn">Schema Collection and Extension on schemapile</span><span class="nf">(schemas=<b>9,259</b> repos=<b>14,597</b>)</span><span class="st">Stage 1</span></span></div>
+                                  <div class="nd">
+                                    <span class="fl">Output: extended schema, domain description</span>
+                                    <p>SchemaPile's real-world schemas come from permissively licensed GitHub repositories. A tool-using agent annotates each of the 14,597 source repositories with a domain description. Each schema is extended with LLM-generated tables that keep its naming conventions, normalisation level and foreign-key style.</p>
+                                  </div>
+                                </li>
+                              </ol>
+                            </li>
+                          </ol>
+                        </li>
+                      </ol>
+                    </li>
+                  </ol>
+                </li>
+              </ol>
+            </li>
+          </ol>
+        </div>
+      </div>
+    </div>
+    <div class="aside">
+      <p>EXPLAIN prints the last step at the top, so a plan reads from the bottom up. Start at schema collection, stage 1, and follow the arrows up to the release.</p>
+      <p>Every stage is validated by execution before its output moves on. The <code>Filter</code> line under each node names the check.</p>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="compare" aria-labelledby="h-compare">
+  <h2 class="cmt" id="h-compare"><span class="dd" aria-hidden="true">-- </span>How it compares</h2>
+  <div class="row">
+    <div class="sess">
+      <div class="cmd-block">
+        <div class="q" data-q>SELECT dataset, schemas, med_tables, med_cols, fks, med_rows
+  FROM corpora
+ ORDER BY med_cols DESC;</div>
+        <div id="r-compare"></div>
+      </div>
+      <div class="cmd-block">
+        <div class="q" data-q>SELECT dataset, n_sql, n_nl, pct_func, pct_where,
+       pct_join, pct_nested, pct_agg
+  FROM query_stats;</div>
+        <div id="r-qstats"></div>
+      </div>
+    </div>
+    <div class="aside">
+      <p>The median SQaLe schema has <strong>113</strong> tables and <strong>538</strong> columns. The median BIRD schema has 5 tables and 39 columns, and the median SynSQL schema 10 tables and 72 columns.</p>
+      <p>23.4% of SQaLe queries are nested (BIRD 7.7%), and 40% of joining queries chain multiple joins (BIRD 26%). 3.1% of queries touch five or more tables, up to 20. No BIRD or EHRSQL query touches more than four.</p>
+      <p class="note"><code>med_rows</code> is the median number of rows per table. <code>pct_*</code> columns give the share of SQL queries, in %, that use functions, WHERE, joins, nesting and aggregation.</p>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="results" aria-labelledby="h-results">
+  <h2 class="cmt" id="h-results"><span class="dd" aria-hidden="true">-- </span>Results</h2>
+  <div class="stack">
+    <div class="row">
+      <div class="sess">
+        <h3 class="cmt"><span class="dd" aria-hidden="true">-- </span>Same recipe, different data</h3>
+        <div class="cmd-block">
+          <div class="q" data-q>\dconfig train.*</div>
+          <div id="r-config"></div>
+        </div>
+      </div>
+      <div class="aside">
+        <p><strong>M<sub>SQaLe</sub></strong> is Qwen3.5-2B trained with GRPO on SQaLe. M<sub>BIRD</sub> and M<sub>SynSQL</sub> are the same model trained the same way on BIRD train and SynSQL-2.5M.</p>
+        <p>Base model, environment, tools, reward, steps, batch size and evaluation are identical. There are no distilled traces, no teacher and no test-time scaffolding.</p>
+        <p>The schema is withheld, and the model explores the database through tools. The reward ranks a correct result above a query that executes, that above a query that parses, and that above nothing. Partial credit never ranks a wrong query above a correct one.</p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="sess">
+        <h3 class="cmt"><span class="dd" aria-hidden="true">-- </span>Execution accuracy</h3>
+        <div class="cmd-block">
+          <div class="q" data-q>SELECT model, sqale, bird, ehrsql
+  FROM eval
+ ORDER BY sqale DESC;</div>
+          <div id="r-matrix"></div>
+        </div>
+      </div>
+      <div class="aside">
+        <p>Execution accuracy in %, on 300 SQaLe test questions, BIRD and EHRSQL.</p>
+        <p>On the SQaLe test set, training on SQaLe adds <strong>30.7</strong> points to the base model, training on BIRD 19.7 and training on SynSQL 13.3. M<sub>SQaLe</sub> ends 3.6 points behind Qwen3.6-27B.</p>
+        <p>On BIRD, M<sub>BIRD</sub> scores 54.7 and M<sub>SQaLe</sub> 52.3. On EHRSQL the two tie at 23.7.</p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="sess">
+        <h3 class="cmt"><span class="dd" aria-hidden="true">-- </span>Size and compute</h3>
+        <div class="cmd-block">
+          <div class="q" data-q>SELECT model, params_b, accuracy, tflops
+  FROM compute_bench;  -- 100 moderate SQaLe test questions</div>
+          <figure class="pane figpane" style="margin:0" aria-labelledby="fig-cap">
+            <div class="chart" id="pareto"></div>
+            <div class="key" id="pareto-key"></div>
+            <p class="readout" id="readout" aria-live="polite"></p>
+            <figcaption id="fig-cap" class="rc">Accuracy against model size (log scale); circle size is compute per question.</figcaption>
+          </figure>
+          <p class="rc" id="pareto-rc"></p>
+          <details class="tv">
+            <summary>Show the rows as a table</summary>
+            <div id="r-pareto"></div>
+          </details>
+        </div>
+      </div>
+      <div class="aside">
+        <p>Accuracy on 100 moderate SQaLe test questions, with the same agentic harness for every model.</p>
+        <p>M<sub>SQaLe</sub> reaches <strong>52%</strong> at <strong>224</strong> TFLOPs per question. Qwen3.5-27B reaches 63% at 1,710 TFLOPs. In the 9 to 12B range, only Qwen3.5-9B (58%) is ahead of M<sub>SQaLe</sub>.</p>
+        <p class="note">Hover or tap a circle to read its row.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="findings" aria-labelledby="h-findings">
+  <h2 class="cmt" id="h-findings"><span class="dd" aria-hidden="true">-- </span>What SQaLe teaches</h2>
+  <div class="stack">
+    <div class="row">
+      <div class="sess">
+        <h3 class="cmt"><span class="dd" aria-hidden="true">-- </span>Schema size</h3>
+        <div class="cmd-block">
+          <div class="q" data-q>SELECT schema_size, m_sqale, m_bird, m_synsql
+  FROM scale_eval;</div>
+          <div id="r-scale"></div>
+        </div>
+      </div>
+      <div class="aside">
+        <p>Accuracy falls for every model as the schema grows, and M<sub>SQaLe</sub> leads at every size. At full schema size it inspects <strong>71.3%</strong> of the gold tables, against 56.5% for M<sub>BIRD</sub> and 60.2% for M<sub>SynSQL</sub>.</p>
+        <p>BIRD and SynSQL training schemas have a median of 5 and 10 tables, so models trained on them never have to search.</p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="sess">
+        <h3 class="cmt"><span class="dd" aria-hidden="true">-- </span>Populated tables</h3>
+        <div class="cmd-block">
+          <div class="q" data-q>SELECT model, literals_seen
+  FROM traces
+ ORDER BY literals_seen DESC;</div>
+          <div id="r-literals"></div>
+        </div>
+      </div>
+      <div class="aside">
+        <p>Before submitting, M<sub>SQaLe</sub> has seen <strong>75%</strong> of the string literals its answer depends on. M<sub>SynSQL</sub> has seen 45%, M<sub>BIRD</sub> 36% and the untrained model 25%.</p>
+        <p>SynSQL's tables hold a median of 2 rows. SQaLe's tables hold a median of 69.</p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="sess">
+        <h3 class="cmt"><span class="dd" aria-hidden="true">-- </span>Domains</h3>
+        <div class="cmd-block">
+          <div class="q" data-q>SELECT split, m_sqale, m_bird, m_sqale - m_bird AS gap
+  FROM domain_eval;</div>
+          <div id="r-domain"></div>
+          <p class="notice"><b>NOTICE:</b>  sample of 108 schemas; too small to call the difference between the two gaps significant</p>
+        </div>
+      </div>
+      <div class="aside">
+        <p>On SQaLe test questions whose schemas lie outside BIRD's domains, M<sub>SQaLe</sub> leads M<sub>BIRD</sub> by <strong>9.9</strong> points (46.4 vs 36.5). Inside them it leads by 2.8 (39.3 vs 36.5).</p>
+        <p class="note">The sample of 108 schemas is too small to call the difference between the two gaps significant.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="cite" aria-labelledby="h-cite">
+  <h2 class="cmt" id="h-cite"><span class="dd" aria-hidden="true">-- </span>Cite</h2>
+  <div class="row">
+    <div class="sess">
+      <div class="cmd-block">
+        <div class="q" data-q>\copy citation TO STDOUT</div>
+        <div class="pane bibpane">
+          <div class="bibbar"><span>BibTeX</span><button class="copy" id="copy" type="button">Copy</button></div>
+          <pre class="bib" id="bib" tabindex="0" aria-label="BibTeX entry"></pre>
+        </div>
+        <p class="rc">COPY 2</p>
+      </div>
+    </div>
+    <div class="aside">
+      <p>If you use SQaLe, please cite this paper and the earlier workshop paper. The dataset, code and model are linked at the top of the page.</p>
+    </div>
+  </div>
+</section>
+
+<footer class="foot">
+  <div class="q" data-q>\q</div>
+  <div class="foot-grid">
+    <div>
+      <h2>Affiliations</h2>
+      <p>University of Amsterdam<br>Centrum Wiskunde &amp; Informatica</p>
+    </div>
+    <div>
+      <h2>Contact</h2>
+      <p class="mono">{cornelius.wolff, daniel.gomm, madelon.hulsebos}@cwi.nl</p>
+    </div>
+    <div class="wide">
+      <h2>This page</h2>
+      <p>Earlier version: <a href="https://arxiv.org/abs/2602.22223" target="_blank" rel="noopener">SQaLe: A Large Text-to-SQL Corpus Grounded in Real Schemas</a></p>
+      <p>Website content MIT licensed</p>
+    </div>
+  </div>
+</footer>
+
+</div>
+
+<script src="assets/sqale-data.js"></script>
+<script>
+(function () {
+  "use strict";
+  var D = window.SQALE;
+  if (!D) return;
+
+  var $ = function (s) { return document.querySelector(s); };
+  var fmt = function (n) { return n.toLocaleString("en-US"); };
+  var f1 = function (n) { return n.toFixed(1); };
+  function esc(s) {
+    return String(s).replace(/[&<>"]/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
+    });
+  }
+  function mname(m) {
+    var k = /^M_(.+)$/.exec(m);
+    return k ? "M<sub>" + esc(k[1]) + "</sub>" : esc(m);
+  }
+
+  /* ---- tiny SQL highlighter ---- */
+  var KW = {};
+  "SELECT DISTINCT FROM WHERE JOIN ON AND OR AS ORDER BY DESC ASC EXPLAIN TO STDOUT IN NOT NULL IS LIMIT GROUP"
+    .split(" ").forEach(function (w) { KW[w] = 1; });
+  var TOK = /(--[^\n]*)|('(?:[^']|'')*')|(\\[A-Za-z]+)|([A-Za-z_][A-Za-z0-9_]*)|(\d+(?:\.\d+)?)|(\s+)|([\s\S])/g;
+  function hl(src) {
+    var out = "", m;
+    TOK.lastIndex = 0;
+    while ((m = TOK.exec(src))) {
+      if (m[1]) out += '<span class="c">' + esc(m[1]) + "</span>";
+      else if (m[2]) out += '<span class="s">' + esc(m[2]) + "</span>";
+      else if (m[3]) out += '<span class="m">' + esc(m[3]) + "</span>";
+      else if (m[4]) out += KW[m[4]] ? '<span class="k">' + m[4] + "</span>" : esc(m[4]);
+      else if (m[5]) out += '<span class="n">' + m[5] + "</span>";
+      else if (m[6]) out += m[6];
+      else out += '<span class="p">' + esc(m[7]) + "</span>";
+    }
+    return out;
+  }
+
+  /* ---- prompts: sqale=> for the first line, sqale-> for continuation lines ---- */
+  Array.prototype.forEach.call(document.querySelectorAll("[data-q]"), function (el) {
+    var lines = el.textContent.split("\n");
+    el.innerHTML = lines.map(function (l, i) {
+      return '<span class="ps" aria-hidden="true">sqale' + (i ? "-&gt;" : "=&gt;") + "</span><code>" + hl(l) + "</code>";
+    }).join("");
+  });
+
+  /* ---- psql table builder ---- */
+  function ptable(o) {
+    var n = o.rows.length;
+    var h = '<div class="res" role="region" tabindex="0" aria-label="' + esc(o.label) + '">' +
+      '<table class="psql ' + (o.cls || "") + '">';
+    if (o.caption) h += "<caption>" + o.caption + "</caption>";
+    h += "<thead><tr>" + o.cols.map(function (c) { return '<th scope="col">' + c.h + "</th>"; }).join("") + "</tr></thead><tbody>";
+    o.rows.forEach(function (r) {
+      h += "<tr" + (r.cls ? ' class="' + r.cls + '"' : "") + ">" + r.c.map(function (v, i) {
+        var cc = (o.cols[i].cls || "") + (r.cellCls && r.cellCls[i] ? " " + r.cellCls[i] : "");
+        return "<td" + (cc ? ' class="' + cc + '"' : "") + ">" + v + "</td>";
+      }).join("") + "</tr>";
+    });
+    h += "</tbody></table></div>";
+    if (o.footer !== false) h += '<p class="rc">(' + n + " row" + (n === 1 ? "" : "s") + ")</p>";
+    return h;
+  }
+  function bar(v, ours) {
+    return '<span class="cb' + (ours ? " ours" : "") + '"><span class="trk"><span class="fl" style="width:' + v + '%"></span></span><span class="v">' + f1(v) + "</span></span>";
+  }
+  var NULL = '<span class="null" title="not measured">not measured</span>';
+  var C = D.counts;
+
+  /* count(*) */
+  $("#r-count").innerHTML = ptable({
+    label: "Number of questions", cls: "plain cnt",
+    cols: [{ h: "count", cls: "num" }],
+    rows: [{ c: [fmt(C.questions)] }]
+  });
+
+  /* key numbers */
+  $("#r-corpus").innerHTML = ptable({
+    label: "Corpus counts", cls: "big",
+    cols: [{ h: "schemas", cls: "num" }, { h: "tables", cls: "num" }, { h: "questions", cls: "num" }, { h: "distinct_sql", cls: "num" }],
+    rows: [{ c: [fmt(C.schemas), fmt(C.tables), fmt(C.questions), fmt(C.sql)] }]
+  });
+  $("#r-schema").innerHTML = ptable({
+    label: "Schema statistics", cls: "big",
+    cols: [{ h: "med_tables", cls: "num" }, { h: "med_cols", cls: "num" }, { h: "foreign_keys", cls: "num" }, { h: "synthetic_rows", cls: "num" }, { h: "med_rows", cls: "num" }],
+    rows: [{ c: [fmt(C.medTables), fmt(C.medCols), fmt(C.fks), fmt(C.rowsPopulated), fmt(C.medRowsPerTable)] }]
+  });
+
+  /* expanded record */
+  (function () {
+    var ex = D.example, sc = D.schema;
+    var goldSet = {};
+    sc.gold.forEach(function (i) { goldSet[i] = 1; });
+    var goldNames = sc.gold.map(function (i) { return sc.tables[i]; }).sort();
+    var squares = sc.tables.map(function (t, i) {
+      return '<i class="' + (goldSet[i] ? "on" : "") + '" title="' + esc(t) + '"></i>';
+    }).join("");
+    var mini = ptable({
+      label: "Result of the gold SQL", cls: "",
+      cols: ex.resultColumns.map(function (c) { return { h: esc(c), cls: "nw" }; }),
+      rows: ex.result.map(function (r) { return { c: r.map(esc) }; }),
+      footer: false
+    });
+    var fields = [
+      ["question_id", esc(ex.id)],
+      ["schema", esc(ex.schemaId) + ' <span class="c">(' + ex.numTables + " tables, " + fmt(sc.rows) + " rows)</span>"],
+      ["difficulty", esc(ex.difficulty)],
+      ["question", esc(D.styles[0].text)],
+      ["sql", hl(ex.sqlPretty), "sql"],
+      ["relevant_tables", esc(goldNames.join(", ")) +
+        '<span class="tmap" role="img" aria-label="' + sc.gold.length + " of " + ex.numTables + ' tables in the schema are used by the SQL">' + squares + "</span>" +
+        '<span class="tmap-cap">' + sc.gold.length + " of " + ex.numTables + " tables</span>"],
+      ["result", '<div class="mini">' + mini + '</div><span class="tmap-cap">(' + ex.result.length + " row)</span>"]
+    ];
+    var dashes = new Array(240).join("-");
+    var h = '<div class="pane xrec" role="region" aria-label="Expanded record for one SQaLe question">' +
+      '<span class="hd" aria-hidden="true">-[ RECORD 1 ]' + dashes + '</span><span class="hd" aria-hidden="true">+</span><span class="hd" aria-hidden="true">' + dashes + "</span>";
+    fields.forEach(function (f) {
+      h += '<span class="f">' + f[0] + '</span><span class="sep" aria-hidden="true"></span><span class="v' + (f[2] ? " " + f[2] : "") + '">' + f[1] + "</span>";
+    });
+    h += "</div>";
+    $("#r-example").innerHTML = h;
+  })();
+
+  /* phrasings */
+  $("#r-styles").innerHTML = ptable({
+    label: "Eight phrasings of the example question", cls: "full",
+    cols: [{ h: "style", cls: "nw stl" }, { h: "question", cls: "wrapcell" }],
+    rows: D.styles.map(function (s) { return { c: [esc(s.label), esc(s.text)] }; })
+  });
+
+  /* comparison */
+  var cmp = D.compare.slice().sort(function (a, b) { return b.medCols - a.medCols; });
+  $("#r-compare").innerHTML = ptable({
+    label: "Schema statistics by dataset",
+    cols: [{ h: "dataset", cls: "nw model" }, { h: "schemas", cls: "num" }, { h: "med_tables", cls: "num" }, { h: "med_cols", cls: "num" }, { h: "fks", cls: "num" }, { h: "med_rows", cls: "num" }],
+    rows: cmp.map(function (d) {
+      var mt = d.medTables % 1 === 0 && d.medTables >= 100 ? fmt(d.medTables) : f1(d.medTables);
+      return {
+        cls: d.name === "SQaLe" ? "ours" : "",
+        c: [esc(d.name), fmt(d.schemas), mt, fmt(d.medCols), fmt(d.fks), d.medRows == null ? '<span class="null" title="not reported">null</span>' : fmt(d.medRows)]
+      };
+    })
+  });
+  $("#r-qstats").innerHTML = ptable({
+    label: "SQL query statistics by dataset",
+    cols: [{ h: "dataset", cls: "nw model" }, { h: "n_sql", cls: "num" }, { h: "n_nl", cls: "num" }, { h: "pct_func", cls: "num" }, { h: "pct_where", cls: "num" }, { h: "pct_join", cls: "num" }, { h: "pct_nested", cls: "num" }, { h: "pct_agg", cls: "num" }],
+    rows: D.queryStats.map(function (d) {
+      return {
+        cls: d.name === "SQaLe" ? "ours" : "",
+        c: [esc(d.name), fmt(d.sql), fmt(d.nl), f1(d.func), f1(d.where), f1(d.join), f1(d.nested), f1(d.agg)]
+      };
+    })
+  });
+
+  /* training config */
+  $("#r-config").innerHTML = ptable({
+    label: "Training configuration", caption: "List of configuration parameters", cls: "full",
+    cols: [{ h: "Parameter", cls: "nw" }, { h: "Value", cls: "wrapcell" }],
+    rows: [
+      ["train.base_model", "Qwen3.5-2B, from the base checkpoint"],
+      ["train.method", "GRPO (reinforcement learning only)"],
+      ["train.data", "SQaLe | SynSQL-2.5M | BIRD train, one run each"],
+      ["train.schema", "withheld, explored through tools"],
+      ["train.tools", "list_tables, describe_table, sample_rows, distinct_values, run_query, foreign_keys, join_path"],
+      ["train.reward", "correct result > executes > parses > nothing"],
+      ["train.teacher", "none (no distilled traces, no test-time scaffolding)"]
+    ].map(function (r) { return { c: [r[0], esc(r[1])] }; })
+  });
+
+  /* eval matrix */
+  var SUB = {
+    "M_SQaLe": "2B, GRPO on SQaLe",
+    "M_BIRD": "2B, GRPO on BIRD train",
+    "M_SynSQL": "2B, GRPO on SynSQL",
+    "Qwen3.5-2B": "2B, untrained",
+    "Qwen3.6-27B": "27B, untrained"
+  };
+  var mx = D.matrix.slice().sort(function (a, b) { return b.sqale - a.sqale; });
+  $("#r-matrix").innerHTML = ptable({
+    label: "Execution accuracy by model",
+    cols: [{ h: "model", cls: "nw" }, { h: "sqale" }, { h: "bird" }, { h: "ehrsql" }],
+    rows: mx.map(function (r) {
+      var ours = r.kind === "ours";
+      return {
+        cls: ours ? "ours" : "",
+        c: [
+          '<span class="model">' + mname(r.model) + '</span><span class="sub2">' + esc(SUB[r.model] || "") + "</span>",
+          bar(r.sqale, ours), bar(r.bird, ours), r.ehrsql == null ? NULL : bar(r.ehrsql, ours)
+        ]
+      };
+    })
+  });
+
+  /* findings */
+  $("#r-scale").innerHTML = ptable({
+    label: "Accuracy by schema size",
+    cols: [{ h: "schema_size", cls: "nw" }, { h: "m_sqale", cls: "num acc" }, { h: "m_bird", cls: "num" }, { h: "m_synsql", cls: "num" }],
+    rows: D.scale.map(function (s) { return { c: [esc(s.level), f1(s.sqale[0]), f1(s.bird[0]), f1(s.synsql[0])] }; })
+  });
+  $("#r-literals").innerHTML = ptable({
+    label: "Share of answer literals seen before submitting",
+    cols: [{ h: "model", cls: "nw" }, { h: "literals_seen" }],
+    rows: D.literalsSeen.map(function (r) {
+      var ours = r.model === "M_SQaLe";
+      return { cls: ours ? "ours" : "", c: ['<span class="model">' + mname(r.model) + "</span>", bar(r.pct, ours).replace(/>(\d+)\.0</, ">$1%<")] };
+    })
+  });
+  $("#r-domain").innerHTML = ptable({
+    label: "Accuracy inside and outside BIRD's domains",
+    cols: [{ h: "split", cls: "nw" }, { h: "m_sqale", cls: "num acc" }, { h: "m_bird", cls: "num" }, { h: "gap", cls: "num" }],
+    rows: D.domain.map(function (d) { return { c: [esc(d.split), f1(d.sqale), f1(d.bird), "+" + f1(d.sqale - d.bird)] }; })
+  });
+
+  /* pareto table view */
+  var P = D.pareto;
+  $("#r-pareto").innerHTML = ptable({
+    label: "Size and compute benchmark rows",
+    cols: [{ h: "model", cls: "nw" }, { h: "params_b", cls: "num" }, { h: "accuracy", cls: "num" }, { h: "tflops", cls: "num" }],
+    rows: P.map(function (p) {
+      return { cls: p.kind === "ours" ? "ours" : "", c: ['<span class="model">' + mname(p.model) + "</span>", String(p.params), Math.round(p.acc * 100) + "%", fmt(Math.round(p.tflops))] };
+    })
+  });
+  $("#pareto-rc").textContent = "(" + P.length + " rows)";
+
+  /* ---- scatter: accuracy vs model size (log x), circle size = TFLOPs ---- */
+  var NS = "http://www.w3.org/2000/svg";
+  var rad = function (t) { return 3 + 0.2 * Math.sqrt(t); };
+  var cls = function (k) { return k === "ours" ? "c-ours" : k === "trained" ? "c-trained" : "c-base"; };
+  var readout = $("#readout");
+  var ours = P.filter(function (p) { return p.kind === "ours"; })[0];
+  function rowText(p) {
+    return '<span class="ps">-&gt; </span>' + mname(p.model) + " | " + p.params + "B params | " + Math.round(p.acc * 100) + "% | " + fmt(Math.round(p.tflops)) + " TFLOPs per question";
+  }
+  readout.innerHTML = rowText(ours);
+
+  function svgEl(tag, attrs, text) {
+    var e = document.createElementNS(NS, tag);
+    for (var a in attrs) e.setAttribute(a, attrs[a]);
+    if (text != null) e.textContent = text;
+    return e;
+  }
+  function labelEl(p, x, y, anchor, isOurs) {
+    var t = svgEl("text", { x: x, y: y, "text-anchor": anchor, "class": isOurs ? "lab lab-ours" : "lab" });
+    var k = /^M_(.+)$/.exec(p.model);
+    if (k) {
+      t.appendChild(svgEl("tspan", {}, "M"));
+      t.appendChild(svgEl("tspan", { dy: 3, "font-size": "0.75em" }, k[1]));
+      t.appendChild(svgEl("tspan", { dy: -3 }, "  " + Math.round(p.acc * 100) + "%"));
+    } else {
+      t.textContent = p.model + "  " + Math.round(p.acc * 100) + "%";
+    }
+    return t;
+  }
+
+  var host = $("#pareto");
+  var lastW = 0;
+  function draw() {
+    var W = Math.max(300, Math.round(host.clientWidth));
+    if (W === lastW) return;
+    lastW = W;
+    var narrow = W < 560;
+    var H = narrow ? 330 : 430;
+    var m = { l: narrow ? 38 : 48, r: narrow ? 10 : 18, t: 14, b: narrow ? 44 : 50 };
+    var pw = W - m.l - m.r, ph = H - m.t - m.b;
+    var x0 = Math.log10(narrow ? 1.3 : 1.0), x1 = Math.log10(85), yMax = 0.7;
+    var X = function (v) { return m.l + (Math.log10(v) - x0) / (x1 - x0) * pw; };
+    var Y = function (a) { return m.t + (1 - a / yMax) * ph; };
+
+    var svg = svgEl("svg", { viewBox: "0 0 " + W + " " + H, width: W, height: H, "class": "ch", role: "img",
+      "aria-label": "Scatter plot of accuracy against model size for " + P.length + " models. M_SQaLe, 2B parameters, reaches 52% at 224 TFLOPs per question." });
+
+    [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6].forEach(function (v) {
+      svg.appendChild(svgEl("line", { x1: m.l, x2: W - m.r, y1: Y(v), y2: Y(v), "class": v === 0 ? "axis" : "grid" }));
+      svg.appendChild(svgEl("text", { x: m.l - 8, y: Y(v) + 4, "text-anchor": "end" }, Math.round(v * 100) + "%"));
+    });
+    [2, 4, 8, 14, 27, 70].forEach(function (v) {
+      svg.appendChild(svgEl("line", { x1: X(v), x2: X(v), y1: Y(0), y2: Y(0) + 5, "class": "axis" }));
+      svg.appendChild(svgEl("text", { x: X(v), y: Y(0) + 18, "text-anchor": "middle" }, v + "B"));
+    });
+    svg.appendChild(svgEl("text", { x: m.l + pw / 2, y: H - 6, "text-anchor": "middle", "class": "ttl" }, "Model size, billion parameters (log scale)"));
+    svg.appendChild(svgEl("text", { x: m.l + 6, y: m.t + 4, "text-anchor": "start", "class": "ttl" }, "Accuracy"));
+
+    var gDots = svgEl("g", {}), gHit = svgEl("g", {}), gLab = svgEl("g", {});
+    var dots = {};
+    P.slice().sort(function (a, b) { return b.tflops - a.tflops; }).forEach(function (p) {
+      var cx = X(p.params), cy = Y(p.acc), r = rad(p.tflops);
+      var c = svgEl("circle", { cx: cx.toFixed(1), cy: cy.toFixed(1), r: r.toFixed(1), "class": "dot " + cls(p.kind) });
+      c.appendChild(svgEl("title", {}, p.model.replace("M_", "M ") + ": " + p.params + "B, " + Math.round(p.acc * 100) + "%, " + fmt(Math.round(p.tflops)) + " TFLOPs"));
+      gDots.appendChild(c);
+      dots[p.model] = c;
+    });
+    // M_SQaLe drawn last so it sits on top
+    if (dots[ours.model]) gDots.appendChild(dots[ours.model]);
+
+    P.forEach(function (p) {
+      var h = svgEl("circle", { cx: X(p.params).toFixed(1), cy: Y(p.acc).toFixed(1), r: (rad(p.tflops) + 6).toFixed(1), "class": "hit" });
+      var on = function () {
+        Object.keys(dots).forEach(function (k) { dots[k].classList.remove("on"); });
+        dots[p.model].classList.add("on");
+        readout.innerHTML = rowText(p);
+      };
+      var off = function () { dots[p.model].classList.remove("on"); readout.innerHTML = rowText(ours); };
+      h.addEventListener("mouseenter", on);
+      h.addEventListener("mouseleave", off);
+      h.addEventListener("click", on);
+      gHit.appendChild(h);
+    });
+
+    var labels = [
+      { model: "M_SQaLe", side: "right" },
+      { model: "Qwen3.5-27B", side: "left" },
+      { model: "Qwen3.5-9B", side: "left" }
+    ];
+    if (!narrow) labels.push({ model: "M_BIRD", side: "left" }, { model: "M_SynSQL", side: "left" }, { model: "Qwen3.5-2B", side: "left" });
+    labels.forEach(function (L) {
+      var p = P.filter(function (q) { return q.model === L.model; })[0];
+      if (!p) return;
+      var r = rad(p.tflops), cx = X(p.params), cy = Y(p.acc);
+      var gap = r + 6;
+      gLab.appendChild(labelEl(p, L.side === "right" ? cx + gap : cx - gap, cy + 4, L.side === "right" ? "start" : "end", p.kind === "ours"));
+    });
+
+    svg.appendChild(gDots);
+    svg.appendChild(gLab);
+    svg.appendChild(gHit);
+    host.textContent = "";
+    host.appendChild(svg);
+  }
+
+  /* legend */
+  (function () {
+    var key = $("#pareto-key");
+    function sw(c) { return '<svg width="12" height="12" aria-hidden="true"><circle cx="6" cy="6" r="5" class="' + c + '"/></svg>'; }
+    var sizes = [200, 1000, 3000], sx = 0, parts = "";
+    sizes.forEach(function (t) {
+      var r = rad(t);
+      parts += '<circle class="ring" cx="' + (sx + r).toFixed(1) + '" cy="' + (30 - r - 1).toFixed(1) + '" r="' + r.toFixed(1) + '"/>' +
+        '<text x="' + (sx + 2 * r + 4).toFixed(1) + '" y="27">' + fmt(t) + "</text>";
+      sx += 2 * r + 4 + (String(fmt(t)).length * 6.2) + 10;
+    });
+    key.innerHTML =
+      "<span>" + sw("c-ours") + "<span>M<sub>SQaLe</sub></span></span>" +
+      "<span>" + sw("c-trained") + "<span>M<sub>BIRD</sub>, M<sub>SynSQL</sub></span></span>" +
+      "<span>" + sw("c-base") + "<span>General-purpose models</span></span>" +
+      '<span><span>TFLOPs per question</span><svg width="' + Math.ceil(sx) + '" height="31" aria-hidden="true">' + parts + "</svg></span>";
+  })();
+
+  draw();
+  if ("ResizeObserver" in window) new ResizeObserver(function () { draw(); }).observe(host);
+  else window.addEventListener("resize", draw);
+
+  /* ---- BibTeX + copy ---- */
+  var bib = $("#bib");
+  bib.innerHTML = D.bibtex.split("\n").map(function (l) {
+    return '<span class="ln">' + esc(l)
+      .replace(/^(@\w+)/, '<span class="bk">$1</span>')
+      .replace(/^(\s+)(\w+)(\s+=)/, '$1<span class="bf">$2</span>$3') + "</span>";
+  }).join("");
+  var btn = $("#copy"), timer;
+  function flash(t) {
+    btn.textContent = t;
+    clearTimeout(timer);
+    timer = setTimeout(function () { btn.textContent = "Copy"; }, 1600);
+  }
+  function selectBib() {
+    var r = document.createRange();
+    r.selectNodeContents(bib);
+    var s = window.getSelection();
+    s.removeAllRanges();
+    s.addRange(r);
+    flash("Selected");
+  }
+  btn.addEventListener("click", function () {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(D.bibtex).then(function () { flash("Copied"); }).catch(selectBib);
+    } else {
+      selectBib();
+    }
+  });
+})();
+</script>
+</body>
+</html>

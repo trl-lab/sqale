@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SQaLe site mockups</title>
+<meta name="description" content="Five design directions for the one-page SQaLe project website.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400&family=Schibsted+Grotesk:wght@400;700;800&family=Geist+Mono:wght@400&family=Martian+Mono:wdth,wght@75..112.5,400;75..112.5,700&family=Public+Sans:wght@400&family=Archivo:wdth,wght@62..125,400;62..125,900&family=DM+Mono:wght@400&family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Hanken+Grotesk:wght@400;600&display=swap">
+<style>
+/*
+  Layout: a neutral contact sheet. One row per direction, specimen tile left,
+  notes right; the specimens carry all the colour, the chrome stays quiet.
+  Each tile shows its direction's light palette, or its dark palette when the
+  viewer is in dark mode.
+*/
+:root {
+  --bg: #f5f6f7;
+  --fg: #17191c;
+  --muted: #60656d;
+  --rule: #dfe2e6;
+  --surface: #ffffff;
+  --focus: #2f5bd3;
+
+  --ui: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --ui-mono: ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* specimen palettes, light */
+  --a-bg: #f5f7fb; --a-fg: #161a22; --a-mu: #556073; --a-ac: #2840c8; --a-rule: #d7dde7;
+  --b-bg: #ffffff; --b-fg: #1d2327; --b-mu: #a5aeb4; --b-edge: #d0d6da; --b-ac: #0b7a75; --b-hi: #d98e04;
+  --c-bg: #f6f7f9; --c-fg: #141922; --c-mu: #5f6776; --c-ac: #8c2d6a; --c-str: #2f6a5c;
+  --d-bg: #ffffff; --d-fg: #111111; --d-mu: #8a8a8a; --d-ac: #ffd60a; --d-line: #111111;
+  --e-bg: #ffffff; --e-fg: #1f2328; --e-mu: #5f6670; --e-ac: #107250; --e-rule: #e5e7ea;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #131518; --fg: #e8eaed; --muted: #9aa0a8; --rule: #2a2e34; --surface: #1b1e22; --focus: #8ea8ff;
+    --a-bg: #111725; --a-fg: #e4e8f1; --a-mu: #9ca6ba; --a-ac: #93a3ff; --a-rule: #283247;
+    --b-bg: #0d1517; --b-fg: #dce3e4; --b-mu: #9aa7aa; --b-edge: #36494d; --b-ac: #3cc6bc; --b-hi: #f2a93b;
+    --c-bg: #11151c; --c-fg: #e3e7ed; --c-mu: #8c95a3; --c-ac: #e58bc4; --c-str: #8dcbb9;
+    --d-bg: #0e0e0d; --d-fg: #edece6; --d-mu: #7b7b76; --d-ac: #ffd60a; --d-line: #ffd60a;
+    --e-bg: #1b1a18; --e-fg: #ece8e1; --e-mu: #a39e95; --e-ac: #5dc79b; --e-rule: #322f2b;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #131518; --fg: #e8eaed; --muted: #9aa0a8; --rule: #2a2e34; --surface: #1b1e22; --focus: #8ea8ff;
+  --a-bg: #111725; --a-fg: #e4e8f1; --a-mu: #9ca6ba; --a-ac: #93a3ff; --a-rule: #283247;
+  --b-bg: #0d1517; --b-fg: #dce3e4; --b-mu: #9aa7aa; --b-edge: #36494d; --b-ac: #3cc6bc; --b-hi: #f2a93b;
+  --c-bg: #11151c; --c-fg: #e3e7ed; --c-mu: #8c95a3; --c-ac: #e58bc4; --c-str: #8dcbb9;
+  --d-bg: #0e0e0d; --d-fg: #edece6; --d-mu: #7b7b76; --d-ac: #ffd60a; --d-line: #ffd60a;
+  --e-bg: #1b1a18; --e-fg: #ece8e1; --e-mu: #a39e95; --e-ac: #5dc79b; --e-rule: #322f2b;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font: 15px/1.55 var(--ui);
+  padding-inline: max(16px, env(safe-area-inset-left, 0px));
+  padding-block: 56px 72px;
+}
+a { color: inherit; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; border-radius: 2px; }
+
+.wrap { max-width: 1120px; margin-inline: auto; display: grid; gap: 48px; }
+
+header { display: grid; gap: 12px; max-width: 68ch; }
+.eyebrow { font: 500 12px/1 var(--ui-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+h1 { margin: 0; font-size: clamp(28px, 4vw, 40px); line-height: 1.1; letter-spacing: -.01em; text-wrap: balance; }
+header p { margin: 0; color: var(--muted); }
+header p strong { color: var(--fg); font-weight: 600; }
+
+.list { display: grid; gap: 0; border-top: 1px solid var(--rule); }
+.entry {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  gap: 40px;
+  padding-block: 40px;
+  border-bottom: 1px solid var(--rule);
+  align-items: start;
+}
+.notes { display: grid; gap: 14px; min-width: 0; }
+.notes h2 { margin: 0; font-size: 22px; line-height: 1.2; text-wrap: balance; }
+.notes .file { font: 13px/1 var(--ui-mono); color: var(--muted); }
+.notes p { margin: 0; max-width: 60ch; }
+.notes dl { margin: 0; display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 6px 16px; font-size: 14px; }
+.notes dt { color: var(--muted); font: 500 11px/1.9 var(--ui-mono); letter-spacing: .06em; text-transform: uppercase; }
+.notes dd { margin: 0; min-width: 0; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--rule); }
+.open {
+  justify-self: start;
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 9px 16px; border: 1px solid var(--fg); border-radius: 999px;
+  font-weight: 600; font-size: 14px; text-decoration: none;
+}
+.open:hover { background: var(--fg); color: var(--bg); }
+
+/* specimen tiles: each is a separate object, so it gets a frame */
+.tile {
+  position: relative;
+  display: block;
+  aspect-ratio: 16 / 10;
+  max-width: 100%;
+  overflow: hidden;
+  border-radius: 6px;
+  border: 1px solid var(--rule);
+  text-decoration: none;
+  container-type: inline-size;
+}
+.tile:hover { border-color: var(--muted); }
+
+/* A: Proceedings */
+.t-a { background: var(--a-bg); color: var(--a-fg); display: grid; grid-template-columns: 1.1fr 1fr; column-gap: 5%; padding: 5%; align-items: center; }
+.t-a .eb { font: 500 2.1cqw/1 "IBM Plex Sans", var(--ui); color: var(--a-mu); letter-spacing: .06em; text-transform: uppercase; }
+.t-a .wm { font: 600 14cqw/0.95 "Source Serif 4", Georgia, serif; font-variation-settings: "opsz" 60; letter-spacing: -.02em; margin-block: 2cqw 1.5cqw; }
+.t-a .sub { font: 400 2.6cqw/1.3 "Source Serif 4", Georgia, serif; }
+.t-a .au { font: 400 2cqw/1.4 "IBM Plex Sans", var(--ui); color: var(--a-mu); margin-top: 2cqw; }
+.t-a .btns { display: flex; gap: 1.2cqw; margin-top: 2.5cqw; }
+.t-a .btns span { font: 500 1.9cqw/1 "IBM Plex Sans", var(--ui); padding: 1.1cqw 1.8cqw; border-radius: 99px; border: 1px solid var(--a-ac); color: var(--a-ac); }
+.t-a .btns span:first-child { background: var(--a-ac); color: var(--a-bg); }
+.t-a .fig { border-top: 1px solid var(--a-rule); border-bottom: 1px solid var(--a-rule); padding-block: 2.5cqw; display: grid; gap: 1.6cqw; }
+.t-a .fig .q { font: 400 2.4cqw/1.35 "Source Serif 4", Georgia, serif; }
+.t-a .fig code { font: 400 1.75cqw/1.45 "IBM Plex Mono", var(--ui-mono); color: var(--a-mu); white-space: pre; }
+.t-a .fig .cap { font: 400 1.6cqw/1.3 "IBM Plex Sans", var(--ui); color: var(--a-mu); }
+
+/* B: Join Graph */
+.t-b { background: var(--b-bg); color: var(--b-fg); }
+.t-b svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.t-b .txt { position: absolute; left: 5cqw; top: 5cqw; display: grid; gap: 1.4cqw; max-width: 42%; }
+.t-b .wm { font: 800 11cqw/0.9 "Schibsted Grotesk", var(--ui); letter-spacing: -.04em; }
+.t-b .sub { font: 400 2.4cqw/1.3 "Schibsted Grotesk", var(--ui); }
+.t-b .k { position: absolute; left: 5cqw; bottom: 5cqw; font: 400 1.9cqw/1.5 "Geist Mono", var(--ui-mono); }
+.t-b .k b { color: var(--b-ac); font-weight: 400; }
+
+/* C: Query Session */
+.t-c { background: var(--c-bg); color: var(--c-fg); padding: 5% 6%; display: grid; align-content: center; gap: 12px; font-family: "Martian Mono", var(--ui-mono); }
+.t-c .wm { font-size: 10cqw; font-weight: 700; font-variation-settings: "wdth" 112.5; line-height: 1; letter-spacing: -.02em; }
+.t-c .sub { font: 400 2.4cqw/1.35 "Public Sans", var(--ui); max-width: 70%; }
+.t-c .cmds { display: flex; gap: 2cqw; font-size: 2cqw; color: var(--c-ac); }
+.t-c pre { margin: 0; font: inherit; font-size: 1.85cqw; line-height: 1.55; font-variation-settings: "wdth" 87; }
+.t-c .p { color: var(--c-mu); }
+.t-c .kw { color: var(--c-ac); font-weight: 700; }
+.t-c .wm .kw { font-weight: inherit; }
+.t-c .n { color: var(--c-str); }
+
+/* D: To Scale */
+.t-d { background: var(--d-bg); color: var(--d-fg); padding: 5%; display: grid; grid-template-rows: auto 1fr; gap: 16px; font-family: "Archivo", var(--ui); }
+.t-d .wm { font-size: 15cqw; font-weight: 900; font-variation-settings: "wdth" 125; line-height: .85; letter-spacing: -.03em; }
+.t-d .waffles { display: grid; grid-template-columns: auto 1fr; gap: 1.6cqw 3cqw; align-items: center; align-self: end; }
+.t-d .lab { font: 400 1.8cqw/1 "DM Mono", var(--ui-mono); text-transform: uppercase; letter-spacing: .06em; }
+.t-d .sq { display: flex; flex-wrap: wrap; gap: .45cqw; }
+.t-d .sq i { width: 1.6cqw; height: 1.6cqw; background: var(--d-mu); }
+.t-d .sq.on i { background: var(--d-ac); box-shadow: inset 0 0 0 1px var(--d-line); }
+
+/* E: Article */
+.t-e { background: var(--e-bg); color: var(--e-fg); padding: 5% 7%; display: grid; align-content: center; gap: 12px; }
+.t-e .wm { font: 500 11cqw/1 "Newsreader", Georgia, serif; font-variation-settings: "opsz" 72; letter-spacing: -.015em; }
+.t-e .deck { font: 400 3cqw/1.3 "Newsreader", Georgia, serif; color: var(--e-mu); max-width: 75%; }
+.t-e .meta { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2cqw; border-top: 1px solid var(--e-rule); padding-top: 2cqw; font: 400 1.7cqw/1.4 "Hanken Grotesk", var(--ui); }
+.t-e .meta b { display: block; font-weight: 600; text-transform: uppercase; letter-spacing: .07em; font-size: 1.4cqw; color: var(--e-mu); margin-bottom: .6cqw; }
+.t-e .meta a, .t-e .meta span.l { color: var(--e-ac); }
+.t-e .body { display: grid; grid-template-columns: 1fr 30%; gap: 4cqw; font: 400 2.1cqw/1.55 "Newsreader", Georgia, serif; }
+.t-e .body .side { font: 400 1.6cqw/1.4 "Hanken Grotesk", var(--ui); color: var(--e-mu); border-left: 2px solid var(--e-ac); padding-left: 1.6cqw; }
+
+footer { color: var(--muted); font-size: 13px; max-width: 68ch; }
+footer code { font-family: var(--ui-mono); font-size: 12px; }
+
+@media (max-width: 760px) {
+  body { padding-block: 32px 48px; }
+  .entry { grid-template-columns: minmax(0, 1fr); gap: 20px; padding-block: 28px; }
+  .notes dl { grid-template-columns: 84px minmax(0, 1fr); }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">sqale-website / mockup</div>
+    <h1>Five directions for the SQaLe website</h1>
+    <p>Each mockup is a complete one-page site with the <strong>same content</strong>: the paper's numbers, one real record from the test set, the pipeline, the controlled comparison and the three findings. Only the design differs. All five read their charts from <code>assets/sqale-data.js</code> and support light and dark mode.</p>
+  </header>
+
+  <div class="list">
+
+    <section class="entry" aria-labelledby="h-a">
+      <a class="tile t-a" href="proceedings.html" aria-label="Open the Proceedings mockup">
+        <div>
+          <div class="eb">Preprint · 2026</div>
+          <div class="wm">SQaLe</div>
+          <div class="sub">A large realistic dataset to empower small specialised text-to-SQL models</div>
+          <div class="au">Wolff¹² · Gomm¹² · Hulsebos²</div>
+          <div class="btns"><span>Paper</span><span>Dataset</span><span>Code</span></div>
+        </div>
+        <div class="fig">
+          <div class="q">Identify the names of employees who have received feedback from “Tuttle Gledhill” …</div>
+          <code>SELECT DISTINCT e.first_name, …
+FROM feedback_session fs
+JOIN employee e …</code>
+          <div class="cap">Figure 1. One record, 3 of 87 tables.</div>
+        </div>
+      </a>
+      <div class="notes">
+        <div class="file">proceedings.html</div>
+        <h2 id="h-a">Proceedings</h2>
+        <p>The academic project page researchers already know, set with care. A split hero puts the title next to a real record typeset as Figure 1, and the rest follows the paper's own register of numbered figures and tables.</p>
+        <dl>
+          <dt>Type</dt><dd>Source Serif 4, IBM Plex Sans, IBM Plex Mono</dd>
+          <dt>Colour</dt><dd><div class="chips"><span class="chip" style="background:var(--a-bg)"></span><span class="chip" style="background:var(--a-fg)"></span><span class="chip" style="background:var(--a-mu)"></span><span class="chip" style="background:var(--a-ac)"></span></div></dd>
+          <dt>Fits if</dt><dd>The site should read like the paper and look trustworthy to reviewers.</dd>
+        </dl>
+        <a class="open" href="proceedings.html">Open mockup</a>
+      </div>
+    </section>
+
+    <section class="entry" aria-labelledby="h-b">
+      <a class="tile t-b" href="join-graph.html" aria-label="Open the Join Graph mockup">
+        <svg id="mini-graph" viewBox="0 0 160 100" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg>
+        <div class="txt">
+          <div class="wm">SQaLe</div>
+          <div class="sub">87 tables. The question needs 3.</div>
+        </div>
+        <div class="k">join_path(<b>employee</b>, <b>department</b>)</div>
+      </a>
+      <div class="notes">
+        <div class="file">join-graph.html</div>
+        <h2 id="h-b">Join Graph</h2>
+        <p>The hero draws the real foreign-key graph of the example's 87-table schema and replays a five-step agent episode through it, with the real tool outputs. The rest of the page stays quiet so that one moment carries the idea.</p>
+        <dl>
+          <dt>Type</dt><dd>Schibsted Grotesk, Geist Mono</dd>
+          <dt>Colour</dt><dd><div class="chips"><span class="chip" style="background:var(--b-bg)"></span><span class="chip" style="background:var(--b-fg)"></span><span class="chip" style="background:var(--b-mu)"></span><span class="chip" style="background:var(--b-ac)"></span><span class="chip" style="background:var(--b-hi)"></span></div></dd>
+          <dt>Fits if</dt><dd>The headline message is that SQaLe models learn to search large schemas.</dd>
+        </dl>
+        <a class="open" href="join-graph.html">Open mockup</a>
+      </div>
+    </section>
+
+    <section class="entry" aria-labelledby="h-c">
+      <a class="tile t-c" href="query-session.html" aria-label="Open the Query Session mockup">
+        <div class="wm">SQ<span class="kw">a</span>L<span class="kw">e</span></div>
+        <div class="sub">A large realistic dataset to empower small specialised text-to-SQL models</div>
+        <div class="cmds"><span>\paper</span><span>\dataset</span><span>\code</span><span>\cite</span></div>
+        <pre><span class="p">sqale=&gt;</span> <span class="kw">SELECT</span> count(*) <span class="kw">FROM</span> questions;
+  count
+-----------
+ <span class="n">1,408,056</span>
+<span class="p">(1 row)</span></pre>
+      </a>
+      <div class="notes">
+        <div class="file">query-session.html</div>
+        <h2 id="h-c">Query Session</h2>
+        <p>Every section is a query and its result: counts as a result table, the example in psql's expanded display, the pipeline as an <code>EXPLAIN</code> plan, the citation via <code>\copy</code>. Light and precise, with short prose beside each result.</p>
+        <dl>
+          <dt>Type</dt><dd>Martian Mono, Public Sans</dd>
+          <dt>Colour</dt><dd><div class="chips"><span class="chip" style="background:var(--c-bg)"></span><span class="chip" style="background:var(--c-fg)"></span><span class="chip" style="background:var(--c-mu)"></span><span class="chip" style="background:var(--c-ac)"></span><span class="chip" style="background:var(--c-str)"></span></div></dd>
+          <dt>Fits if</dt><dd>The audience is mostly database people, and you want the most memorable of the five.</dd>
+        </dl>
+        <a class="open" href="query-session.html">Open mockup</a>
+      </div>
+    </section>
+
+    <section class="entry" aria-labelledby="h-d">
+      <a class="tile t-d" href="to-scale.html" aria-label="Open the To Scale mockup">
+        <div class="wm">SQaLe</div>
+        <div class="waffles">
+          <span class="lab">BIRD</span><span class="sq" data-n="5"></span>
+          <span class="lab">SynSQL</span><span class="sq" data-n="10"></span>
+          <span class="lab">SQaLe</span><span class="sq on" data-n="113"></span>
+        </div>
+      </a>
+      <div class="notes">
+        <div class="file">to-scale.html</div>
+        <h2 id="h-d">To Scale</h2>
+        <p>A Swiss poster that takes the name literally: every comparison is drawn to scale. The median schema appears as one square per table (5 for BIRD, 113 for SQaLe), and compute appears as circles with area proportional to TFLOPs.</p>
+        <dl>
+          <dt>Type</dt><dd>Archivo (variable width), DM Mono</dd>
+          <dt>Colour</dt><dd><div class="chips"><span class="chip" style="background:var(--d-bg)"></span><span class="chip" style="background:var(--d-fg)"></span><span class="chip" style="background:var(--d-mu)"></span><span class="chip" style="background:var(--d-ac)"></span></div></dd>
+          <dt>Fits if</dt><dd>You want the scale argument understood at a glance, for example from a link in a talk.</dd>
+        </dl>
+        <a class="open" href="to-scale.html">Open mockup</a>
+      </div>
+    </section>
+
+    <section class="entry" aria-labelledby="h-e">
+      <a class="tile t-e" href="article.html" aria-label="Open the Article mockup">
+        <div class="wm">SQaLe</div>
+        <div class="deck">A large realistic dataset to empower small specialised text-to-SQL models</div>
+        <div class="meta">
+          <div><b>Authors</b>Wolff, Gomm, Hulsebos</div>
+          <div><b>Affiliations</b>UvA, CWI</div>
+          <div><b>Published</b>Preprint · 2026</div>
+          <div><b>Links</b><span class="l">Paper · Dataset</span></div>
+        </div>
+        <div class="body">
+          <div>Frontier language models in agentic pipelines lead text-to-SQL benchmarks, at a high inference cost.</div>
+          <div class="side">Median 538 columns per schema, against 39 in BIRD.</div>
+        </div>
+      </a>
+      <div class="notes">
+        <div class="file">article.html</div>
+        <h2 id="h-e">Article</h2>
+        <p>A short interactive article in the Distill tradition: a serif text column with sidenotes, a sticky table of contents, and five numbered figures you can operate, including a phrasing switcher and the size-against-accuracy scatter with tooltips.</p>
+        <dl>
+          <dt>Type</dt><dd>Newsreader, Hanken Grotesk, JetBrains Mono</dd>
+          <dt>Colour</dt><dd><div class="chips"><span class="chip" style="background:var(--e-bg)"></span><span class="chip" style="background:var(--e-fg)"></span><span class="chip" style="background:var(--e-mu)"></span><span class="chip" style="background:var(--e-ac)"></span></div></dd>
+          <dt>Fits if</dt><dd>Visitors should leave understanding the method and the findings, beyond the headline numbers.</dd>
+        </dl>
+        <a class="open" href="article.html">Open mockup</a>
+      </div>
+    </section>
+
+  </div>
+
+  <footer>
+    <p>Shared data in <code>assets/sqale-data.js</code>: paper numbers as of 2026-09-26, the size and compute benchmark, and the example record, its eight phrasings and its schema graph from the supplementary sample. See <code>README.md</code> for sources.</p>
+  </footer>
+</div>
+
+<script src="assets/sqale-data.js"></script>
+<script>
+(function () {
+  // Waffle squares for the To Scale tile: one square per table.
+  document.querySelectorAll('.t-d .sq').forEach(function (el) {
+    var n = +el.dataset.n;
+    el.innerHTML = new Array(n + 1).join('<i></i>');
+  });
+
+  // Mini schema graph for the Join Graph tile, drawn from the real layout.
+  var S = window.SQALE && window.SQALE.schema;
+  var svg = document.getElementById('mini-graph');
+  if (!S || !svg) return;
+  var ns = 'http://www.w3.org/2000/svg';
+  var X = function (p) { return 66 + p[0] * 88; };
+  var Y = function (p) { return 8 + p[1] * 84; };
+  var gold = new Set(S.gold);
+  var pathEdges = [];
+  S.edges.forEach(function (e) {
+    var a = S.pos[e[0]], b = S.pos[e[1]];
+    var on = gold.has(e[0]) && gold.has(e[1]);
+    var l = document.createElementNS(ns, 'line');
+    l.setAttribute('x1', X(a)); l.setAttribute('y1', Y(a));
+    l.setAttribute('x2', X(b)); l.setAttribute('y2', Y(b));
+    l.setAttribute('stroke', on ? 'var(--b-ac)' : 'var(--b-edge)');
+    l.setAttribute('stroke-width', on ? 0.9 : 0.25);
+    if (on) pathEdges.push(l); else svg.appendChild(l);
+  });
+  pathEdges.forEach(function (l) { svg.appendChild(l); });
+  S.pos.forEach(function (p, i) {
+    var c = document.createElementNS(ns, 'circle');
+    var on = gold.has(i);
+    c.setAttribute('cx', X(p)); c.setAttribute('cy', Y(p));
+    c.setAttribute('r', on ? 2.1 : 0.6 + S.cols[i] * 0.12);
+    c.setAttribute('fill', on ? 'var(--b-ac)' : 'var(--b-mu)');
+    svg.appendChild(c);
+  });
+})();
+</script>
+</body>
+</html>
