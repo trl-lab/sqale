@@ -30,9 +30,9 @@ window.SQALE = {
   affiliations: ["University of Amsterdam", "Centrum Wiskunde & Informatica"],
   links: {
     paper: "#",
-    dataset: "https://huggingface.co/datasets/trl-lab/SQaLe-text-to-SQL-dataset",
+    dataset: "https://huggingface.co/datasets/trl-lab/sqale2_queries",
     code: "https://github.com/trl-lab/SQaLe_2",
-    model: "https://huggingface.co/trl-lab/SQaLe-Model"
+    model: "https://huggingface.co/trl-lab/qwen3.5-2b-grpo-sqale"
   },
 
   counts: {
