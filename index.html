@@ -736,7 +736,7 @@ h1, h2, h3, h4 { text-wrap: balance; margin: 0; }
 .byline {
   margin: 0;
   display: grid;
-  grid-template-columns: 1.1fr 1.5fr 0.8fr 1.3fr;
+  grid-template-columns: 1fr 1.4fr 1fr;
   gap: 1.25rem 1.75rem;
   border-block: 1px solid var(--rule);
   padding-block: 1rem 1.15rem;
@@ -757,19 +757,43 @@ h1, h2, h3, h4 { text-wrap: balance; margin: 0; }
 .byline ul, .byline ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.15rem; }
 .byline sup { color: var(--muted); font-weight: 600; margin-left: 0.1em; }
 .affs sup { margin: 0 0.3em 0 0; }
-.byline .links { display: flex; flex-wrap: wrap; gap: 0.2rem 1rem; }
-.lnk {
-  display: inline-flex; align-items: center; gap: 0.2rem;
-  font-weight: 600; padding-block: 0.15rem;
-  text-decoration: none; border-bottom: 1px solid var(--accent-line);
+
+/* Resource links: the page's main actions, boxed under the paper information. */
+.resources { grid-column: text-start / margin-end; min-width: 0; margin-top: -0.5rem; }
+.resources ul {
+  list-style: none; margin: 0; padding: 0;
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.75rem;
 }
-.lnk:hover { border-bottom-color: var(--accent); }
-.lnk svg { width: 0.7em; height: 0.7em; stroke: var(--accent); fill: none; stroke-width: 1.6; }
+.res {
+  height: 100%; box-sizing: border-box;
+  display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 0.85rem; row-gap: 0.1rem; align-items: center;
+  padding: 0.9rem 1.1rem;
+  border: 1px solid var(--accent-line); border-radius: 10px; background: var(--accent-soft);
+  color: var(--fg); text-decoration: none; font-family: var(--sans);
+  transition: border-color 0.15s, background-color 0.15s, box-shadow 0.15s;
+}
+.res:hover { border-color: var(--accent); background: var(--bg); box-shadow: 0 2px 10px var(--shadow); }
+.res:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.res-icon {
+  grid-row: 1 / span 2; width: 1.75rem; height: 1.75rem;
+  fill: none; stroke: var(--accent); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
+}
+.res-name {
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  font-size: 1.125rem; font-weight: 650; line-height: 1.25; color: var(--accent);
+}
+.res-ext { width: 0.62em; height: 0.62em; fill: none; stroke: currentColor; stroke-width: 1.6; }
+.res-sub { font-size: var(--fs-small); line-height: 1.35; color: var(--muted); min-width: 0; }
+.res-sub sub { font-size: 0.72em; }
+@media (prefers-reduced-motion: reduce) { .res { transition: none; } }
 
 @media (max-width: 999.98px) {
   .byline { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 559.98px) {
+  .resources ul { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.6rem; }
+  .res { grid-template-columns: minmax(0, 1fr); row-gap: 0.35rem; padding: 0.8rem 0.85rem; }
+  .res-icon { grid-row: auto; width: 1.5rem; height: 1.5rem; }
   .byline { grid-template-columns: minmax(0, 1fr); gap: 0; padding-block: 0; }
   .by-col { grid-template-columns: 6.25rem minmax(0, 1fr); gap: 0.75rem; padding-block: 0.75rem; border-top: 1px solid var(--rule); }
   .by-col:first-child { border-top: 0; }
@@ -1005,14 +1029,8 @@ pre code { font-size: inherit; }
 .result .tbl td { font-family: var(--mono); font-size: 0.8125rem; }
 .result .tbl th { font-family: var(--mono); text-transform: none; letter-spacing: 0; font-size: 0.75rem; font-weight: 500; }
 .strip-wrap { display: grid; gap: 0.5rem; border-top: 1px solid var(--rule); padding-top: 0.9rem; }
-.strip { display: flex; flex-wrap: wrap; gap: 3px; }
-.cell { width: 10px; height: 10px; border-radius: 2px; background: var(--cell); }
-.cell.is-gold { background: var(--accent); }
-.strip-key { font-family: var(--sans); font-size: var(--fs-small); color: var(--muted); display: flex; flex-wrap: wrap; gap: 0.3rem 1.25rem; }
-.strip-key > span { display: inline-flex; align-items: baseline; gap: 0.45rem; }
-.strip-key .k-txt { display: inline; }
-.strip-key i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; }
-.strip-key code { color: var(--fg); font-size: 0.9em; }
+.schema-used { font-family: var(--sans); font-size: var(--fs-small); line-height: 1.5; color: var(--muted); }
+.schema-used code { color: var(--fg); font-size: 0.9em; }
 
 /* ---------- SVG charts ---------- */
 .chart { position: relative; min-width: 0; }
@@ -1106,7 +1124,7 @@ details.data { font-family: var(--sans); font-size: var(--fs-small); }
 details.data summary { cursor: pointer; color: var(--accent); font-weight: 600; width: fit-content; }
 details.data[open] summary { margin-bottom: 0.6rem; }
 
-/* ---------- Figure 9: bars ---------- */
+/* ---------- Figure 8: bars ---------- */
 .f5 { container-type: inline-size; }
 .f5-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.6rem 1.5rem; }
 .seg { display: inline-flex; border: 1px solid var(--rule-strong); border-radius: 999px; padding: 2px; gap: 2px; background: var(--raised); }
@@ -1145,7 +1163,7 @@ details.data[open] summary { margin-bottom: 0.6rem; }
 .bar-scale span:nth-child(2) { display: flex; justify-content: space-between; }
 .lit { max-width: var(--w-text); }
 
-/* ---------- Figure 7: episodes ---------- */
+/* ---------- Figure 6: episodes ---------- */
 .ep { container-type: inline-size; display: grid; gap: 1.25rem; }
 .ep-pick { display: flex; flex-wrap: wrap; gap: 0.4rem; }
 /* keep the pill style; Figure 1's container query restyles .tab in wide containers */
@@ -1155,13 +1173,6 @@ details.data[open] summary { margin-bottom: 0.6rem; }
 .ep-q { display: grid; gap: 0.5rem; }
 .ep-hint { font-family: var(--sans); font-size: var(--fs-small); line-height: 1.5; color: var(--fg-2); max-width: 70ch; }
 .ep-hint .label { margin-right: 0.5rem; }
-.ep-map { display: grid; gap: 0.5rem; border-top: 1px solid var(--rule); padding-top: 0.9rem; }
-.ep-map-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.25rem 1rem; align-items: baseline; }
-.ep-count { font-family: var(--sans); font-size: var(--fs-small); color: var(--fg-2); font-variant-numeric: tabular-nums; }
-.cell.is-seen { background: var(--accent-line); }
-.cell.is-now { box-shadow: 0 0 0 1.5px var(--bg), 0 0 0 3px var(--fg); }
-.cell.is-used { background: var(--accent); }
-.strip-key .cell { flex: none; }
 
 .ep-rail {
   list-style: none; margin: 0; padding: 0;
@@ -1292,19 +1303,17 @@ mark.ep-lit { background: var(--accent-soft); color: var(--fg); box-shadow: 0 0 
       <dt>Published</dt>
       <dd>Preprint · 2026</dd>
     </div>
-    <div class="by-col">
-      <dt>Links</dt>
-      <dd><ul class="links">
-        <!-- TODO: arXiv URL -->
-        <li><a class="lnk" href="#">Paper</a></li>
-        <li><a class="lnk" href="https://huggingface.co/datasets/trl-lab/SQaLe-2-text-to-SQL-Queries" target="_blank" rel="noopener" title="Questions and SQL on Hugging Face">Queries<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M3 2h5v5M8 2 2 8"/></svg></a></li>
-        <li><a class="lnk" href="https://huggingface.co/datasets/trl-lab/SQaLe-2-text-to-SQL-Schemas" target="_blank" rel="noopener" title="Schemas and databases on Hugging Face">Schemas<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M3 2h5v5M8 2 2 8"/></svg></a></li>
-        <li><a class="lnk" href="https://github.com/trl-lab/SQaLe_2" target="_blank" rel="noopener" title="Code on GitHub">Code<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M3 2h5v5M8 2 2 8"/></svg></a></li>
-        <li><a class="lnk" href="https://huggingface.co/trl-lab/qwen3.5-2b-grpo-sqale" target="_blank" rel="noopener" title="Model on Hugging Face">Model<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M3 2h5v5M8 2 2 8"/></svg></a></li>
-        <li><a class="lnk" href="#cite">Cite</a></li>
-      </ul></dd>
-    </div>
   </dl>
+  <nav class="resources" aria-label="Paper, data, model and code">
+    <ul>
+      <li><!-- TODO: arXiv URL --><a class="res" href="#"><svg class="res-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4"/><path d="M10 12h5M10 15.5h5"/></svg><span class="res-name">Paper</span><span class="res-sub">Preprint, 2026</span></a></li>
+      <li><a class="res" href="https://huggingface.co/datasets/trl-lab/SQaLe-2-text-to-SQL-Queries" target="_blank" rel="noopener"><svg class="res-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H10l-4.5 3.5V16H4z"/><path d="M8 9h8M8 12.2h5"/></svg><span class="res-name">Queries<svg class="res-ext" viewBox="0 0 10 10" aria-hidden="true"><path d="M3 2h5v5M8 2 2 8"/></svg></span><span class="res-sub">Questions and SQL · Hugging Face</span></a></li>
+      <li><a class="res" href="https://huggingface.co/datasets/trl-lab/SQaLe-2-text-to-SQL-Schemas" target="_blank" rel="noopener"><svg class="res-icon" viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="6" rx="7" ry="2.6"/><path d="M5 6v12c0 1.4 3.1 2.6 7 2.6s7-1.2 7-2.6V6"/><path d="M5 12c0 1.4 3.1 2.6 7 2.6s7-1.2 7-2.6"/></svg><span class="res-name">Schemas<svg class="res-ext" viewBox="0 0 10 10" aria-hidden="true"><path d="M3 2h5v5M8 2 2 8"/></svg></span><span class="res-sub">Databases · Hugging Face</span></a></li>
+      <li><a class="res" href="https://huggingface.co/trl-lab/qwen3.5-2b-grpo-sqale" target="_blank" rel="noopener"><svg class="res-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 20 7.5v9L12 21l-8-4.5v-9z"/><path d="M4 7.5 12 12l8-4.5M12 12v9"/></svg><span class="res-name">Model<svg class="res-ext" viewBox="0 0 10 10" aria-hidden="true"><path d="M3 2h5v5M8 2 2 8"/></svg></span><span class="res-sub">M<sub>SQaLe</sub> · Hugging Face</span></a></li>
+      <li><a class="res" href="https://github.com/trl-lab/SQaLe_2" target="_blank" rel="noopener"><svg class="res-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 7 4 12l5 5M15 7l5 5-5 5M13.5 5l-3 14"/></svg><span class="res-name">Code<svg class="res-ext" viewBox="0 0 10 10" aria-hidden="true"><path d="M3 2h5v5M8 2 2 8"/></svg></span><span class="res-sub">Generation pipeline · GitHub</span></a></li>
+      <li><a class="res" href="#cite"><svg class="res-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 7H6v5h3.2c0 2.6-1 3.8-3.2 4.8M19 7h-4v5h3.2c0 2.6-1 3.8-3.2 4.8"/></svg><span class="res-name">Cite</span><span class="res-sub">BibTeX</span></a></li>
+    </ul>
+  </nav>
 </header>
 
 <div class="layout">
@@ -1373,11 +1382,10 @@ mark.ep-lit { background: var(--accent-soft); color: var(--fg); box-shadow: 0 0 
           </div>
           <div class="strip-wrap">
             <span class="label" id="strip-label">Schema</span>
-            <div class="strip" id="schema-strip" role="img"></div>
-            <div class="strip-key" id="strip-key"></div>
+            <p class="schema-used" id="schema-used"></p>
           </div>
         </div>
-        <figcaption id="cap-1"><b>Figure 1.</b> One record from the test split. The tabs switch between the eight phrasings of the question; the gold SQL and its one-row result stay the same for all of them. Each square below is one of the schema’s 87 tables, and the 3 in green are the ones the SQL uses.</figcaption>
+        <figcaption id="cap-1"><b>Figure 1.</b> One record from the test split. The tabs switch between the eight phrasings of the question; the gold SQL and its one-row result stay the same for all of them.</figcaption>
       </figure>
 
       <p>SQaLe’s databases hold 108,708,694 synthetic rows. Tables hold a median of 69 rows, 95.2% of tables are populated, and 95.1% of foreign-key cells are valid after repair. Every literal in a question is grounded in the data, so a model has to read values as well as table and column names.</p>
@@ -1425,20 +1433,7 @@ mark.ep-lit { background: var(--accent-soft); color: var(--fg); box-shadow: 0 0 
       <h3>Training on SQaLe</h3>
       <p>To isolate the effect of the data, we train Qwen3.5-2B with GRPO directly from the base checkpoint three times, once each on SQaLe, SynSQL-2.5M and BIRD train. We call the results <span class="m">M<sub>SQaLe</sub></span> (Qwen3.5-2B trained with GRPO on SQaLe), <span class="m">M<sub>SynSQL</sub></span> and <span class="m">M<sub>BIRD</sub></span>. Apart from the training data and the strength of a length curriculum, the base model, environment, tools, reward, steps, batch size and evaluation are identical. There are no distilled traces, no teacher and no test-time scaffolding.<sup class="sn-ref"><a href="#sn-2" id="snr-2" aria-label="Note 2">2</a></sup></p>
 
-      <p>Figure&nbsp;4 shows how the outcome of the rollouts changes during training. Over the first 30 steps, 43% of rollouts end without a query that parses and 12% return the gold result. Over the last 200 reported steps, under 1% are invalid and 45% return the gold result.</p>
-
-      <figure class="fig wide" id="fig-train-outcome" aria-labelledby="cap-4">
-        <div class="fig-body">
-          <div class="fig-panel">
-            <p class="panel-title">Outcome of the rollouts during training</p>
-            <p class="panel-sub">Share of rollouts per reported step (%), by reward tier; moving average over 9 reported steps, unsmoothed values in grey</p>
-            <div class="legend" id="tr-outcome-legend"></div>
-            <div class="chart tr" id="tr-outcome" tabindex="0" role="img" aria-label="Line chart over 1,800 training steps. The share of rollouts that return the gold result rises from 12% to about 45%; invalid rollouts fall from 43% to under 1%; rollouts that execute with a wrong result settle around 55%; parse-only rollouts stay under 11%. Steps after 1,658 were not reported."><div class="tip" id="tr-outcome-tip" hidden role="status"></div></div>
-          </div>
-        </div>
-        <figcaption id="cap-4"><b>Figure 4.</b> Reward tiers of the rollouts during GRPO training on SQaLe (run 26640986): the query returns the gold result, executes with a different result, only parses, or is invalid. Coloured lines are centred moving averages over 9 reported steps (54 training steps); grey lines show the unsmoothed values. The moving averages leave out step 1,658, which the export logs twice with diverging values; the grey lines still show it. The run trained for 1,800 steps; the reporting tool missed its updates after step 1,658, so the curves end there. Hover over a chart, or focus it and use the arrow keys, for the values at a step. Data: <a href="assets/training/26640986-Outcome-mix.csv" target="_blank" rel="noopener">outcome mix</a> and <a href="assets/training/26640986-Episode-shape.csv" target="_blank" rel="noopener">episode shape</a> (CSV).</figcaption>
-      </figure>
-      <p>On the SQaLe test set (Figure&nbsp;5), <span class="m">M<sub>SQaLe</sub></span> reaches 66.3%, which is 27.6 points above the untrained model and 9.7 points behind Qwen3.6-27B. Training on BIRD adds 15.3 points and training on SynSQL 12.0. On BIRD, <span class="m">M<sub>SQaLe</sub></span> reaches 52.3% against 54.7% for <span class="m">M<sub>BIRD</sub></span>, which was trained on BIRD itself. On EHRSQL the two are tied at 23.7%.</p>
+     <p>On the SQaLe test set (Figure&nbsp;4), <span class="m">M<sub>SQaLe</sub></span> reaches 66.3%, which is 27.6 points above the untrained model and 9.7 points behind Qwen3.6-27B. Training on BIRD adds 15.3 points and training on SynSQL 12.0. On BIRD, <span class="m">M<sub>SQaLe</sub></span> reaches 52.3% against 54.7% for <span class="m">M<sub>BIRD</sub></span>, which was trained on BIRD itself. On EHRSQL the two are tied at 23.7%.</p>
 
       <figure class="fig wide" id="fig-results" aria-labelledby="cap-5">
         <div class="fig-body">
@@ -1447,10 +1442,10 @@ mark.ep-lit { background: var(--accent-soft); color: var(--fg); box-shadow: 0 0 
             <div class="table-wrap"><table class="tbl" id="matrix-table"></table></div>
           </div>
         </div>
-        <figcaption id="cap-5"><b>Figure 5.</b> Execution accuracy of Qwen3.5-2B trained with GRPO on one corpus each, on 300 SQaLe test questions, BIRD and EHRSQL. Bold marks the best of the three trained models in each column.</figcaption>
+        <figcaption id="cap-5"><b>Figure 4.</b> Execution accuracy of Qwen3.5-2B trained with GRPO on one corpus each, on 300 SQaLe test questions, BIRD and EHRSQL. Bold marks the best of the three trained models in each column.</figcaption>
       </figure>
 
-      <p>Figure&nbsp;6 compares cost. All models run in the same agentic harness on 100 moderate SQaLe test questions. <span class="m">M<sub>SQaLe</sub></span> reaches 52% at 224 TFLOPs per question, and Qwen3.5-27B reaches 63% at 1,710 TFLOPs. Among general-purpose models in the 9–12B range, only Qwen3.5-9B (58%) is ahead of <span class="m">M<sub>SQaLe</sub></span>.</p>
+      <p>Figure&nbsp;5 compares cost. All models run in the same agentic harness on 100 moderate SQaLe test questions. <span class="m">M<sub>SQaLe</sub></span> reaches 52% at 224 TFLOPs per question, and Qwen3.5-27B reaches 63% at 1,710 TFLOPs. Among general-purpose models in the 9–12B range, only Qwen3.5-9B (58%) is ahead of <span class="m">M<sub>SQaLe</sub></span>.</p>
 
       <figure class="fig wide" id="fig-size" aria-labelledby="cap-6">
         <div class="fig-body">
@@ -1464,13 +1459,13 @@ mark.ep-lit { background: var(--accent-soft); color: var(--fg); box-shadow: 0 0 
             </details>
           </div>
         </div>
-        <figcaption id="cap-6"><b>Figure 6.</b> Accuracy against parameter count for every model in the same agentic harness, with dot area proportional to TFLOPs per question. Hover or focus a dot for its values; arrow keys move between dots.</figcaption>
+        <figcaption id="cap-6"><b>Figure 5.</b> Accuracy against parameter count for every model in the same agentic harness, with dot area proportional to TFLOPs per question. Hover or focus a dot for its values; arrow keys move between dots.</figcaption>
       </figure>
     </section>
 
     <section class="sec" id="episode" aria-labelledby="h-episode">
       <h2 id="h-episode">How the model answers</h2>
-      <p><span class="m">M<sub>SQaLe</sub></span> never sees the schema. In each round it writes a short plan and then emits one or more tool calls. The environment runs every call, returns all the results in one message and reports how many rounds are left before the model has to answer. Figure&nbsp;7 replays three of its episodes on full schemas of 106 to 239 tables, and all three end with a correct answer.<sup class="sn-ref"><a href="#sn-3" id="snr-3" aria-label="Note 3">3</a></sup></p>
+      <p><span class="m">M<sub>SQaLe</sub></span> never sees the schema. In each round it writes a short plan and then emits one or more tool calls. The environment runs every call, returns all the results in one message and reports how many rounds are left before the model has to answer. Figure&nbsp;6 replays three of its episodes on full schemas of 106 to 239 tables, and all three end with a correct answer.<sup class="sn-ref"><a href="#sn-3" id="snr-3" aria-label="Note 3">3</a></sup></p>
 
       <figure class="fig wide" id="fig-episode" aria-labelledby="cap-7">
         <div class="fig-body ep">
@@ -1479,19 +1474,6 @@ mark.ep-lit { background: var(--accent-soft); color: var(--fg); box-shadow: 0 0 
             <p class="rec-meta" id="ep-meta"></p>
             <p class="q-text" id="ep-question"></p>
             <p class="ep-hint" id="ep-hint"></p>
-          </div>
-          <div class="ep-map">
-            <div class="ep-map-head">
-              <span class="label" id="ep-map-label">Schema</span>
-              <span class="ep-count" id="ep-count" aria-live="polite"></span>
-            </div>
-            <div class="strip" id="ep-strip" role="img"></div>
-            <div class="strip-key" aria-hidden="true">
-              <span><i class="cell is-seen"></i>inspected</span>
-              <span><i class="cell is-seen is-now"></i>inspected in this round</span>
-              <span><i class="cell is-used"></i>used by the final SQL</span>
-              <span><i class="cell"></i>not inspected</span>
-            </div>
           </div>
           <ol class="ep-rail" role="tablist" aria-label="Rounds" id="ep-rail"></ol>
           <div class="ep-bar">
@@ -1512,12 +1494,12 @@ mark.ep-lit { background: var(--accent-soft); color: var(--fg); box-shadow: 0 0 
           </div>
           <p class="ep-note" id="ep-note"></p>
         </div>
-        <figcaption id="cap-7"><b>Figure 7.</b> Three real episodes of <span class="m">M<sub>SQaLe</sub></span> on full SQaLe schemas, with the schema withheld. Pick an episode and step through its rounds. Each round shows the model’s reasoning and every tool call it issued in that round, with the output it got back. After six rounds the environment stops the exploration and the model writes its final SQL as text. Each square is one table of the schema. Reasoning is abridged to verbatim excerpts, identical calls within a round are shown once with a count, and long outputs are clipped.</figcaption>
+        <figcaption id="cap-7"><b>Figure 6.</b> Three real episodes of <span class="m">M<sub>SQaLe</sub></span> on full SQaLe schemas, with the schema withheld. Pick an episode and step through its rounds. Each round shows the model’s reasoning and every tool call it issued in that round, with the output it got back. After six rounds the environment stops the exploration and the model writes its final SQL as text. Reasoning is abridged to verbatim excerpts, identical calls within a round are shown once with a count, and long outputs are clipped.</figcaption>
       </figure>
 
       <p>All three episodes start the same way. The first round lists the tables, and the next one or two rounds inspect the few tables that match the question, with four to nine distinct calls in a round. The model then drafts a query and checks its output. The first two episodes end with <code>submit_sql</code>. The third keeps checking until the six rounds run out, and then the environment asks for the SQL as text. Most episodes end this way: in the 108-question evaluation these episodes come from, 84 of the 108 full-schema episodes reach the round limit.</p>
 
-      <p><span class="m">M<sub>SQaLe</sub></span> also learned to batch its tool calls. The prompt asks for a single JSON object per reply, and we neither encouraged nor limited multiple calls; the environment simply runs every call it finds. During training, rounds per episode stay between 5.6 and 6.8 (Figure&nbsp;8). Tool calls per episode stay near six for the first 800 steps, spike twice, and then climb steadily from step 954 to an average of 19.3 over steps 1,300 to 1,658. In the same evaluation, the untrained Qwen3.5-2B never issues more than one call per round on full schemas. <span class="m">M<sub>SQaLe</sub></span> issues several in 85% of its rounds, 5.5 calls per round of which 4.4 are distinct. The environment caps rounds, not calls, so batching lets the model inspect more of the database within the same budget. The other two GRPO runs picked up the habit less cleanly.</p>
+      <p><span class="m">M<sub>SQaLe</sub></span> also learned to batch its tool calls. The prompt asks for a single JSON object per reply, and we neither encouraged nor limited multiple calls; the environment simply runs every call it finds. During training, rounds per episode stay between 5.6 and 6.8 (Figure&nbsp;7). Tool calls per episode stay near six for the first 800 steps, spike twice, and then climb steadily from step 954 to an average of 19.3 over steps 1,300 to 1,658. In the same evaluation, the untrained Qwen3.5-2B never issues more than one call per round on full schemas. <span class="m">M<sub>SQaLe</sub></span> issues several in 85% of its rounds, 5.5 calls per round of which 4.4 are distinct. The environment caps rounds, not calls, so batching lets the model inspect more of the database within the same budget. The other two GRPO runs picked up the habit less cleanly.</p>
 
       <figure class="fig wide" id="fig-train-shape" aria-labelledby="cap-8">
         <div class="fig-body">
@@ -1528,7 +1510,7 @@ mark.ep-lit { background: var(--accent-soft); color: var(--fg); box-shadow: 0 0 
             <div class="chart tr" id="tr-shape" tabindex="0" role="img" aria-label="Line chart over 1,800 training steps. Rounds per episode stay between 5.6 and 6.8. Tool calls per episode stay near 6 until step 800, spike twice, climb from step 954 and average 19.3 from step 1,300. Steps after 1,658 were not reported."><div class="tip" id="tr-shape-tip" hidden role="status"></div></div>
           </div>
         </div>
-        <figcaption id="cap-8"><b>Figure 8.</b> Rounds and tool calls per episode during GRPO training on SQaLe (same run as Figure&nbsp;4). The round limit never changes, so the growth in tool calls is growth in calls per round. The run trained for 1,800 steps; the reporting tool missed its updates after step 1,658, so the curves end there. Hover over a chart, or focus it and use the arrow keys, for the values at a step. Data: <a href="assets/training/26640986-Outcome-mix.csv" target="_blank" rel="noopener">outcome mix</a> and <a href="assets/training/26640986-Episode-shape.csv" target="_blank" rel="noopener">episode shape</a> (CSV).</figcaption>
+        <figcaption id="cap-8"><b>Figure 7.</b> Rounds and tool calls per episode during GRPO training on SQaLe (run 26640986). The round limit never changes, so the growth in tool calls is growth in calls per round. The run trained for 1,800 steps; the reporting tool missed its updates after step 1,658, so the curves end there. Hover over a chart, or focus it and use the arrow keys, for the values at a step. Data: <a href="assets/training/26640986-Episode-shape.csv" target="_blank" rel="noopener">episode shape</a> (CSV).</figcaption>
       </figure>
     </section>
 
@@ -1561,7 +1543,7 @@ mark.ep-lit { background: var(--accent-soft); color: var(--fg); box-shadow: 0 0 
             <div class="mpanel" id="literals"></div>
           </div>
         </div>
-        <figcaption id="cap-9"><b>Figure 9.</b> Top, the three trained models at three schema sizes: the gold tables only, the gold tables plus 32 distractor tables, and the full schema. The toggle switches between accuracy and the share of episodes in which the model opened every gold table. Bottom, how many of the literals its answer needs each model has seen before it submits.</figcaption>
+        <figcaption id="cap-9"><b>Figure 8.</b> Top, the three trained models at three schema sizes: the gold tables only, the gold tables plus 32 distractor tables, and the full schema. The toggle switches between accuracy and the share of episodes in which the model opened every gold table. Bottom, how many of the literals its answer needs each model has seen before it submits.</figcaption>
       </figure>
 
       <h3>Domains</h3>
@@ -1586,7 +1568,7 @@ mark.ep-lit { background: var(--accent-soft); color: var(--fg); box-shadow: 0 0 
       <ol class="notes-list">
         <li id="sn-1"><span>On 158 BIRD dev questions (225 judge calls), 94.5% of the queries the judge accepts are aligned with the question. The judge agrees with human labels 86.2% of the time (κ&nbsp;=&nbsp;0.68).<a class="back" href="#snr-1" aria-label="Back to note 1 in the text">↩</a></span></li>
         <li id="sn-2"><span>The schema is withheld. The model explores the database through tools, the five used in answering plus <code>foreign_keys</code> and <code>join_path</code>. The reward is tiered (correct result, then executes, then parses, then nothing), and partial credit never ranks a wrong query above a correct one.<a class="back" href="#snr-2" aria-label="Back to note 2 in the text">↩</a></span></li>
-        <li id="sn-3"><span>The episodes come from the full-schema condition of an earlier schema-size evaluation on 108 questions, not the 300-question evaluation behind Figures&nbsp;5 and&nbsp;9. Their questions use the evidence-supported phrasing, so each comes with a short evidence note.<a class="back" href="#snr-3" aria-label="Back to note 3 in the text">↩</a></span></li>
+        <li id="sn-3"><span>The episodes come from the full-schema condition of an earlier schema-size evaluation on 108 questions, not the 300-question evaluation behind Figures&nbsp;4 and&nbsp;8. Their questions use the evidence-supported phrasing, so each comes with a short evidence note.<a class="back" href="#snr-3" aria-label="Back to note 3 in the text">↩</a></span></li>
         <li id="sn-4"><span>The domain split covers 108 schemas. That sample is too small to call the difference between the two gaps significant.<a class="back" href="#snr-4" aria-label="Back to note 4 in the text">↩</a></span></li>
       </ol>
     </section>
@@ -1728,24 +1710,15 @@ mark.ep-lit { background: var(--accent-soft); color: var(--fg); box-shadow: 0 0 
       row.forEach(function (v) { el('td', null, r, v); });
     });
 
-    var strip = document.getElementById('schema-strip');
     var goldNames = sc.gold.map(function (i) { return sc.tables[i]; });
-    sc.tables.forEach(function (name, i) {
-      el('span', { class: 'cell' + (sc.gold.indexOf(i) >= 0 ? ' is-gold' : ''), title: name }, strip);
-    });
-    strip.setAttribute('aria-label', sc.tables.length + ' tables in the schema; the gold SQL uses ' + goldNames.length + ': ' + goldNames.join(', '));
     document.getElementById('strip-label').textContent = 'Schema · ' + sc.tables.length + ' tables';
-    var key = document.getElementById('strip-key');
-    var k1 = el('span', null, key);
-    el('i', { class: 'cell is-gold' }, k1);
-    var k1t = el('span', { class: 'k-txt' }, k1, 'used by the gold SQL (' + goldNames.length + '): ');
+    var usedLine = document.getElementById('schema-used');
+    usedLine.appendChild(document.createTextNode('The gold SQL uses ' + goldNames.length + ' of them: '));
     goldNames.forEach(function (n, j) {
-      el('code', null, k1t, n);
-      if (j < goldNames.length - 1) k1t.appendChild(document.createTextNode(', '));
+      el('code', null, usedLine, n);
+      var sep = j === goldNames.length - 1 ? '.' : j === goldNames.length - 2 ? ' and ' : ', ';
+      usedLine.appendChild(document.createTextNode(sep));
     });
-    var k2 = el('span', null, key);
-    el('i', { class: 'cell' }, k2);
-    k2.appendChild(document.createTextNode('other tables (' + (sc.tables.length - goldNames.length) + ')'));
   }
 
   function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
@@ -1920,7 +1893,7 @@ mark.ep-lit { background: var(--accent-soft); color: var(--fg); box-shadow: 0 0 
     });
   }
 
-  /* ---------- Figures 5 and 6: matrix, size/compute ---------- */
+  /* ---------- Figures 4 and 5: matrix, size/compute ---------- */
   function buildMatrix() {
     var t = document.getElementById('matrix-table');
     var head = el('tr', null, el('thead', null, t));
@@ -2112,7 +2085,7 @@ mark.ep-lit { background: var(--accent-soft); color: var(--fg); box-shadow: 0 0 
     });
   }
 
-  /* ---------- Figure 9: what SQaLe teaches ---------- */
+  /* ---------- Figure 8: what SQaLe teaches ---------- */
   var scaleBars = [];
   var SCALE_SUB = ['Execution accuracy (%) at three schema sizes', 'Share of episodes in which the model opened every gold table (%) at three schema sizes'];
   function barRow(parent, name, value, decimals) {
@@ -2165,18 +2138,17 @@ mark.ep-lit { background: var(--accent-soft); color: var(--fg); box-shadow: 0 0 
     scaleRow(lit);
   }
 
-  /* ---------- Figure 7: episodes ---------- */
+  /* ---------- Figure 6: episodes ---------- */
   function buildEpisode() {
     var E = D.episodes;
     if (!E || !E.length) return;
     var tabsEl = document.getElementById('ep-tabs');
     var rail = document.getElementById('ep-rail');
-    var strip = document.getElementById('ep-strip');
     var callsEl = document.getElementById('ep-calls');
     var prev = document.getElementById('ep-prev');
     var next = document.getElementById('ep-next');
     var play = document.getElementById('ep-play');
-    var cur = 0, round = 0, cells = [], steps = [], timer = null;
+    var cur = 0, round = 0, steps = [], timer = null;
     var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     function plural(n, one, many) { return n + ' ' + (n === 1 ? one : many); }
@@ -2247,10 +2219,6 @@ mark.ep-lit { background: var(--accent-soft); color: var(--fg); box-shadow: 0 0 
       hint.textContent = '';
       el('span', { class: 'label' }, hint, 'Evidence');
       hint.appendChild(document.createTextNode(ep.hint));
-      document.getElementById('ep-map-label').textContent = 'Schema · ' + ep.nTables + ' tables';
-
-      strip.textContent = '';
-      cells = ep.tables.map(function (name) { return el('span', { class: 'cell', title: name }, strip); });
 
       rail.textContent = '';
       rail.style.setProperty('--n', ep.rounds.length);
@@ -2285,23 +2253,6 @@ mark.ep-lit { background: var(--accent-soft); color: var(--fg); box-shadow: 0 0 
       });
       document.getElementById('ep-round').setAttribute('aria-labelledby', 'ep-step-' + k);
       if (focus) steps[k].focus();
-
-      /* schema map: inspected up to this round, ringed for this round */
-      var seen = {}, now = {};
-      for (var j = 0; j <= k; j++) ep.rounds[j].calls.forEach(function (c) {
-        c.t.forEach(function (t) { seen[t] = 1; if (j === k) now[t] = 1; });
-      });
-      var used = {};
-      if (last) ep.final.used.forEach(function (t) { used[t] = 1; });
-      cells.forEach(function (c, i) {
-        c.className = 'cell' + (used[i] ? ' is-used' : seen[i] ? ' is-seen' : '') + (now[i] ? ' is-now' : '');
-      });
-      var nSeen = Object.keys(seen).length;
-      var count = 'Inspected ' + nSeen + ' of ' + ep.nTables + ' tables';
-      if (last) count += ' · the final SQL uses ' + ep.final.used.length;
-      document.getElementById('ep-count').textContent = count;
-      strip.setAttribute('aria-label', ep.nTables + ' tables in the schema. ' + count + ': ' +
-        Object.keys(seen).map(function (i) { return ep.tables[i]; }).join(', '));
 
       var distinct = rd.calls.length;
       var nTool = ep.rounds.filter(function (r) { return !r.forced; }).length;
@@ -2380,21 +2331,8 @@ mark.ep-lit { background: var(--accent-soft); color: var(--fg); box-shadow: 0 0 
     pick(0, false);
   }
 
-  /* ---------- Figures 4 and 8: training curves ---------- */
+  /* ---------- Figure 7: training curves ---------- */
   var TRAIN = {
-    'tr-outcome': {
-      smooth: 9,  /* centred moving average over 9 reported steps (54 training steps) */
-      smoothExclude: [1658],  /* logged twice with diverging values; shown raw only */
-      yMax: 0.8, yTicks: [0, 0.2, 0.4, 0.6, 0.8],
-      yFmt: function (v) { return Math.round(v * 100) + '%'; },
-      tipFmt: function (v) { return fmt(v * 100, 1) + '%'; },
-      series: [
-        { key: 'equivalent', label: 'returns the gold result', cls: 'tr-sqale', dot: 'f-sqale', lg: 'lg-sqale', strong: true },
-        { key: 'executable', label: 'executes, wrong result', cls: 'tr-ink', dot: 'f-ink', lg: '' },
-        { key: 'invalid', label: 'invalid', cls: 'tr-muted', dot: 'f-muted', lg: 'lg-muted' },
-        { key: 'parsable', label: 'only parses', cls: 'tr-dash', dot: 'f-dot', lg: 'lg-dash' }
-      ]
-    },
     'tr-shape': {
       yMax: 25, yTicks: [0, 5, 10, 15, 20, 25],
       yFmt: function (v) { return String(v); },
@@ -2611,7 +2549,7 @@ mark.ep-lit { background: var(--accent-soft); color: var(--fg); box-shadow: 0 0 
   buildTrainLegends();
   buildCite();
   buildToc();
-  function drawAll() { drawPipeline(); drawCompare(); drawPareto(); drawTrain('tr-outcome'); drawTrain('tr-shape'); }
+  function drawAll() { drawPipeline(); drawCompare(); drawPareto(); drawTrain('tr-shape'); }
   drawAll();
 
   var widths = new WeakMap();
@@ -2624,10 +2562,10 @@ mark.ep-lit { background: var(--accent-soft); color: var(--fg); box-shadow: 0 0 
         if (e.target.id === 'pipeline') drawPipeline();
         else if (e.target.id === 'compare-plot') drawCompare();
         else if (e.target.id === 'pareto-plot') drawPareto();
-        else if (e.target.id === 'tr-outcome' || e.target.id === 'tr-shape') drawTrain(e.target.id);
+        else if (e.target.id === 'tr-shape') drawTrain(e.target.id);
       });
     });
-    ['pipeline', 'compare-plot', 'pareto-plot', 'tr-outcome', 'tr-shape'].forEach(function (id) { ro.observe(document.getElementById(id)); });
+    ['pipeline', 'compare-plot', 'pareto-plot', 'tr-shape'].forEach(function (id) { ro.observe(document.getElementById(id)); });
   } else {
     window.addEventListener('resize', drawAll);
   }

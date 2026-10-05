@@ -104,11 +104,9 @@ Figure 3 compares schema size across four datasets. The median SQaLe schema has 
 
 To isolate the effect of the data, we train Qwen3.5-2B with GRPO directly from the base checkpoint three times, once each on SQaLe, SynSQL-2.5M and BIRD train. We call the results M_SQaLe (Qwen3.5-2B trained with GRPO on SQaLe), M_SynSQL and M_BIRD. Apart from the training data and the strength of a length curriculum, the base model, environment, tools, reward, steps, batch size and evaluation are identical. There are no distilled traces, no teacher and no test-time scaffolding.[^2]
 
-**Figure 4. Outcome of the rollouts during training.** Over the first 30 steps, 43% of rollouts end without a query that parses and 12% return the gold result. Over the last 200 reported steps, under 1% are invalid and 45% return the gold result. The run (26640986) trained for 1,800 steps; the reporting tool missed its updates after step 1,658. Data: [outcome mix (CSV)](https://trl-lab.github.io/sqale/assets/training/26640986-Outcome-mix.csv) and [episode shape (CSV)](https://trl-lab.github.io/sqale/assets/training/26640986-Episode-shape.csv).
+On the SQaLe test set (Figure 4), M_SQaLe reaches 66.3%, which is 27.6 points above the untrained model and 9.7 points behind Qwen3.6-27B. Training on BIRD adds 15.3 points and training on SynSQL 12.0. On BIRD, M_SQaLe reaches 52.3% against 54.7% for M_BIRD, which was trained on BIRD itself. On EHRSQL the two are tied at 23.7%.
 
-On the SQaLe test set (Figure 5), M_SQaLe reaches 66.3%, which is 27.6 points above the untrained model and 9.7 points behind Qwen3.6-27B. Training on BIRD adds 15.3 points and training on SynSQL 12.0. On BIRD, M_SQaLe reaches 52.3% against 54.7% for M_BIRD, which was trained on BIRD itself. On EHRSQL the two are tied at 23.7%.
-
-**Figure 5. Execution accuracy (%) by training corpus**, on 300 SQaLe test questions, BIRD and EHRSQL.
+**Figure 4. Execution accuracy (%) by training corpus**, on 300 SQaLe test questions, BIRD and EHRSQL.
 
 | Model | SQaLe test | BIRD | EHRSQL |
 |---|--:|--:|--:|
@@ -118,9 +116,9 @@ On the SQaLe test set (Figure 5), M_SQaLe reaches 66.3%, which is 27.6 points ab
 | Qwen3.5-2B (untrained base model) | 38.7 | 19.3 | 8.2 |
 | Qwen3.6-27B (untrained, 27B parameters) | 76.0 | 69.3 | 55.0 |
 
-Figure 6 compares cost. All models run in the same agentic harness on 100 moderate SQaLe test questions. M_SQaLe reaches 52% at 224 TFLOPs per question, and Qwen3.5-27B reaches 63% at 1,710 TFLOPs. Among general-purpose models in the 9–12B range, only Qwen3.5-9B (58%) is ahead of M_SQaLe.
+Figure 5 compares cost. All models run in the same agentic harness on 100 moderate SQaLe test questions. M_SQaLe reaches 52% at 224 TFLOPs per question, and Qwen3.5-27B reaches 63% at 1,710 TFLOPs. Among general-purpose models in the 9–12B range, only Qwen3.5-9B (58%) is ahead of M_SQaLe.
 
-**Figure 6. Accuracy against model size**, 100 moderate SQaLe test questions, all models in the same agentic harness.
+**Figure 5. Accuracy against model size**, 100 moderate SQaLe test questions, all models in the same agentic harness.
 
 | Model | Parameters (B) | Accuracy (%) | TFLOPs per question |
 |---|--:|--:|--:|
@@ -152,9 +150,9 @@ Figure 6 compares cost. All models run in the same agentic harness on 100 modera
 
 ## How the model answers
 
-M_SQaLe never sees the schema. In each round it writes a short plan and then emits one or more tool calls. The environment runs every call, returns all the results in one message and reports how many rounds are left before the model has to answer. Figure 7 replays three of its episodes on full schemas of 106 to 239 tables, and all three end with a correct answer.[^3]
+M_SQaLe never sees the schema. In each round it writes a short plan and then emits one or more tool calls. The environment runs every call, returns all the results in one message and reports how many rounds are left before the model has to answer. Figure 6 replays three of its episodes on full schemas of 106 to 239 tables, and all three end with a correct answer.[^3]
 
-**Figure 7. Three real episodes of M_SQaLe on full SQaLe schemas, with the schema withheld.** Identical calls within a round are listed once.
+**Figure 6. Three real episodes of M_SQaLe on full SQaLe schemas, with the schema withheld.** Identical calls within a round are listed once.
 
 **Shipping rates** · `schema_002386`, 239 tables · simple question · answered correctly
 
@@ -193,9 +191,9 @@ M_SQaLe never sees the schema. In each round it writes a short plan and then emi
 
 All three episodes start the same way. The first round lists the tables, and the next one or two rounds inspect the few tables that match the question, with four to nine distinct calls in a round. The model then drafts a query and checks its output. The first two episodes end with `submit_sql`. The third keeps checking until the six rounds run out, and then the environment asks for the SQL as text. Most episodes end this way: in the 108-question evaluation these episodes come from, 84 of the 108 full-schema episodes reach the round limit.
 
-M_SQaLe also learned to batch its tool calls. The prompt asks for a single JSON object per reply, and we neither encouraged nor limited multiple calls; the environment simply runs every call it finds. During training, rounds per episode stay between 5.6 and 6.8 (Figure 8). Tool calls per episode stay near six for the first 800 steps, spike twice, and then climb steadily from step 954 to an average of 19.3 over steps 1,300 to 1,658. In the same evaluation, the untrained Qwen3.5-2B never issues more than one call per round on full schemas. M_SQaLe issues several in 85% of its rounds, 5.5 calls per round of which 4.4 are distinct. The environment caps rounds, not calls, so batching lets the model inspect more of the database within the same budget. The other two GRPO runs picked up the habit less cleanly.
+M_SQaLe also learned to batch its tool calls. The prompt asks for a single JSON object per reply, and we neither encouraged nor limited multiple calls; the environment simply runs every call it finds. During training, rounds per episode stay between 5.6 and 6.8 (Figure 7). Tool calls per episode stay near six for the first 800 steps, spike twice, and then climb steadily from step 954 to an average of 19.3 over steps 1,300 to 1,658. In the same evaluation, the untrained Qwen3.5-2B never issues more than one call per round on full schemas. M_SQaLe issues several in 85% of its rounds, 5.5 calls per round of which 4.4 are distinct. The environment caps rounds, not calls, so batching lets the model inspect more of the database within the same budget. The other two GRPO runs picked up the habit less cleanly.
 
-**Figure 8. Rounds and tool calls per episode during GRPO training on SQaLe** (same run as Figure 4). The round limit never changes, so the growth in tool calls is growth in calls per round. Data: [episode shape (CSV)](https://trl-lab.github.io/sqale/assets/training/26640986-Episode-shape.csv).
+**Figure 7. Rounds and tool calls per episode during GRPO training on SQaLe** (run 26640986). The round limit never changes, so the growth in tool calls is growth in calls per round. The run trained for 1,800 steps; the reporting tool missed its updates after step 1,658, so the curves end there. Data: [episode shape (CSV)](https://trl-lab.github.io/sqale/assets/training/26640986-Episode-shape.csv).
 
 ## What a small model learns
 
@@ -205,7 +203,7 @@ The three trained models differ only in their training data, so differences in h
 
 Accuracy falls for every model as the schema grows, and M_SQaLe leads at every size, from 72.7% with only the gold tables to 66.3% on the full schema. With only the gold tables present, all three models open every gold table in at least 95% of episodes. On the full schema, M_SQaLe opens every gold table in 89.7% of episodes, against 85.0% for M_BIRD and 83.3% for M_SynSQL. BIRD and SynSQL training schemas have a median of 5 and 10 tables, so models trained on them never have to search.
 
-**Figure 9 (top). Execution accuracy (%) at three schema sizes**, with the share of episodes in which the model opened every gold table (%) in brackets.
+**Figure 8 (top). Execution accuracy (%) at three schema sizes**, with the share of episodes in which the model opened every gold table (%) in brackets.
 
 | Tables in the database | M_SQaLe | M_BIRD | M_SynSQL |
 |---|--:|--:|--:|
@@ -217,7 +215,7 @@ Accuracy falls for every model as the schema grows, and M_SQaLe leads at every s
 
 Before submitting, M_SQaLe has seen 88% of the string literals its answer depends on. M_SynSQL has seen 55%, M_BIRD 40% and the untrained model 35%. SynSQL's tables hold a median of 2 rows, and SQaLe's hold 69.
 
-**Figure 9 (bottom). String literals seen before submitting:** the share of the string literals the answer depends on that the model saw in tool output.
+**Figure 8 (bottom). String literals seen before submitting:** the share of the string literals the answer depends on that the model saw in tool output.
 
 | Model | Literals seen (%) |
 |---|--:|
@@ -255,7 +253,7 @@ If you use SQaLe, please cite this paper and the earlier workshop paper.
 
 [^1]: On 158 BIRD dev questions (225 judge calls), 94.5% of the queries the judge accepts are aligned with the question. The judge agrees with human labels 86.2% of the time (κ = 0.68).
 [^2]: The schema is withheld. The model explores the database through tools, the five used in answering plus `foreign_keys` and `join_path`. The reward is tiered (correct result, then executes, then parses, then nothing), and partial credit never ranks a wrong query above a correct one.
-[^3]: The episodes come from the full-schema condition of an earlier schema-size evaluation on 108 questions, not the 300-question evaluation behind Figures 5 and 9. Their questions use the evidence-supported phrasing, so each comes with a short evidence note.
+[^3]: The episodes come from the full-schema condition of an earlier schema-size evaluation on 108 questions, not the 300-question evaluation behind Figures 4 and 8. Their questions use the evidence-supported phrasing, so each comes with a short evidence note.
 [^4]: The domain split covers 108 schemas. That sample is too small to call the difference between the two gaps significant.
 
 Contact: {cornelius.wolff, daniel.gomm, madelon.hulsebos}@cwi.nl. Website content MIT licensed.
