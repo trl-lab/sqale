@@ -758,7 +758,9 @@ h1, h2, h3, h4 { text-wrap: balance; margin: 0; }
    costs the masthead no height. Narrower, it gets a row of its own. */
 @media (min-width: 1000px) {
   .masthead > .theme, .masthead > .mast-title { grid-row: 1; }
-  .masthead > .theme { align-self: start; margin-block: 0; }
+  /* The title shares the row and its box spans the full width, so the switch has
+     to be lifted above it or the h1 swallows the clicks. */
+  .masthead > .theme { align-self: start; margin-block: 0; position: relative; z-index: 1; }
 }
 
 /* ---------- masthead ---------- */
