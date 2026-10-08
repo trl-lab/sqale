@@ -3,6 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script>
+/* Apply a saved theme choice before first paint. With no saved choice the page
+   follows the browser's colour scheme, which is what the CSS below does. */
+(function () {
+  try {
+    var t = localStorage.getItem('sqale-theme');
+    if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+  } catch (e) { /* storage blocked */ }
+})();
+</script>
 <title>SQaLe: a large realistic dataset for small text-to-SQL models</title>
 <meta name="description" content="SQaLe is a semi-synthetic text-to-SQL dataset of 1,408,056 questions paired with SQL over 9,259 real-world schemas. A Qwen3.5-2B model trained on it with GRPO rises from 38.7% to 66.3% execution accuracy on the SQaLe test set.">
 <link rel="canonical" href="https://trl-lab.github.io/sqale/">
@@ -583,6 +593,7 @@
   --kw: #687079;
   --str: #8a5a10;
   --shadow: rgba(31, 35, 40, 0.12);
+  color-scheme: light;
 
   --serif: "Newsreader", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
   --sans: "Hanken Grotesk", "Helvetica Neue", Arial, system-ui, sans-serif;
@@ -709,6 +720,45 @@ h1, h2, h3, h4 { text-wrap: balance; margin: 0; }
 }
 @media (max-width: 559.98px) {
   :root { --fs-body: 1.125rem; --fs-lede: 1.1875rem; --fs-h2: 1.5625rem; --fs-h3: 1.1875rem; }
+}
+
+/* ---------- theme switch ---------- */
+/* Three states: auto follows the browser, light and dark override it. */
+.theme {
+  grid-column: text-start / margin-end;
+  justify-self: end;
+  margin-block: -0.75rem -1.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.15rem;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  background: var(--surface);
+}
+.theme-btn {
+  appearance: none;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  font-family: var(--sans);
+  font-size: var(--fs-label);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  line-height: 1;
+}
+.theme-btn:hover { color: var(--fg); }
+.theme-btn[aria-pressed="true"] { background: var(--raised); color: var(--accent); box-shadow: 0 1px 3px var(--shadow); }
+.theme-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+/* Wide enough for the switch to sit in the empty space beside the title, so it
+   costs the masthead no height. Narrower, it gets a row of its own. */
+@media (min-width: 1000px) {
+  .masthead > .theme, .masthead > .mast-title { grid-row: 1; }
+  .masthead > .theme { align-self: start; margin-block: 0; }
 }
 
 /* ---------- masthead ---------- */
@@ -905,6 +955,49 @@ h1, h2, h3, h4 { text-wrap: balance; margin: 0; }
   color: var(--muted); padding-top: 0.28rem; font-variant-numeric: tabular-nums;
 }
 .stages strong { font-weight: 600; }
+
+/* ---------- foldable detail ---------- */
+/* Secondary material behind a small button: the heading and the surrounding
+   prose stay, the figure and the long detail open on demand. */
+details.fold > summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  width: fit-content;
+  cursor: pointer;
+  list-style: none;
+  font-family: var(--sans);
+  font-size: var(--fs-small);
+  font-weight: 600;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-line);
+  border-radius: 999px;
+  padding: 0.35rem 0.9rem;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+details.fold > summary::-webkit-details-marker { display: none; }
+details.fold > summary::marker { content: ""; }
+details.fold > summary:hover { background: var(--bg); border-color: var(--accent); }
+details.fold > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.fold-chev {
+  width: 0.6rem; height: 0.6rem; flex: none;
+  fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;
+  transition: transform 0.15s;
+}
+details.fold[open] > summary .fold-chev { transform: rotate(90deg); }
+.fold-hide { display: none; }
+details.fold[open] .fold-show { display: none; }
+details.fold[open] .fold-hide { display: inline; }
+/* The folded content keeps the section's vertical rhythm. Figures inside it are
+   no longer items of the section grid, so they drop the subgrid for one column. */
+.fold-inner { display: grid; row-gap: 1.15rem; margin-top: 1.15rem; }
+.fold-inner > * { min-width: 0; }
+.fold-inner .fig { grid-template-columns: minmax(0, 1fr); margin-top: 0; }
+.fold-inner .fig > .fig-body, .fold-inner .fig > figcaption { grid-column: 1 / -1; }
+@media (prefers-reduced-motion: reduce) {
+  details.fold > summary, .fold-chev { transition: none; }
+}
 
 /* ---------- figures ---------- */
 .fig {
@@ -1279,6 +1372,11 @@ mark.ep-lit { background: var(--accent-soft); color: var(--fg); box-shadow: 0 0 
 <div class="page">
 
 <header class="masthead">
+  <div class="theme" id="theme" role="group" aria-label="Colour theme">
+    <button type="button" class="theme-btn" data-set="auto" aria-pressed="true">Auto</button>
+    <button type="button" class="theme-btn" data-set="light" aria-pressed="false">Light</button>
+    <button type="button" class="theme-btn" data-set="dark" aria-pressed="false">Dark</button>
+  </div>
   <div class="mast-title">
     <h1 class="title">SQaLe</h1>
     <p class="deck">A large realistic dataset to empower small specialised text-to-SQL models</p>
@@ -1394,20 +1492,25 @@ mark.ep-lit { background: var(--accent-soft); color: var(--fg); box-shadow: 0 0 
 
     <section class="sec" id="built" aria-labelledby="h-built">
       <h2 id="h-built">How it is built</h2>
-      <p>The pipeline runs in five stages, and every stage is validated by execution. Value synthesis repairs rows that break key constraints, and answering sends failed or rejected queries back to the agent.</p>
+      <details class="fold" id="fold-built">
+        <summary><svg class="fold-chev" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.5 1.2 7.3 5 3.5 8.8"/></svg><span class="fold-show">Show how it is built</span><span class="fold-hide">Hide how it is built</span></summary>
+        <div class="fold-inner">
+          <p>The pipeline runs in five stages, and every stage is validated by execution. Value synthesis repairs rows that break key constraints, and answering sends failed or rejected queries back to the agent.</p>
 
-      <figure class="fig wide" id="fig-pipeline" aria-labelledby="cap-2">
-        <div class="fig-body"><div class="chart" id="pipeline" role="img" aria-label="The five pipeline stages from left to right: schema collection and extension, value synthesis, question generation, style variation, agentic answering and judging. Value synthesis has a repair loop; answering has return loops for execution errors and for queries the judge rejects."></div></div>
-        <figcaption id="cap-2"><b>Figure 2.</b> The generation pipeline. Return arrows mark the repair loop in value synthesis and the two feedback loops in answering.</figcaption>
-      </figure>
+          <figure class="fig wide" id="fig-pipeline" aria-labelledby="cap-2">
+            <div class="fig-body"><div class="chart" id="pipeline" role="img" aria-label="The five pipeline stages from left to right: schema collection and extension, value synthesis, question generation, style variation, agentic answering and judging. Value synthesis has a repair loop; answering has return loops for execution errors and for queries the judge rejects."></div></div>
+            <figcaption id="cap-2"><b>Figure 2.</b> The generation pipeline. Return arrows mark the repair loop in value synthesis and the two feedback loops in answering.</figcaption>
+          </figure>
 
-      <ol class="stages">
-        <li><div><strong>Schema collection and extension.</strong> SchemaPile provides real-world schemas from permissively licensed GitHub repositories. A tool-using agent annotates each of the 14,597 source repositories with a domain description. An LLM then extends each schema with tables that keep its naming conventions, normalisation level and foreign-key style.</div></li>
-        <li><div><strong>Value synthesis.</strong> Tables are filled in foreign-key dependency order. For each table the LLM writes a Python function from its DDL, its original rows, the allowed foreign-key values and the domain description. Fact and junction tables get more rows and a skewed key distribution, and every table is checked for primary-key uniqueness and referential integrity.</div></li>
-        <li><div><strong>Question generation.</strong> A connected subgraph of up to 20 tables is sampled along foreign keys, together with sample rows. The LLM writes questions that need every table in it, at three difficulty levels (simple, moderate, hard), with every literal grounded in the data.</div></li>
-        <li><div><strong>Style variation.</strong> Each question is rewritten into the seven styles shown in Figure&nbsp;1. All eight versions share the gold SQL.</div></li>
-        <li><div><strong>Agentic answering and judging.</strong> An agent explores the live database with tools (<code>list_tables</code>, <code>describe_table</code>, <code>sample_rows</code>, <code>distinct_values</code>, <code>run_query</code>) and commits with <code>submit_sql</code>. Execution errors go back to the agent. An LLM judge checks the result against the question and sends rejected queries back for a rewrite.<sup class="sn-ref"><a href="#sn-1" id="snr-1" aria-label="Note 1">1</a></sup></div></li>
-      </ol>
+          <ol class="stages">
+            <li><div><strong>Schema collection and extension.</strong> SchemaPile provides real-world schemas from permissively licensed GitHub repositories. A tool-using agent annotates each of the 14,597 source repositories with a domain description. An LLM then extends each schema with tables that keep its naming conventions, normalisation level and foreign-key style.</div></li>
+            <li><div><strong>Value synthesis.</strong> Tables are filled in foreign-key dependency order. For each table the LLM writes a Python function from its DDL, its original rows, the allowed foreign-key values and the domain description. Fact and junction tables get more rows and a skewed key distribution, and every table is checked for primary-key uniqueness and referential integrity.</div></li>
+            <li><div><strong>Question generation.</strong> A connected subgraph of up to 20 tables is sampled along foreign keys, together with sample rows. The LLM writes questions that need every table in it, at three difficulty levels (simple, moderate, hard), with every literal grounded in the data.</div></li>
+            <li><div><strong>Style variation.</strong> Each question is rewritten into the seven styles shown in Figure&nbsp;1. All eight versions share the gold SQL.</div></li>
+            <li><div><strong>Agentic answering and judging.</strong> An agent explores the live database with tools (<code>list_tables</code>, <code>describe_table</code>, <code>sample_rows</code>, <code>distinct_values</code>, <code>run_query</code>) and commits with <code>submit_sql</code>. Execution errors go back to the agent. An LLM judge checks the result against the question and sends rejected queries back for a rewrite.<sup class="sn-ref"><a href="#sn-1" id="snr-1" aria-label="Note 1">1</a></sup></div></li>
+          </ol>
+        </div>
+      </details>
     </section>
 
     <section class="sec" id="compares" aria-labelledby="h-compares">
@@ -1435,15 +1538,20 @@ mark.ep-lit { background: var(--accent-soft); color: var(--fg); box-shadow: 0 0 
 
      <p>On the SQaLe test set (Figure&nbsp;4), <span class="m">M<sub>SQaLe</sub></span> reaches 66.3%, which is 27.6 points above the untrained model and 9.7 points behind Qwen3.6-27B. Training on BIRD adds 15.3 points and training on SynSQL 12.0. On BIRD, <span class="m">M<sub>SQaLe</sub></span> reaches 52.3% against 54.7% for <span class="m">M<sub>BIRD</sub></span>, which was trained on BIRD itself. On EHRSQL the two are tied at 23.7%.</p>
 
-      <figure class="fig wide" id="fig-results" aria-labelledby="cap-5">
-        <div class="fig-body">
-          <div class="fig-panel">
-            <p class="panel-title">Execution accuracy (%) by training corpus</p>
-            <div class="table-wrap"><table class="tbl" id="matrix-table"></table></div>
-          </div>
+      <details class="fold" id="fold-results">
+        <summary><svg class="fold-chev" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.5 1.2 7.3 5 3.5 8.8"/></svg><span class="fold-show">Show Figure&nbsp;4: accuracy by training corpus</span><span class="fold-hide">Hide Figure&nbsp;4</span></summary>
+        <div class="fold-inner">
+          <figure class="fig wide" id="fig-results" aria-labelledby="cap-5">
+            <div class="fig-body">
+              <div class="fig-panel">
+                <p class="panel-title">Execution accuracy (%) by training corpus</p>
+                <div class="table-wrap"><table class="tbl" id="matrix-table"></table></div>
+              </div>
+            </div>
+            <figcaption id="cap-5"><b>Figure 4.</b> Execution accuracy of Qwen3.5-2B trained with GRPO on one corpus each, on 300 SQaLe test questions, BIRD and EHRSQL. Bold marks the best of the three trained models in each column.</figcaption>
+          </figure>
         </div>
-        <figcaption id="cap-5"><b>Figure 4.</b> Execution accuracy of Qwen3.5-2B trained with GRPO on one corpus each, on 300 SQaLe test questions, BIRD and EHRSQL. Bold marks the best of the three trained models in each column.</figcaption>
-      </figure>
+      </details>
 
       <p>Figure&nbsp;5 compares cost. All models run in the same agentic harness on 100 moderate SQaLe test questions. <span class="m">M<sub>SQaLe</sub></span> reaches 52% at 224 TFLOPs per question, and Qwen3.5-27B reaches 63% at 1,710 TFLOPs. Among general-purpose models in the 9–12B range, only Qwen3.5-9B (58%) is ahead of <span class="m">M<sub>SQaLe</sub></span>.</p>
 
@@ -2538,6 +2646,55 @@ mark.ep-lit { background: var(--accent-soft); color: var(--fg); box-shadow: 0 0 
     document.querySelectorAll('.sec').forEach(function (s) { io.observe(s); });
   }
 
+  /* ---------- theme switch ---------- */
+  function buildTheme() {
+    var root = document.documentElement;
+    var group = document.getElementById('theme');
+    if (!group) return;
+    var btns = Array.prototype.slice.call(group.querySelectorAll('.theme-btn'));
+    function mark(v) {
+      btns.forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-set') === v)); });
+    }
+    function apply(v) {
+      if (v === 'auto') root.removeAttribute('data-theme');
+      else root.setAttribute('data-theme', v);
+      try {
+        if (v === 'auto') localStorage.removeItem('sqale-theme');
+        else localStorage.setItem('sqale-theme', v);
+      } catch (e) { /* storage blocked */ }
+      mark(v);
+      drawAll();
+    }
+    btns.forEach(function (b) {
+      b.addEventListener('click', function () { apply(b.getAttribute('data-set')); });
+    });
+    mark(root.getAttribute('data-theme') || 'auto');
+  }
+
+  /* ---------- foldable detail ---------- */
+  function buildFolds() {
+    var folds = Array.prototype.slice.call(document.querySelectorAll('details.fold'));
+    if (!folds.length) return;
+    /* Charts inside a fold are drawn at zero width while it is closed. */
+    folds.forEach(function (d) {
+      d.addEventListener('toggle', function () { if (d.open) drawAll(); });
+    });
+    /* A link into folded content (a note back-link, a shared #hash) opens its fold. */
+    function reveal() {
+      var id = location.hash.length > 1 ? decodeURIComponent(location.hash.slice(1)) : '';
+      var t = id ? document.getElementById(id) : null;
+      if (!t || !t.closest) return;
+      var opened = false, d = t.closest('details.fold');
+      while (d) {
+        if (!d.open) { d.open = true; opened = true; }
+        d = d.parentElement ? d.parentElement.closest('details.fold') : null;
+      }
+      if (opened) setTimeout(function () { t.scrollIntoView(); }, 0);
+    }
+    window.addEventListener('hashchange', reveal);
+    reveal();
+  }
+
   /* ---------- boot ---------- */
   buildRecord();
   buildCompareTable();
@@ -2549,6 +2706,8 @@ mark.ep-lit { background: var(--accent-soft); color: var(--fg); box-shadow: 0 0 
   buildTrainLegends();
   buildCite();
   buildToc();
+  buildTheme();
+  buildFolds();
   function drawAll() { drawPipeline(); drawCompare(); drawPareto(); drawTrain('tr-shape'); }
   drawAll();
 
