@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script>
+/* Apply a saved theme choice before first paint. With no saved choice the page
+   follows the browser's colour scheme, which is what the CSS below does. */
+(function () {
+  try {
+    var t = localStorage.getItem('sqale-theme');
+    if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+  } catch (e) { /* storage blocked */ }
+})();
+</script>
+<title>How the model answers · SQaLe</title>
+<meta name="description" content="Three real episodes of M_SQaLe answering SQaLe questions on full schemas of 106 to 239 tables, with the schema withheld, replayed round by round.">
+<link rel="canonical" href="https://trl-lab.github.io/sqale/answers.html">
+<meta name="theme-color" content="#107250">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="SQaLe">
+<meta property="og:title" content="How the model answers · SQaLe">
+<meta property="og:description" content="Three real episodes of M_SQaLe answering SQaLe questions on full schemas of 106 to 239 tables, with the schema withheld, replayed round by round.">
+<meta property="og:url" content="https://trl-lab.github.io/sqale/answers.html">
+<meta property="og:image" content="https://trl-lab.github.io/sqale/assets/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..700;1,6..72,300..700&family=Hanken+Grotesk:wght@400..700&family=JetBrains+Mono:wght@400..600&display=swap">
+<link rel="stylesheet" href="assets/site.css">
+<!-- 100% privacy-first analytics -->
+<script async src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
+</head>
+<body>
+<a class="skip" href="#article">Skip to article</a>
+<div class="page">
+
+<header class="masthead sub">
+  <div class="theme" id="theme" role="group" aria-label="Colour theme">
+    <button type="button" class="theme-btn" data-set="auto" aria-pressed="true">Auto</button>
+    <button type="button" class="theme-btn" data-set="light" aria-pressed="false">Light</button>
+    <button type="button" class="theme-btn" data-set="dark" aria-pressed="false">Dark</button>
+  </div>
+  <div class="mast-title">
+  <div class="mast-title">
+    <p class="crumb"><a href="./">← SQaLe</a></p>
+    <h1 class="title sub-title" id="h-episode">How the model answers</h1>
+    <p class="deck sub-deck">Three real episodes, replayed round by round, on schemas of 106 to 239 tables.</p>
+  </div>
+</header>
+
+<div class="layout">
+  <main class="article" id="article">
+
+    <section class="sec" id="episode" aria-labelledby="h-episode">
+      <p>Answering a SQaLe question means finding the few tables it needs among hundreds. <span class="m">M<sub>SQaLe</sub></span> never sees the schema. In each round it writes a short plan and then emits one or more tool calls. The environment runs every call, returns all the results in one message and reports how many rounds are left before the model has to answer. Figure&nbsp;1 replays three of its episodes on full schemas of 106 to 239 tables, and all three end with a correct answer.<sup class="sn-ref"><a href="#sn-1" id="snr-1" aria-label="Note 1">1</a></sup></p>
+
+      <figure class="fig wide" id="fig-episode" aria-labelledby="cap-1">
+        <div class="fig-body ep">
+          <div class="ep-pick" role="tablist" aria-label="Episode" id="ep-tabs"></div>
+          <div class="ep-q">
+            <p class="rec-meta" id="ep-meta"></p>
+            <p class="q-text" id="ep-question"></p>
+            <p class="ep-hint" id="ep-hint"></p>
+          </div>
+          <ol class="ep-rail" role="tablist" aria-label="Rounds" id="ep-rail"></ol>
+          <div class="ep-bar">
+            <p class="ep-status" id="ep-status"></p>
+            <div class="ep-ctrl">
+              <button type="button" class="ep-btn" id="ep-prev">Previous</button>
+              <button type="button" class="ep-btn" id="ep-play" aria-pressed="false">Play</button>
+              <button type="button" class="ep-btn" id="ep-next">Next</button>
+            </div>
+          </div>
+          <div class="ep-round" id="ep-round" role="tabpanel">
+            <div class="ep-think">
+              <span class="label">Reasoning, abridged</span>
+              <p id="ep-think"></p>
+            </div>
+            <div class="ep-calls" id="ep-calls"></div>
+            <p class="ep-budget" id="ep-budget"></p>
+          </div>
+          <p class="ep-note" id="ep-note"></p>
+        </div>
+        <figcaption id="cap-1"><b>Figure 1.</b> Three real episodes of <span class="m">M<sub>SQaLe</sub></span> on full SQaLe schemas, with the schema withheld. Pick an episode and step through its rounds. Each round shows the model’s reasoning and every tool call it issued in that round, with the output it got back. After six rounds the environment stops the exploration and the model writes its final SQL as text. Reasoning is abridged to verbatim excerpts, identical calls within a round are shown once with a count, and long outputs are clipped.</figcaption>
+      </figure>
+
+      <p>All three episodes start the same way. The first round lists the tables, and the next one or two rounds inspect the few tables that match the question, with four to nine distinct calls in a round. The model then drafts a query and checks its output. The first two episodes end with <code>submit_sql</code>. The third keeps checking until the six rounds run out, and then the environment asks for the SQL as text. Most episodes end this way: in the 108-question evaluation these episodes come from, 84 of the 108 full-schema episodes reach the round limit.</p>
+
+      <p><span class="m">M<sub>SQaLe</sub></span> also learned to batch its tool calls. The prompt asks for a single JSON object per reply, and we neither encouraged nor limited multiple calls; the environment simply runs every call it finds. During training, rounds per episode stay between 5.6 and 6.8. Tool calls per episode stay near six for the first 800 steps, spike twice, and then climb steadily from step 954 to an average of 19.3 over steps 1,300 to 1,658. In the same evaluation, the untrained Qwen3.5-2B never issues more than one call per round on full schemas. <span class="m">M<sub>SQaLe</sub></span> issues several in 85% of its rounds, 5.5 calls per round of which 4.4 are distinct. The environment caps rounds, not calls, so batching lets the model inspect more of the database within the same budget. The other two GRPO runs picked up the habit less cleanly.</p>
+    </section>
+
+    <section class="sec" id="notes" aria-labelledby="h-notes">
+      <h2 id="h-notes">Notes</h2>
+      <ol class="notes-list">
+        <li id="sn-1"><span>The episodes come from the full-schema condition of an earlier schema-size evaluation on 108 questions, not the 300-question evaluation behind Figures&nbsp;2 and&nbsp;4 on the <a href="index.html">project page</a>. Their questions use the evidence-supported phrasing, so each comes with a short evidence note.<a class="back" href="#snr-1" aria-label="Back to note 1 in the text">↩</a></span></li>
+      </ol>
+    </section>
+
+    <section class="sec" id="back">
+      <p class="back-link"><a href="index.html#learns">← Back to the SQaLe project page</a></p>
+    </section>
+
+  </main>
+</div>
+
+<footer class="site-foot">
+  <div class="foot-inner">
+    <div>
+      <span class="label">Affiliations</span>
+      <p><sup>1</sup> University of Amsterdam<br><sup>2</sup> Centrum Wiskunde &amp; Informatica</p>
+    </div>
+    <div>
+      <span class="label">Contact</span>
+      <p class="mail">{cornelius.wolff, daniel.gomm, madelon.hulsebos}@cwi.nl</p>
+    </div>
+    <div>
+      <span class="label">Earlier version</span>
+      <p><a href="https://arxiv.org/abs/2602.22223" target="_blank" rel="noopener">SQaLe: A Large Text-to-SQL Corpus Grounded in Real Schemas</a></p>
+      <span class="label">Text versions</span>
+      <p><a href="index.md">Markdown</a> · <a href="llms.txt">llms.txt</a> · <a href="llms-full.txt">llms-full.txt</a></p>
+      <p>Website content MIT licensed</p>
+    </div>
+  </div>
+</footer>
+
+</div>
+<script src="assets/sqale-data.js"></script>
+<script src="assets/site.js"></script>
+</body>
+</html>

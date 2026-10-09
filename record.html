@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script>
+/* Apply a saved theme choice before first paint. With no saved choice the page
+   follows the browser's colour scheme, which is what the CSS below does. */
+(function () {
+  try {
+    var t = localStorage.getItem('sqale-theme');
+    if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+  } catch (e) { /* storage blocked */ }
+})();
+</script>
+<title>A record in full · SQaLe</title>
+<meta name="description" content="One SQaLe record from the test split: the schema it was written against, the eight phrasings of its question, and the gold SQL and result they all share.">
+<link rel="canonical" href="https://trl-lab.github.io/sqale/record.html">
+<meta name="theme-color" content="#107250">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="SQaLe">
+<meta property="og:title" content="A record in full · SQaLe">
+<meta property="og:description" content="One SQaLe record from the test split: the schema it was written against, the eight phrasings of its question, and the gold SQL and result they all share.">
+<meta property="og:url" content="https://trl-lab.github.io/sqale/record.html">
+<meta property="og:image" content="https://trl-lab.github.io/sqale/assets/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..700;1,6..72,300..700&family=Hanken+Grotesk:wght@400..700&family=JetBrains+Mono:wght@400..600&display=swap">
+<link rel="stylesheet" href="assets/site.css">
+<!-- 100% privacy-first analytics -->
+<script async src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
+</head>
+<body>
+<a class="skip" href="#article">Skip to article</a>
+<div class="page">
+
+<header class="masthead sub">
+  <div class="theme" id="theme" role="group" aria-label="Colour theme">
+    <button type="button" class="theme-btn" data-set="auto" aria-pressed="true">Auto</button>
+    <button type="button" class="theme-btn" data-set="light" aria-pressed="false">Light</button>
+    <button type="button" class="theme-btn" data-set="dark" aria-pressed="false">Dark</button>
+  </div>
+  <div class="mast-title">
+  <div class="mast-title">
+    <p class="crumb"><a href="./">← SQaLe</a></p>
+    <h1 class="title sub-title" id="h-record">A record in full</h1>
+    <p class="deck sub-deck">One question, eight phrasings, one gold query — and the 87-table schema behind it.</p>
+  </div>
+</header>
+
+<div class="layout">
+  <main class="article" id="article">
+
+    <section class="sec" id="record" aria-labelledby="h-record">
+      <p>Every SQaLe record has the shape below. This one is from the test split: the schema it was written against, the eight phrasings of its question, and the gold SQL and result they all share.</p>
+
+      <figure class="fig wide" id="fig-record" aria-labelledby="cap-1">
+        <div class="fig-body record">
+          <p class="rec-meta" id="rec-meta"></p>
+          <div class="rec-grid">
+            <div class="tabs" role="tablist" aria-label="Phrasing of the question" aria-orientation="vertical" id="style-tabs"></div>
+            <div class="rec-main">
+              <div class="qstack" id="style-panels"></div>
+              <div class="blk">
+                <span class="label">Gold SQL · the same for all 8 phrasings</span>
+                <div class="code-wrap"><pre><code id="rec-sql"></code></pre></div>
+              </div>
+              <div class="blk result">
+                <span class="label" id="rec-result-label">Result</span>
+                <div class="table-wrap"><table class="tbl" id="rec-result"></table></div>
+              </div>
+            </div>
+          </div>
+          <div class="strip-wrap">
+            <span class="label" id="strip-label">Schema</span>
+            <p class="schema-used" id="schema-used"></p>
+          </div>
+        </div>
+        <figcaption id="cap-1"><b>Figure 1.</b> One record from the test split. The tabs switch between the eight phrasings of the question; the gold SQL and its one-row result stay the same for all of them.</figcaption>
+      </figure>
+
+      <p>SQaLe’s databases hold 108,708,694 synthetic rows. Tables hold a median of 69 rows, 95.2% of tables are populated, and 95.1% of foreign-key cells are valid after repair. Every literal in a question is grounded in the data, so a model has to read values as well as table and column names.</p>
+    </section>
+
+    <section class="sec" id="back">
+      <p class="back-link"><a href="index.html#dataset">← Back to the SQaLe project page</a></p>
+    </section>
+
+  </main>
+</div>
+
+<footer class="site-foot">
+  <div class="foot-inner">
+    <div>
+      <span class="label">Affiliations</span>
+      <p><sup>1</sup> University of Amsterdam<br><sup>2</sup> Centrum Wiskunde &amp; Informatica</p>
+    </div>
+    <div>
+      <span class="label">Contact</span>
+      <p class="mail">{cornelius.wolff, daniel.gomm, madelon.hulsebos}@cwi.nl</p>
+    </div>
+    <div>
+      <span class="label">Earlier version</span>
+      <p><a href="https://arxiv.org/abs/2602.22223" target="_blank" rel="noopener">SQaLe: A Large Text-to-SQL Corpus Grounded in Real Schemas</a></p>
+      <span class="label">Text versions</span>
+      <p><a href="index.md">Markdown</a> · <a href="llms.txt">llms.txt</a> · <a href="llms-full.txt">llms-full.txt</a></p>
+      <p>Website content MIT licensed</p>
+    </div>
+  </div>
+</footer>
+
+</div>
+<script src="assets/sqale-data.js"></script>
+<script src="assets/site.js"></script>
+</body>
+</html>

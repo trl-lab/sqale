@@ -10,6 +10,8 @@
 ## Project page
 
 - [SQaLe project page in Markdown](https://trl-lab.github.io/sqale/index.md): the full text of https://trl-lab.github.io/sqale/, with every figure given as a table
+- [A record in full](https://trl-lab.github.io/sqale/record.html): one record from the test split, with its schema, eight phrasings and gold SQL
+- [How the model answers](https://trl-lab.github.io/sqale/answers.html): three real episodes replayed round by round on full schemas
 - [Using SQaLe](https://trl-lab.github.io/sqale/reference.md): dataset fields, loading the data, running the models, known issues
 - [Everything in one file](https://trl-lab.github.io/sqale/llms-full.txt): the project page and the reference together
 
