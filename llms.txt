@@ -1,11 +1,15 @@
 # SQaLe
 
-> SQaLe is a large semi-synthetic text-to-SQL dataset grounded in real-world database schemas: 1,408,056 natural-language questions paired with 176,761 distinct SQL queries over 9,259 populated SQLite databases built from SchemaPile, with a median of 113 tables and 538 columns per schema. It comes from the paper "SQaLe: a large realistic dataset to empower small specialised text-to-SQL models" by Cornelius Wolff, Daniel Gomm and Madelon Hulsebos (University of Amsterdam and Centrum Wiskunde & Informatica, 2026), which also trains Qwen3.5-2B text-to-SQL agents on it with GRPO.
+> SQaLe is a large semi-synthetic text-to-SQL dataset grounded in real-world database schemas: 1,408,056 natural-language questions paired with 176,761 distinct SQL queries over 9,259 populated SQLite databases built from SchemaPile, with a median of 113 tables and 538 columns per schema. It comes from the paper "Towards Specialized Text-to-SQL Models with SQaLe" by Cornelius Wolff, Daniel Gomm and Madelon Hulsebos (University of Amsterdam and Centrum Wiskunde & Informatica, 2026), which also trains Qwen3.5-2B text-to-SQL agents on it with GRPO.
 
 - Every question comes in eight phrasings that share one gold SQL query, at a simple, moderate or hard difficulty.
 - Every gold query was executed on its populated database and accepted by an LLM judge.
 - The data is split by schema into train (8,836 databases, 169,277 question records) and test (423 databases, 8,100 question records).
 - The questions and the databases are two Hugging Face datasets that join on `schema_id`. Both are MIT licensed.
+
+## Paper
+
+- [Towards Specialized Text-to-SQL Models with SQaLe](https://trl-lab.github.io/sqale/assets/pdf/SQaLe-paper.pdf): the paper (PDF) by Cornelius Wolff, Daniel Gomm and Madelon Hulsebos, 2026
 
 ## Project page
 

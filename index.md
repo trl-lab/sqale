@@ -1,4 +1,4 @@
-# SQaLe: a large realistic dataset to empower small specialised text-to-SQL models
+# Towards Specialized Text-to-SQL Models with SQaLe
 
 Cornelius Wolff (1, 2), Daniel Gomm (1, 2), Madelon Hulsebos (2)
 (1) University of Amsterdam, (2) Centrum Wiskunde & Informatica
@@ -6,6 +6,7 @@ Preprint, 2026
 
 This is the plain-text version of the SQaLe project page at <https://trl-lab.github.io/sqale/>. The page draws its figures with JavaScript; here every figure is given as a table or a short description.
 
+- Paper (PDF): *Towards Specialized Text-to-SQL Models with SQaLe*, <https://trl-lab.github.io/sqale/assets/pdf/SQaLe-paper.pdf>
 - Questions and SQL: <https://huggingface.co/datasets/trl-lab/SQaLe-2-text-to-SQL-Queries>
 - Schemas and databases: <https://huggingface.co/datasets/trl-lab/SQaLe-2-text-to-SQL-Schemas>
 - Model: <https://huggingface.co/trl-lab/qwen3.5-2b-grpo-sqale>
@@ -161,13 +162,14 @@ Schemas that size do not come ready to use. The pipeline runs in five stages, an
 
 ## Cite
 
-If you use SQaLe, please cite this paper and the earlier workshop paper.
+If you use SQaLe, please cite the paper, [*Towards Specialized Text-to-SQL Models with SQaLe*](https://trl-lab.github.io/sqale/assets/pdf/SQaLe-paper.pdf), and the earlier workshop paper.
 
 ```bibtex
 @article{wolff2026sqale,
-  title   = {SQaLe: A Large Realistic Dataset to Empower Small Specialised Text-to-SQL Models},
+  title   = {Towards Specialized Text-to-SQL Models with SQaLe},
   author  = {Wolff, Cornelius and Gomm, Daniel and Hulsebos, Madelon},
   journal = {arXiv preprint},
+  url     = {https://trl-lab.github.io/sqale/assets/pdf/SQaLe-paper.pdf},
   year    = {2026}
 }
 

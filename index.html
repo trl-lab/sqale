@@ -13,7 +13,7 @@
   } catch (e) { /* storage blocked */ }
 })();
 </script>
-<title>SQaLe: a large realistic dataset for small text-to-SQL models</title>
+<title>Towards Specialized Text-to-SQL Models with SQaLe</title>
 <meta name="description" content="SQaLe is a semi-synthetic text-to-SQL dataset of 1,408,056 questions paired with SQL over 9,259 real-world schemas. A Qwen3.5-2B model trained on it with GRPO rises from 38.7% to 66.3% execution accuracy on the SQaLe test set.">
 <link rel="canonical" href="https://trl-lab.github.io/sqale/">
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
@@ -28,25 +28,33 @@
 <!-- Social previews -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="SQaLe">
-<meta property="og:title" content="SQaLe: a large realistic dataset for small text-to-SQL models">
+<meta property="og:title" content="Towards Specialized Text-to-SQL Models with SQaLe">
 <meta property="og:description" content="1,408,056 natural-language questions paired with SQL over 9,259 populated real-world schemas, and 2B text-to-SQL agents trained on it with GRPO.">
 <meta property="og:url" content="https://trl-lab.github.io/sqale/">
 <meta property="og:image" content="https://trl-lab.github.io/sqale/assets/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="SQaLe: a large realistic dataset to empower small specialised text-to-SQL models. 1,408,056 questions with SQL, 9,259 real-world schemas, 113 median tables per schema.">
+<meta property="og:image:alt" content="SQaLe: Towards Specialized Text-to-SQL Models with SQaLe. 1,408,056 questions with SQL, 9,259 real-world schemas, 113 median tables per schema.">
 <meta property="og:locale" content="en_US">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="SQaLe: a large realistic dataset for small text-to-SQL models">
+<meta name="twitter:title" content="Towards Specialized Text-to-SQL Models with SQaLe">
 <meta name="twitter:description" content="1,408,056 natural-language questions paired with SQL over 9,259 populated real-world schemas, and 2B text-to-SQL agents trained on it with GRPO.">
 <meta name="twitter:image" content="https://trl-lab.github.io/sqale/assets/og-image.png">
-<meta name="twitter:image:alt" content="SQaLe: a large realistic dataset to empower small specialised text-to-SQL models. 1,408,056 questions with SQL, 9,259 real-world schemas, 113 median tables per schema.">
-<!-- Citation metadata (Google Scholar, Zotero) -->
-<meta name="citation_title" content="SQaLe: A Large Realistic Dataset to Empower Small Specialised Text-to-SQL Models">
+<meta name="twitter:image:alt" content="SQaLe: Towards Specialized Text-to-SQL Models with SQaLe. 1,408,056 questions with SQL, 9,259 real-world schemas, 113 median tables per schema.">
+<!-- Citation metadata (Google Scholar, Zotero). citation_title must match the title printed in the PDF. -->
+<meta name="citation_title" content="Towards Specialized Text-to-SQL Models with SQaLe">
 <meta name="citation_author" content="Wolff, Cornelius">
+<meta name="citation_author_institution" content="University of Amsterdam">
+<meta name="citation_author_institution" content="Centrum Wiskunde &amp; Informatica">
 <meta name="citation_author" content="Gomm, Daniel">
+<meta name="citation_author_institution" content="University of Amsterdam">
+<meta name="citation_author_institution" content="Centrum Wiskunde &amp; Informatica">
 <meta name="citation_author" content="Hulsebos, Madelon">
+<meta name="citation_author_institution" content="Centrum Wiskunde &amp; Informatica">
 <meta name="citation_publication_date" content="2026">
+<meta name="citation_language" content="en">
+<meta name="citation_pdf_url" content="https://trl-lab.github.io/sqale/assets/pdf/SQaLe-paper.pdf">
+<meta name="citation_abstract_html_url" content="https://trl-lab.github.io/sqale/">
 <!-- Structured data: the paper, the two datasets (Google Dataset Search) and the library -->
 <script type="application/ld+json">
 {
@@ -56,7 +64,7 @@
    "@type": "WebPage",
    "@id": "https://trl-lab.github.io/sqale/#webpage",
    "url": "https://trl-lab.github.io/sqale/",
-   "name": "SQaLe: a large realistic dataset for small text-to-SQL models",
+   "name": "Towards Specialized Text-to-SQL Models with SQaLe",
    "inLanguage": "en",
    "description": "1,408,056 natural-language questions paired with SQL over 9,259 populated real-world schemas, and 2B text-to-SQL agents trained on it with GRPO.",
    "primaryImageOfPage": "https://trl-lab.github.io/sqale/assets/og-image.png",
@@ -75,8 +83,8 @@
   {
    "@type": "ScholarlyArticle",
    "@id": "https://trl-lab.github.io/sqale/#paper",
-   "headline": "SQaLe: A Large Realistic Dataset to Empower Small Specialised Text-to-SQL Models",
-   "name": "SQaLe: A Large Realistic Dataset to Empower Small Specialised Text-to-SQL Models",
+   "headline": "Towards Specialized Text-to-SQL Models with SQaLe",
+   "name": "Towards Specialized Text-to-SQL Models with SQaLe",
    "author": [
     {
      "@type": "Person",
@@ -125,6 +133,12 @@
    "datePublished": "2026",
    "inLanguage": "en",
    "url": "https://trl-lab.github.io/sqale/",
+   "isAccessibleForFree": true,
+   "encoding": {
+    "@type": "MediaObject",
+    "encodingFormat": "application/pdf",
+    "contentUrl": "https://trl-lab.github.io/sqale/assets/pdf/SQaLe-paper.pdf"
+   },
    "keywords": [
     "text-to-SQL",
     "NL2SQL",
@@ -570,7 +584,7 @@
   </div>
   <div class="mast-title">
     <h1 class="title">SQaLe</h1>
-    <p class="deck">A large realistic dataset to empower small specialised text-to-SQL models</p>
+    <p class="deck">Towards Specialized <span class="m">Text-to-SQL</span> Models with SQaLe</p>
   </div>
   <dl class="byline">
     <div class="by-col">
@@ -595,7 +609,7 @@
   </dl>
   <nav class="resources" aria-label="Paper, data, model and code">
     <ul>
-      <li><!-- TODO: arXiv URL --><a class="res" href="#"><svg class="res-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4"/><path d="M10 12h5M10 15.5h5"/></svg><span class="res-name">Paper</span><span class="res-sub">Preprint, 2026</span></a></li>
+      <li><a class="res" href="assets/pdf/SQaLe-paper.pdf" type="application/pdf" target="_blank" rel="noopener"><svg class="res-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4"/><path d="M10 12h5M10 15.5h5"/></svg><span class="res-name">Paper</span><span class="res-sub">Preprint · PDF</span></a></li>
       <li><a class="res" href="https://huggingface.co/datasets/trl-lab/SQaLe-2-text-to-SQL-Queries" target="_blank" rel="noopener"><svg class="res-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H10l-4.5 3.5V16H4z"/><path d="M8 9h8M8 12.2h5"/></svg><span class="res-name">Queries<svg class="res-ext" viewBox="0 0 10 10" aria-hidden="true"><path d="M3 2h5v5M8 2 2 8"/></svg></span><span class="res-sub">Questions and SQL · Hugging Face</span></a></li>
       <li><a class="res" href="https://huggingface.co/datasets/trl-lab/SQaLe-2-text-to-SQL-Schemas" target="_blank" rel="noopener"><svg class="res-icon" viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="6" rx="7" ry="2.6"/><path d="M5 6v12c0 1.4 3.1 2.6 7 2.6s7-1.2 7-2.6V6"/><path d="M5 12c0 1.4 3.1 2.6 7 2.6s7-1.2 7-2.6"/></svg><span class="res-name">Schemas<svg class="res-ext" viewBox="0 0 10 10" aria-hidden="true"><path d="M3 2h5v5M8 2 2 8"/></svg></span><span class="res-sub">Databases · Hugging Face</span></a></li>
       <li><a class="res" href="https://huggingface.co/trl-lab/qwen3.5-2b-grpo-sqale" target="_blank" rel="noopener"><svg class="res-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 20 7.5v9L12 21l-8-4.5v-9z"/><path d="M4 7.5 12 12l8-4.5M12 12v9"/></svg><span class="res-name">Model<svg class="res-ext" viewBox="0 0 10 10" aria-hidden="true"><path d="M3 2h5v5M8 2 2 8"/></svg></span><span class="res-sub">M<sub>SQaLe</sub> · Hugging Face</span></a></li>
@@ -802,7 +816,7 @@
 
     <section class="sec" id="cite" aria-labelledby="h-cite">
       <h2 id="h-cite">Cite</h2>
-      <p>If you use SQaLe, please cite this paper and the earlier workshop paper.</p>
+      <p>If you use SQaLe, please cite the paper, <a href="assets/pdf/SQaLe-paper.pdf" type="application/pdf" target="_blank" rel="noopener"><cite>Towards Specialized Text-to-SQL Models with SQaLe</cite></a> (PDF), and the earlier workshop paper.</p>
       <div class="bib wide">
         <div class="bib-head">
           <span class="label">BibTeX</span>

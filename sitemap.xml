@@ -2,7 +2,11 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://trl-lab.github.io/sqale/</loc>
-    <lastmod>2026-10-09</lastmod>
+    <lastmod>2026-11-02</lastmod>
+  </url>
+  <url>
+    <loc>https://trl-lab.github.io/sqale/assets/pdf/SQaLe-paper.pdf</loc>
+    <lastmod>2026-11-02</lastmod>
   </url>
   <url>
     <loc>https://trl-lab.github.io/sqale/record.html</loc>
